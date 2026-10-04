@@ -63,23 +63,17 @@ in {
     hidutil property --set '{"UserKeyMapping":${builtins.toJSON cfg.userKeyMapping}}'
   '');
 
-  config.environment.userLaunchAgents.keyboardRemapping = lib.mkIf cfg.enable {
-    enable = true;
-    text = ''
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-          <key>Label</key>
-          <string>com.nix-darwin.keyboardRemapper</string>
-          <key>ProgramArguments</key>
-          <array>
-              <string>hidutil property --set '{"UserKeyMapping":${builtins.toJSON cfg.userKeyMapping}}'</string>
-          </array>
-          <key>KeepAlive</key>
-          <true/>
-      </dict>
-      </plist>
-    '';
+  # hidutil mappings are lost on reboot, so re-apply them once per login.
+  # One argv element per argument (launchd execs ProgramArguments directly, no
+  # shell), and no KeepAlive: hidutil exits immediately and would be respawned forever.
+  config.launchd.user.agents.keyboardRemapping = lib.mkIf cfg.enable {
+    serviceConfig = {
+      Label = "com.nix-darwin.keyboardRemapper";
+      ProgramArguments = [
+        "/usr/bin/hidutil" "property" "--set"
+        (builtins.toJSON { UserKeyMapping = cfg.userKeyMapping; })
+      ];
+      RunAtLoad = true;
+    };
   };
 }

@@ -43,7 +43,7 @@ in {
       eval "$(zellij setup --generate-auto-start zsh)"
     '';
     common.shell.bash.bashrc = lib.mkIf cfg.zellij.auto_start ''
-      eval "$(zellij setup --generate-auto-start zsh)"
+      eval "$(zellij setup --generate-auto-start bash)"
     '';
 
     # yazi : terminal file manager and viewer (enables lots of features, batch rename, archiving, trash bin, etc...)
@@ -52,7 +52,7 @@ in {
       package = cfg.yazi.package;
       shellWrapperName = "y";
     };
-    xdg.configFile."yazi".source = lib.mkIf cfg.starship.enable_config (
+    xdg.configFile."yazi".source = lib.mkIf cfg.yazi.enable_config (
       config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/term/yazi.d"
     );
 

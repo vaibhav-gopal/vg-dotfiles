@@ -6,10 +6,10 @@ in {
     enable = usrlib.mkEnableOptionTrue "enable graphics hardware acceleration";
     video_drivers = usrlib.mkListOfEnumOption "xserver graphics drivers to use, in order (don't mix free MESA-based w/ unfree proprietary drivers)" ["modesetting" "fbdev"] ["nvidia" "amdgpu" "modesetting" "fbdev"];
     nvidia = {
-      enable = usrlib.mkEnableOptionTrue "enable nvidia driver user configuration (factory config will be automatically enabled if hardware present regardless of this option)";
+      enable = usrlib.mkEnableOptionFalse "enable nvidia driver user configuration (factory config will be automatically enabled if hardware present regardless of this option)";
       package = usrlib.mkPackageOption "The nvidia driver version package to use" config.boot.kernelPackages.nvidiaPackages.stable;
       prime = {
-        enable = usrlib.mkEnableOptionTrue "enable nvidia PRIME iGPU/GPU sync";
+        enable = usrlib.mkEnableOptionFalse "enable nvidia PRIME iGPU/GPU sync";
         nvidiaBusId = usrlib.mkStringOption "The PCI Bus ID for an Nvidia GPU for Nvidia PRIME" "";
         amdgpuBusId = usrlib.mkStringOption "The PCI Bus ID for an AMD iGPU/GPU for Nvidia PRIME" "";
         intelBusId = usrlib.mkStringOption "The PCI Bus ID for an Intel iGPU/GPU for Nvidia PRIME" "";
