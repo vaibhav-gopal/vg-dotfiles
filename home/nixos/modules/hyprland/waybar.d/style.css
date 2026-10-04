@@ -1,0 +1,182 @@
+/* ─── waybar : Kanagawa Dragon ───────────────────────────────────────────────
+ * Three floating pills (left / centre / right) over frosted glass (layerrule
+ * blur in hypr.d/rules.conf). Reloads on save (reload_style_on_change).
+ *
+ * palette: ink #181616 #282727 #393836 #625e5a · paper #c5c9c5
+ *          sea #8ba4b0 #7fb4ca #6a9589 · violet #8992a7 · red #c4746e
+ *          yellow #c4b28a #ff9e3b · green #87a987 · orange #b6927b · pink #a292a3
+ */
+
+* {
+  font-family: "JetBrainsMono Nerd Font", "Noto Sans CJK JP", sans-serif;
+  font-size: 13px;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+}
+
+window#waybar {
+  background: transparent;
+  color: #c5c9c5;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+  background: rgba(24, 22, 22, 0.82);
+  border: 1px solid #393836;
+  border-radius: 12px;
+  padding: 0 6px;
+}
+
+#custom-kraken,
+#workspaces,
+#window,
+#clock,
+#tray,
+#custom-dnd,
+#custom-nightlight,
+#cpu,
+#memory,
+#wireplumber,
+#backlight,
+#network,
+#bluetooth,
+#battery,
+#custom-power {
+  padding: 0 8px;
+}
+
+/* ── left ── */
+
+#custom-kraken {
+  color: #7fb4ca;
+  font-size: 17px;
+}
+
+#workspaces button {
+  color: #625e5a;
+  background: transparent;
+  padding: 0 5px;
+  font-size: 14px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+#workspaces button.active {
+  color: #8ba4b0;
+  box-shadow: inset 0 -2px #8ba4b0;
+}
+
+#workspaces button.urgent {
+  color: #c4746e;
+}
+
+#workspaces button:hover {
+  color: #c5c9c5;
+  background: #282727;
+}
+
+#window {
+  color: #9e9b93;
+}
+
+window#waybar.empty #window {
+  padding: 0;
+}
+
+/* ── centre ── */
+
+#clock {
+  color: #c4b28a;
+  font-weight: bold;
+}
+
+/* ── right ── */
+
+#custom-dnd.off,
+#custom-nightlight.off {
+  color: #625e5a;
+}
+
+#custom-dnd.on {
+  color: #c4746e;
+}
+
+#custom-nightlight.on {
+  color: #ff9e3b;
+}
+
+#cpu {
+  color: #b6927b;
+}
+
+#memory {
+  color: #a292a3;
+}
+
+#wireplumber {
+  color: #8992a7;
+}
+
+#wireplumber.muted {
+  color: #625e5a;
+}
+
+#backlight {
+  color: #c4b28a;
+}
+
+#network {
+  color: #87a987;
+}
+
+#network.disconnected {
+  color: #c4746e;
+}
+
+#bluetooth {
+  color: #8ba4b0;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+  color: #625e5a;
+}
+
+#battery {
+  color: #87a987;
+}
+
+#battery.warning:not(.charging) {
+  color: #c4b28a;
+}
+
+@keyframes ebb {
+  to {
+    color: #c5c9c5;
+  }
+}
+
+#battery.critical:not(.charging) {
+  color: #c4746e;
+  animation: ebb 1s ease-in-out infinite alternate;
+}
+
+#custom-power {
+  color: #c4746e;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+}
+
+tooltip {
+  background: #181616;
+  border: 1px solid #8ba4b0;
+  border-radius: 8px;
+}
+
+tooltip label {
+  color: #c5c9c5;
+}

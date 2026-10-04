@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs-unstable, ... }:
 {
   # manually add the systems hardware config!
   imports = [
@@ -6,6 +6,12 @@
   ];
 
   config = {
+    # Hyprland as the daily driver, Plasma kept as a fallback session at the SDDM login screen
+    core.desktop.sessions = [ "hyprland" "plasma" ];
+
+    # use the keyring for saved logins (Chromium doesn't recognise Hyprland, see home/nixos/vgkraken)
+    modules.vivaldi.package = pkgs-unstable.vivaldi.override { commandLineArgs = "--password-store=gnome-libsecret"; };
+
     # Radeon RX 7800 XT (RDNA3) ; open amdgpu + mesa, nothing proprietary
     core.graphics.amd = {
       enable = true;

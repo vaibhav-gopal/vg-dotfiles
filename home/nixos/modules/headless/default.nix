@@ -12,6 +12,7 @@ in {
     nixtype.discord.enable = lib.mkDefault false;
     nixtype.hyprland.enable = lib.mkDefault false;
     nixtype.minecraft.enable = lib.mkDefault false;
+    nixtype.proton-pass.enable = lib.mkDefault false;
     nixtype.spotify.enable = lib.mkDefault false;
     nixtype.vscode.enable = lib.mkDefault false;
 

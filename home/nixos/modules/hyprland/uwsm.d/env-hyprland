@@ -1,0 +1,23 @@
+# Sourced by UWSM for the Hyprland session only (POSIX sh).
+# ~/.config/uwsm/env (home-manager session vars) is sourced first, for every session.
+
+# GPU: Radeon RX 7800 XT on mesa ; VA-API (radeonsi) and Vulkan (RADV) need no variables.
+# If the CPU's iGPU is also enabled and Hyprland feels sluggish, it may be rendering on the
+# iGPU: check `ls -l /dev/dri/by-path`, then pin the 7800 XT's cardN first, e.g.
+#   export AQ_DRM_DEVICES=/dev/dri/card1
+# (or just disable the iGPU in the BIOS)
+
+# toolkits: prefer wayland, fall back to X11
+export QT_QPA_PLATFORM="wayland;xcb"
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export GDK_BACKEND="wayland,x11,*"
+
+# Qt look (style, kanagawa palette, icons) comes from ~/.config/qt6ct ; Hyprland only, Plasma keeps its own
+export QT_QPA_PLATFORMTHEME=qt6ct
+
+# cursor (hyprctl setcursor in autostart.conf covers hyprland itself)
+export XCURSOR_THEME=Bibata-Modern-Classic
+export XCURSOR_SIZE=24
+
+# grimblast saves here
+export XDG_SCREENSHOTS_DIR="$HOME/Pictures/Screenshots"
