@@ -1,0 +1,4 @@
+{...}:
+{
+  nixtype.headless.enable = true;
+}

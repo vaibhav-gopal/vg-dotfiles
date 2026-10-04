@@ -29,6 +29,22 @@
           homedirectory = "/home/vaibhav";
           nixType = "nixos";
         };
+        vgsquid-azul = {
+          username = "vaibhav";
+          system = "x86_64-linux";
+          hostname = "vgsquid-azul";
+          version = "25.11";
+          homedirectory = "/home/vaibhav";
+          nixType = "nixos";
+        };
+        vgsquid-onyx = {
+          username = "vaibhav";
+          system = "x86_64-linux";
+          hostname = "vgsquid-onyx";
+          version = "25.11";
+          homedirectory = "/home/vaibhav";
+          nixType = "nixos";
+        };
         vgwsl2 = {
           username = "vaibhav";
           hostname = "vgwsl2";

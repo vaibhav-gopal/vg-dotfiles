@@ -61,8 +61,8 @@ in {
       enableSSHSupport = true;
     };
 
-    # Firefox
-    programs.firefox.enable = true;
+    # Firefox (only with a desktop to run it in)
+    programs.firefox.enable = config.core.desktop.enable;
 
     # Git
     programs.git.enable = true;

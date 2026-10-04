@@ -9,6 +9,7 @@
 
     # MODULES
     ./steam
+    ./tailscale
     ./vivaldi
   ];
 }
