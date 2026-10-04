@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 {
   # manually add the systems hardware config!
   imports = [
@@ -6,18 +6,11 @@
   ];
 
   config = {
-    core.graphics = {
+    # Radeon RX 7800 XT (RDNA3) ; open amdgpu + mesa, nothing proprietary
+    core.graphics.amd = {
       enable = true;
-      video_drivers = ["nvidia" "amdgpu"];
-      nvidia = {
-        enable = true;
-        package = config.boot.kernelPackages.nvidiaPackages.stable;
-        prime = {
-          enable = true;
-          nvidiaBusId = "PCI:1:0:0";
-          amdgpuBusId = "PCI:115:0:0";
-        };
-      };
+      lact.enable = true; # fan curves / power limits / OC
+      opencl.enable = true; # ROCm compute
     };
 
     # ISSUE:

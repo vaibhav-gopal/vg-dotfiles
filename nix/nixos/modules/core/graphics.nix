@@ -1,4 +1,4 @@
-{ config, lib, usrlib, ... }:
+{ config, lib, usrlib, pkgs, username, ... }:
 let
   cfg = config.core.graphics;
 in {
@@ -15,6 +15,11 @@ in {
         intelBusId = usrlib.mkStringOption "The PCI Bus ID for an Intel iGPU/GPU for Nvidia PRIME" "";
       };
     };
+    amd = {
+      enable = usrlib.mkEnableOptionFalse "enable AMD GPU configuration (amdgpu early KMS + 32-bit userspace for Steam/Proton) ; mesa RADV / radeonsi need no extra setup";
+      lact.enable = usrlib.mkEnableOptionFalse "LACT: GPU monitoring, fan curves, power limits, overclock / undervolt (GUI + lactd daemon ; `lact cli` on headless hosts). Turns on amdgpu overdrive, which RDNA3 fan control needs";
+      opencl.enable = usrlib.mkEnableOptionFalse "ROCm OpenCL runtime for GPU compute (blender, darktable, hashcat, ...) ; check it with `clinfo`";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -23,6 +28,20 @@ in {
 
     # xserver graphics drivers to use (don't combine free ; mesa-based ; with proprietary drivers ; nvidia/amd)
     services.xserver.videoDrivers = cfg.video_drivers;
+
+    # load amdgpu in the initrd: native resolution from the first boot message, no modeset flicker at login
+    hardware.amdgpu.initrd.enable = lib.mkIf cfg.amd.enable true;
+    # 32-bit mesa for Steam / Proton / Wine (programs.steam turns this on too, this covers everything else)
+    hardware.graphics.enable32Bit = lib.mkIf cfg.amd.enable true;
+
+    # LACT daemon (applies saved fan / power profiles at boot) + overdrive (amdgpu.ppfeaturemask) so it may change them
+    services.lact.enable = lib.mkIf (cfg.amd.enable && cfg.amd.lact.enable) true;
+    hardware.amdgpu.overdrive.enable = lib.mkIf (cfg.amd.enable && cfg.amd.lact.enable) true;
+
+    # ROCm OpenCL ; compute needs /dev/kfd + the render node, owned by the render / video groups
+    hardware.amdgpu.opencl.enable = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) true;
+    environment.systemPackages = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) [ pkgs.clinfo ];
+    users.users.${username}.extraGroups = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) [ "render" "video" ];
 
     # enable nvidia drivers (PRIME options/service allows both nvidia + amd iGPU runtime switching for performance / efficiency)
     hardware.nvidia = lib.mkIf cfg.nvidia.enable {
