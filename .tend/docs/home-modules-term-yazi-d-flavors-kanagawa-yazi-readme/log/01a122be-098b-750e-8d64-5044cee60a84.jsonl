@@ -1,0 +1,16 @@
+{"batch":"01a122be-098b-750e-8d64-5044cee60a84","author":"user","at":1791584242059,"message":"read home/modules/term/yazi.d/flavors/kanagawa.yazi/README.md"}
+{"op":"doc.create","title":"","kind":"written","source":"home/modules/term/yazi.d/flavors/kanagawa.yazi/README.md"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-50379f5137f1","section":null,"index":0,"text":"<div align=\"center\">\n  <img src=\"https://github.com/sxyazi/yazi/blob/main/assets/logo.png?raw=true\" alt=\"Yazi logo\" width=\"20%\">\n</div>"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-50387c792649","section":null,"index":1,"text":"<h3 align=\"center\">\n    Kanagawa Flavor for <a href=\"https://github.com/sxyazi/yazi\">Yazi</a>\n</h3>"}
+{"op":"section.add","id":"01a122be-098b-750e-8d64-503927091b97","parent":null,"index":2,"title":"👀 Preview"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-503a6a246ca5","section":"01a122be-098b-750e-8d64-503927091b97","index":0,"text":"<img src=\"preview.png\" width=\"600\" />"}
+{"op":"section.add","id":"01a122be-098b-750e-8d64-503b8c652cbf","parent":null,"index":3,"title":"🎨 Installation"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-503c6d2e95fb","section":"01a122be-098b-750e-8d64-503b8c652cbf","index":0,"text":"```bash\nya pkg add dangooddd/kanagawa\n```"}
+{"op":"section.add","id":"01a122be-098b-750e-8d64-503db6a9bafb","parent":null,"index":4,"title":"⚙️ Usage"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-503ee46fed26","section":"01a122be-098b-750e-8d64-503db6a9bafb","index":0,"text":"> [!Note]\n> To achieve the look like in the screenshot you also need to install\n> [full-border](https://github.com/yazi-rs/plugins/tree/main/full-border.yazi) plugin!"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-503fa113a537","section":"01a122be-098b-750e-8d64-503db6a9bafb","index":1,"text":"Add these lines to your `theme.toml` configuration file to use it:"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-50402d577ab5","section":"01a122be-098b-750e-8d64-503db6a9bafb","index":2,"text":"```toml\n[flavor]\ndark = \"kanagawa\"\n```"}
+{"op":"section.add","id":"01a122be-098b-750e-8d64-504120d1bb5c","parent":null,"index":5,"title":"📜 License"}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-5042eff232ce","section":"01a122be-098b-750e-8d64-504120d1bb5c","index":0,"text":"The flavor is MIT-licensed, and the included tmTheme is also MIT-licensed."}
+{"op":"block.add","id":"01a122be-098b-750e-8d64-50430978b8a3","section":"01a122be-098b-750e-8d64-504120d1bb5c","index":1,"text":"Check the [LICENSE](LICENSE) and [LICENSE-tmtheme](LICENSE-tmtheme) file for more details."}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/home/modules/term/yazi.d/flavors/kanagawa.yazi/README.md","at":"0299a4c373e1d9bf167f7ec512f523835aa2da83","checked":"2026-10-09"}]}

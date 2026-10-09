@@ -1,0 +1,3 @@
+{"batch":"01a122be-087d-74f5-8ea4-fea61719c92b","author":"user","at":1791584241789,"message":"read home/README.md"}
+{"op":"doc.create","title":"DESIGN PHILOSOPHY","kind":"written","source":"home/README.md"}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/home/README.md","at":"3caa93e7047c5bbe6ec8caa39590771f19bb4ea2","checked":"2026-10-09"}]}

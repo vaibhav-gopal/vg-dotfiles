@@ -1,0 +1,2 @@
+{"batch":"01a12288-ab12-734d-8c7a-b3d796f1fa73","after":"01a12286-80a8-7770-bda8-1999cd0c9ab7","author":"user","at":1791580744466,"message":"Licensed GPL-3.0-only WITH AdditionRef-Open-Project-Exception-1.0 OR LicenseRef-Royalty-Free-1.0 OR LicenseRef-Commercial-1.0"}
+{"op":"doc.set","path":"extends.toml","text":"baseline = \"../vg-paradigms\"\nprofiles = [\"nix\"]\nmodules = []\n\n[license]\ncombo = \"library\"\n"}

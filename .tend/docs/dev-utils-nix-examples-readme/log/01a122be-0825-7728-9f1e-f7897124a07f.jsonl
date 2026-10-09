@@ -1,0 +1,6 @@
+{"batch":"01a122be-0825-7728-9f1e-f7897124a07f","author":"user","at":1791584241701,"message":"read dev-utils/nix-examples/README.md"}
+{"op":"doc.create","title":"Development Examples","kind":"written","source":"dev-utils/nix-examples/README.md"}
+{"op":"block.add","id":"01a122be-0825-7728-9f1e-f786e80f1829","section":null,"index":0,"text":"Not intended for direct copy paste"}
+{"op":"block.add","id":"01a122be-0825-7728-9f1e-f78725d2ff75","section":null,"index":1,"text":"More of a learning exercise"}
+{"op":"block.add","id":"01a122be-0825-7728-9f1e-f788aa2316b7","section":null,"index":2,"text":"*.nobuild.nix means the flake has syntax errors that will not compile and needs user tweaks to make it work"}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/dev-utils/nix-examples/README.md","at":"3274e774c5869c18ce2365bb10756c797de20714","checked":"2026-10-09"}]}

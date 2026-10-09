@@ -1,0 +1,17 @@
+{"batch":"01a122be-08d5-7780-bd8a-759822c6561c","author":"user","at":1791584241877,"message":"read home/modules/term/yazi.d/flavors/flexoki-dark.yazi/README.md"}
+{"op":"doc.create","title":"","kind":"written","source":"home/modules/term/yazi.d/flavors/flexoki-dark.yazi/README.md"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-758ab90f4158","section":null,"index":0,"text":"<div align=\"center\">\n  <img src=\"https://github.com/sxyazi/yazi/blob/main/assets/logo.png?raw=true\" alt=\"Yazi logo\" width=\"20%\">\n</div>"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-758b3e5e2eb2","section":null,"index":1,"text":"<h3 align=\"center\">\n\tFlexoki Dark Flavor for <a href=\"https://github.com/sxyazi/yazi\">Yazi</a>\n</h3>"}
+{"op":"section.add","id":"01a122be-08d5-7780-bd8a-758c934fa669","parent":null,"index":2,"title":"👀 Preview"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-758d394a1d31","section":"01a122be-08d5-7780-bd8a-758c934fa669","index":0,"text":"<img src=\"preview.png\" width=\"600\" />"}
+{"op":"section.add","id":"01a122be-08d5-7780-bd8a-758ef70a7e29","parent":null,"index":3,"title":"🎨 Installation"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-758fc82edd17","section":"01a122be-08d5-7780-bd8a-758ef70a7e29","index":0,"text":"```sh\nya pkg add gosxrgxx/flexoki-dark\n```"}
+{"op":"section.add","id":"01a122be-08d5-7780-bd8a-7590a07fd0b3","parent":null,"index":4,"title":"⚙️ Usage"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-759189132f6b","section":"01a122be-08d5-7780-bd8a-7590a07fd0b3","index":0,"text":"To set it as your dark flavor, change the content of your `theme.toml` to:"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-7592090c2175","section":"01a122be-08d5-7780-bd8a-7590a07fd0b3","index":1,"text":"```toml\n[flavor]\ndark = \"flexoki-dark\"\n```"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-75935bf78d18","section":"01a122be-08d5-7780-bd8a-7590a07fd0b3","index":2,"text":"Make sure your `theme.toml` doesn't contain anything other than `[flavor]`, unless you want to override certain styles of this flavor."}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-75942d68c472","section":"01a122be-08d5-7780-bd8a-7590a07fd0b3","index":3,"text":"See the [Yazi flavor documentation](https://yazi-rs.github.io/docs/flavors/overview) for more details."}
+{"op":"section.add","id":"01a122be-08d5-7780-bd8a-7595735c75fe","parent":null,"index":5,"title":"📜 License"}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-759682dd1dd4","section":"01a122be-08d5-7780-bd8a-7595735c75fe","index":0,"text":"The flavor is MIT-licensed, and the included tmTheme is also MIT-licensed."}
+{"op":"block.add","id":"01a122be-08d5-7780-bd8a-759777e7053e","section":"01a122be-08d5-7780-bd8a-7595735c75fe","index":1,"text":"Check the [LICENSE](LICENSE) and [LICENSE-tmtheme](LICENSE-tmtheme) file for more details."}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/home/modules/term/yazi.d/flavors/flexoki-dark.yazi/README.md","at":"0299a4c373e1d9bf167f7ec512f523835aa2da83","checked":"2026-10-09"}]}

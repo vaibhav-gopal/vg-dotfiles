@@ -1,0 +1,25 @@
+{"batch":"01a12289-9a3a-730a-ad28-f024b32a9f73","after":"01a12288-ab12-734d-8c7a-b3d796f1fa73","author":"scan:adopt","at":1791580805689,"message":"The first draft of dotfiles's design, from its code: a part for each folder of code no node owns, linked to it; each still needs its intent (proposal 01a12288-d78a-77ae-b836-2a5f903889e1, proposed by scan:adopt, accepted by user)"}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a05c4f0ab3c9","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"core","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a05c4f0ab3c9","link":{"kind":"path","value":"nix/nixos/modules/core/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a05ddb2f40a5","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"modules","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a05ddb2f40a5","link":{"kind":"path","value":"nix/modules/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a05eb4f89a76","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"nix nix-darwin modules core","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a05eb4f89a76","link":{"kind":"path","value":"nix/nix-darwin/modules/core/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a05f1401bdd6","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"home modules","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a05f1401bdd6","link":{"kind":"path","value":"home/modules/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a060acccb6ce","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"nix nixos-wsl modules core","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a060acccb6ce","link":{"kind":"path","value":"nix/nixos-wsl/modules/core/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a0616681149c","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"vgkraken","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a0616681149c","link":{"kind":"path","value":"nix/nixos/vgkraken/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a0626362312b","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"base","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a0626362312b","link":{"kind":"path","value":"dev-utils/nix-examples/base/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a06351823a0b","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"fhs","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a06351823a0b","link":{"kind":"path","value":"dev-utils/nix-examples/fhs/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a064076fc0c5","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"stdenv","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a064076fc0c5","link":{"kind":"path","value":"dev-utils/nix-examples/stdenv/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a0659b9316dc","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"python","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a0659b9316dc","link":{"kind":"path","value":"dev-utils/nix-templates/python/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a066c5288a85","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"home","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a066c5288a85","link":{"kind":"path","value":"home/*"}}
+{"op":"node.add","id":"01a12288-d789-721b-b181-a067ad86d1d8","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"bun","kind":"component","intent":null,"status":"building"}
+{"op":"node.code.link","node":"01a12288-d789-721b-b181-a067ad86d1d8","link":{"kind":"path","value":"home/modules/bun/*"}}

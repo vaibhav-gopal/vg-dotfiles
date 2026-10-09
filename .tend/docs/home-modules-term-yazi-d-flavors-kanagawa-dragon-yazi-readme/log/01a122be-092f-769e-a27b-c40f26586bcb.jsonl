@@ -1,0 +1,15 @@
+{"batch":"01a122be-092f-769e-a27b-c40f26586bcb","author":"user","at":1791584241967,"message":"read home/modules/term/yazi.d/flavors/kanagawa-dragon.yazi/README.md"}
+{"op":"doc.create","title":"","kind":"written","source":"home/modules/term/yazi.d/flavors/kanagawa-dragon.yazi/README.md"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c403bf3e1a9f","section":null,"index":0,"text":"<div align=\"center\">\n  <img src=\"https://github.com/sxyazi/yazi/blob/main/assets/logo.png?raw=true\" alt=\"Yazi logo\" width=\"20%\">\n</div>"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c40430af3a75","section":null,"index":1,"text":"<h3 align=\"center\">\n    Kanagawa Dragon Flavor for <a href=\"https://github.com/sxyazi/yazi\">Yazi</a>\n</h3>"}
+{"op":"section.add","id":"01a122be-092f-769e-a27b-c405c408c066","parent":null,"index":2,"title":"👀 Preview"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c4064bc3c642","section":"01a122be-092f-769e-a27b-c405c408c066","index":0,"text":"<img src=\"preview.png\" width=\"600\" />"}
+{"op":"section.add","id":"01a122be-092f-769e-a27b-c407d9cf1320","parent":null,"index":3,"title":"🎨 Installation"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c4083fbfaaca","section":"01a122be-092f-769e-a27b-c407d9cf1320","index":0,"text":"```bash\nya pack -a marcosvnmelo/kanagawa-dragon\n```"}
+{"op":"section.add","id":"01a122be-092f-769e-a27b-c40907e37220","parent":null,"index":4,"title":"⚙️ Usage"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c40a39889736","section":"01a122be-092f-769e-a27b-c40907e37220","index":0,"text":"Add these lines to your `theme.toml` configuration file to use it:"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c40bda704536","section":"01a122be-092f-769e-a27b-c40907e37220","index":1,"text":"```toml\n[flavor]\ndark = \"kanagawa-dragon\"\n```"}
+{"op":"section.add","id":"01a122be-092f-769e-a27b-c40cf35cde14","parent":null,"index":5,"title":"📜 License"}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c40d26024b15","section":"01a122be-092f-769e-a27b-c40cf35cde14","index":0,"text":"The flavor is MIT-licensed, and the included tmTheme is also MIT-licensed."}
+{"op":"block.add","id":"01a122be-092f-769e-a27b-c40eae5d037e","section":"01a122be-092f-769e-a27b-c40cf35cde14","index":1,"text":"Check the [LICENSE](LICENSE) and [LICENSE-tmtheme](LICENSE-tmtheme) file for more details."}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/home/modules/term/yazi.d/flavors/kanagawa-dragon.yazi/README.md","at":"0299a4c373e1d9bf167f7ec512f523835aa2da83","checked":"2026-10-09"}]}

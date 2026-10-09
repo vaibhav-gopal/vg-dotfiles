@@ -1,0 +1,2 @@
+{"batch":"01a12285-3830-73f2-b3ac-41f4eba01a27","author":"user","at":1791580518448,"message":"start the design of dotfiles"}
+{"op":"node.add","id":"01a12285-3830-73f2-b3ac-41f3fb692807","parent":null,"name":"dotfiles","kind":"area","intent":"Declarative config for every machine Vaibhav owns: NixOS (vgkraken desktop, vgsquid-azul/onyx headless servers, vgnixmini), NixOS-WSL (vgwsl2) and nix-darwin (vgmacbook), with a shared home-manager layer and live-edited *.d config files","status":"building"}

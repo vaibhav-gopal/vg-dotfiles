@@ -1,0 +1,6 @@
+baseline = "../vg-paradigms"
+profiles = ["nix"]
+modules = []
+
+[license]
+combo = "library"

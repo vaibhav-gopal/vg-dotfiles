@@ -1,0 +1,17 @@
+{"batch":"01a122be-09e5-72a0-94d6-952052cc9f26","author":"user","at":1791584242149,"message":"read home/modules/term/yazi.d/flavors/vscode-dark-modern.yazi/README.md"}
+{"op":"doc.create","title":"","kind":"written","source":"home/modules/term/yazi.d/flavors/vscode-dark-modern.yazi/README.md"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-9512766bcf6a","section":null,"index":0,"text":"<div align=\"center\">\n<img src=\"https://github.com/sxyazi/yazi/blob/main/assets/logo.png?raw=true\" alt=\"Yazi logo\" width=\"20%\">\n<h3>\n\tVSCode Dark Modern Flavor for <a href=\"https://github.com/sxyazi/yazi\">Yazi</a>\n</h3>\n<a>\n\tThis <a href=\"https://github.com/sxyazi/yazi\">Yazi</a>  flavor matches the <a href=\"https://code.visualstudio.com/\">Visual Studio Code</a> default theme.\n</a>\n</div>"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-9513bf60872e","parent":null,"index":1,"title":"👀 Preview"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-9514841aed34","section":"01a122be-09e5-72a0-94d6-9513bf60872e","index":0,"text":"<img src=\"./preview.png\" width=\"600\" />"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-9515caa54abc","parent":null,"index":2,"title":"🎨 Installation"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-9516d20d96d7","parent":"01a122be-09e5-72a0-94d6-9515caa54abc","index":0,"title":"Yazi CLI"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-95175a99fc1e","section":"01a122be-09e5-72a0-94d6-9516d20d96d7","index":0,"text":"```bash\n# v25.5.28+\nya pkg add 956MB/vscode-dark-modern\n\n# pre v25.5.28 (deprecated)\nya pack -a 956MB/vscode-dark-modern\n```"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-951813879412","parent":"01a122be-09e5-72a0-94d6-9515caa54abc","index":1,"title":"Manual"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-9519d9d0aa77","section":"01a122be-09e5-72a0-94d6-951813879412","index":0,"text":"```bash\n# Linux/macOS\ngit clone https://github.com/956MB/vscode-dark-modern.yazi.git ~/.config/yazi/flavors/vscode-dark-modern.yazi\n\n# Windows\ngit clone https://github.com/956MB/vscode-dark-modern.yazi.git %AppData%\\yazi\\config\\flavors\\vscode-dark-modern.yazi\n```"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-951a4c278c29","parent":null,"index":3,"title":"⚙️ Usage"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-951b7892753f","section":"01a122be-09e5-72a0-94d6-951a4c278c29","index":0,"text":"Add the these lines to your `theme.toml` configuration file to use it:"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-951c33bcf642","section":"01a122be-09e5-72a0-94d6-951a4c278c29","index":1,"text":"```toml\n[flavor]\ndark = \"vscode-dark-modern\"\n```"}
+{"op":"section.add","id":"01a122be-09e5-72a0-94d6-951d157209f0","parent":null,"index":4,"title":"📜 License"}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-951ebf48adf8","section":"01a122be-09e5-72a0-94d6-951d157209f0","index":0,"text":"The flavor is MIT-licensed, and the included tmTheme is also MIT-licensed."}
+{"op":"block.add","id":"01a122be-09e5-72a0-94d6-951ff4601dae","section":"01a122be-09e5-72a0-94d6-951d157209f0","index":1,"text":"Check the [LICENSE](LICENSE) and [LICENSE-tmtheme](LICENSE-tmtheme) file for more details."}
+{"op":"doc.made_from","basis":[{"of":"C:/vg-workspace/dotfiles/home/modules/term/yazi.d/flavors/vscode-dark-modern.yazi/README.md","at":"0299a4c373e1d9bf167f7ec512f523835aa2da83","checked":"2026-10-09"}]}
