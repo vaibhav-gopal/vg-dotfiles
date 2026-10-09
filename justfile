@@ -231,6 +231,11 @@ homesession:
     source {{justfile_directory()/scripts-dir/eval-script}} && \
     nix_eval "$(just --justfile {{justfile()}} _{{nixtype}}_home)" "home.sessionVariables"
 
+# Evaluate every machine and home config in the flake (nothing is built ; pending = no hardware-configuration.nix yet)
+[group('eval')]
+check-hosts:
+    bash {{justfile_directory()/scripts-dir}}/check-hosts.sh
+
 # Validate the currently selected flake config from .env without switching the machine
 [group('eval')]
 validate:
