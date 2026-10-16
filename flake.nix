@@ -1,3 +1,5 @@
+# root dev shell for working on this repo (just and friends), built on flake-utils.
+# tend: vg-dotfiles/Composition
 {
   description = "Starter environment for vg-dotfiles";
   inputs = {

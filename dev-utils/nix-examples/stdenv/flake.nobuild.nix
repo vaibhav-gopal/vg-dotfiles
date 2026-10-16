@@ -1,3 +1,5 @@
+# flake example of a stdenv derivation (kept as .nobuild.nix so it is not picked up as a flake).
+# tend: vg-dotfiles/Dev utils/stdenv
 {
   description = "A standard environment derivation example ; For all packages included in the standard environment see here: https://ryantm.github.io/nixpkgs/stdenv/stdenv/#chap-stdenv";
   inputs = {

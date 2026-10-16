@@ -1,3 +1,5 @@
+# the skhd hotkey daemon and its shortcut config.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

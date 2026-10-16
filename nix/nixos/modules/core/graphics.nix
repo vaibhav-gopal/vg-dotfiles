@@ -1,3 +1,5 @@
+# graphics acceleration and drivers: AMD (early KMS, optional LACT + overdrive, ROCm OpenCL) and NVIDIA (incl. PRIME), each opt-in.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, username, ... }:
 let
   cfg = config.core.graphics;

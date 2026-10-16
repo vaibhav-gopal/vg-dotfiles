@@ -8,6 +8,7 @@
 # Launched from the Dock there is no stdin/tty, so anything interactive must
 # either set `terminal = true` (runs inside the terminal emulator) or take its
 # secrets from the macOS Keychain - see the freerdp bridge at the bottom.
+# tend: vg-dotfiles/nix-darwin/Apps
 { config, lib, pkgs, usrlib, ... }:
 
 let

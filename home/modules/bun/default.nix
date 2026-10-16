@@ -1,6 +1,8 @@
+# bun, the JavaScript runtime and package manager, with its bunfig settings.
+# tend: vg-dotfiles/Home/bun
 { config, lib, pkgs, usrlib, ... }:
 
-let 
+let
   cfg = config.features.bun;
 in {
   options.features.bun = {

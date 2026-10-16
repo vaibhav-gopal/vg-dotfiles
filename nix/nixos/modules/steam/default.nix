@@ -1,3 +1,5 @@
+# the Steam gaming client.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, usrlib, ... }:
 let
   cfg = config.modules.steam;

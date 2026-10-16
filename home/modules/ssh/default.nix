@@ -1,6 +1,8 @@
+# ssh client configuration, with keep-alives on by default.
+# tend: vg-dotfiles/Home/ssh
 { config, lib, pkgs, usrlib, ... }:
 
-let 
+let
   cfg = config.common.ssh;
 in {
   options.common.ssh = {

@@ -1,3 +1,5 @@
+# headless home profile: switches the GUI applications off by default.
+# tend: vg-dotfiles/NixOS/Headless
 { config, lib, usrlib, ... }:
 let
   cfg = config.nixtype.headless;

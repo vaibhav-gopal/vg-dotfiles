@@ -1,3 +1,5 @@
+# vgkraken (desktop): flips and overrides the system module options for this machine.
+# tend: vg-dotfiles/NixOS/vgkraken
 { pkgs-unstable, ... }:
 {
   # manually add the systems hardware config!

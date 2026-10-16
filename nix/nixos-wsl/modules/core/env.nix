@@ -1,5 +1,7 @@
+# the base environment of the WSL distro: system packages, zsh, nix-ld (for the VS Code server) and fonts for WSLg apps.
+# tend: vg-dotfiles/NixOS-WSL/Core
 { config, pkgs, lib, pkgs-unstable, usrlib, ... }:
-let 
+let
   cfg = config.core.env;
 in {
   options.core.env = {

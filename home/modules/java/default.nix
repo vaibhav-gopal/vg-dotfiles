@@ -1,3 +1,5 @@
+# the Java runtime (Temurin by default).
+# tend: vg-dotfiles/Home/java
 { config, lib, pkgs, usrlib, ... }:
 
 let

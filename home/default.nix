@@ -1,3 +1,5 @@
+# entry of the shared home layer: the dotfiles paths, then the common modules and the platform's own.
+# tend: vg-dotfiles/Home
 { config, usrlib, hostname, nixType, ... }:
 let
   modulesPath = ./modules;

@@ -3,6 +3,7 @@
 # The cask ships the CLI inside the app bundle rather than on PATH, so this
 # exposes it the way Tailscale's own macOS docs suggest. The cask itself is
 # declared in the system module (nix/nix-darwin/<host>).
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

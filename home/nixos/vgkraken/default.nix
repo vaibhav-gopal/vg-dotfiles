@@ -1,3 +1,5 @@
+# vgkraken (desktop): flips and overrides the home module options for this machine.
+# tend: vg-dotfiles/NixOS/vgkraken
 { pkgs-unstable, ...}:
 {
   nixtype.hyprland.enable = true;

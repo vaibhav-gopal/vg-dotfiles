@@ -9,6 +9,7 @@
 #         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 #       Until then, activation prints a red "Homebrew is not installed, skipping..."
 #       and carries on.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, pkgs, usrlib, homedirectory, ... }:
 let
   cfg = config.modules.homebrew;

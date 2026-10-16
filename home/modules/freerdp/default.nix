@@ -1,3 +1,5 @@
+# the FreeRDP client with saved hosts, each an rdp-<name> alias (on macOS also a dockable app, see nix-darwin/Apps).
+# tend: vg-dotfiles/Home/freerdp
 { config, lib, pkgs, usrlib, ... }:
 let
   cfg = config.common.freerdp;

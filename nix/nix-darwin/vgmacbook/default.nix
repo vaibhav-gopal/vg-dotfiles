@@ -1,3 +1,5 @@
+# vgmacbook: flips and overrides the system module options for this machine (Homebrew casks and apps).
+# tend: vg-dotfiles/nix-darwin/vgmacbook
 { ... }:
 {
   imports = [

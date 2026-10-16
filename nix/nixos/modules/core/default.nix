@@ -1,3 +1,5 @@
+# NixOS core: imports its parts and sets the user, hostname and state version.
+# tend: vg-dotfiles/NixOS/Core
 { hostname, username, version, homedirectory, ... }:
 
 {

@@ -1,3 +1,5 @@
+# nix-darwin sub-flake: inputs and the system configuration for the macOS host.
+# tend: vg-dotfiles/nix-darwin
 {
   description = "Darwin configuration for Vaibhav Gopal";
 

@@ -4,6 +4,7 @@
 # *contents*; these are just the day-to-day shortcuts, so they live with every
 # other alias in home-manager. `brew` is resolved from PATH rather than
 # interpolated as a store path, matching the other alias modules.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

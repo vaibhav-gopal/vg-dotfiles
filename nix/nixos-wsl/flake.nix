@@ -1,4 +1,6 @@
-{  
+# NixOS-WSL sub-flake: inputs and the system configuration for the WSL2 host.
+# tend: vg-dotfiles/NixOS-WSL
+{
   description = "NixOS - WSL2 Configuration for Vaibhav Gopal";
 
   inputs = {

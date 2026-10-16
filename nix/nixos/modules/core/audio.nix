@@ -1,3 +1,5 @@
+# sound through pipewire, with pulseaudio and optional JACK emulation.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, ... }:
 let
   cfg = config.core.audio;

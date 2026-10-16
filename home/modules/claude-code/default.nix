@@ -1,3 +1,5 @@
+# Claude Code with isolated per-account profiles (one CLAUDE_CONFIG_DIR each) and their wrappers.
+# tend: vg-dotfiles/Home/claude-code
 { config, lib, pkgs, usrlib, claude-code, ... }:
 let
   cfg = config.common.claude-code;

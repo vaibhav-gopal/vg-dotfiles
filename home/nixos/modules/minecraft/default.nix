@@ -1,3 +1,5 @@
+# Prism Launcher for Minecraft.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, pkgs, usrlib, ... }:
 let
   cfg = config.nixtype.minecraft;

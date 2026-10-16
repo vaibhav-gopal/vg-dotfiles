@@ -1,3 +1,5 @@
+# imports every NixOS-WSL system module.
+# tend: vg-dotfiles/NixOS-WSL
 { ... }:
 {
   imports = [

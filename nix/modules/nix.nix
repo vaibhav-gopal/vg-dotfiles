@@ -1,3 +1,5 @@
+# nix itself: flakes, binary caches and a weekly garbage collection.
+# tend: vg-dotfiles/Shared
 { config, lib, usrlib, ... }:
 let
   cfg = config.core.nix;

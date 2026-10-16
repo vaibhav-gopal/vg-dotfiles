@@ -1,3 +1,5 @@
+# the editors: vim, neovim (the default $EDITOR, live-edited lua config), Zed in vim mode, and the vimrc VS Code's vim extension reads.
+# tend: vg-dotfiles/Home/editor
 { config, lib, pkgs, pkgs-unstable, usrlib, ... }:
 
 let 

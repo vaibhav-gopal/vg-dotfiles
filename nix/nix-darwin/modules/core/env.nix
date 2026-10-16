@@ -1,3 +1,5 @@
+# the base environment of a darwin host: system packages, zsh and fonts.
+# tend: vg-dotfiles/nix-darwin/Core
 { config, pkgs, lib, pkgs-unstable, usrlib, ... }:
 let
   cfg = config.core.env;

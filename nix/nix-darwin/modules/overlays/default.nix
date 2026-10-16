@@ -1,3 +1,5 @@
+# adds the claude-code overlay to nixpkgs.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, claude-code, ... }:
 
 let

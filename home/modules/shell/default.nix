@@ -1,6 +1,8 @@
+# zsh and bash (completion, suggestions, highlighting), direnv with nix-direnv, and the rc / profile fragments other modules add.
+# tend: vg-dotfiles/Home/shell
 { config, lib, usrlib, ... }:
 
-let 
+let
   cfg = config.common.shell;
 in {
   options.common.shell = {

@@ -1,6 +1,8 @@
+# the terminal: kitty, zellij (starts with every shell), yazi and starship, each with its live-edited config.
+# tend: vg-dotfiles/Home/term
 { config, lib, pkgs, usrlib, ... }:
 
-let 
+let
   cfg = config.common.term;
 in {
   options.common.term = {

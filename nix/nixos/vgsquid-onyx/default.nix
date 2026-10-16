@@ -1,3 +1,5 @@
+# vgsquid-onyx (headless server): flips and overrides the system module options for this machine.
+# tend: vg-dotfiles/NixOS/vgsquid-onyx
 { ... }:
 {
   # manually add the systems hardware config!

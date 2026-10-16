@@ -1,3 +1,5 @@
+# the Vivaldi browser, from nixpkgs-unstable.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, usrlib, pkgs-unstable, ... }:
 let
   cfg = config.modules.vivaldi;

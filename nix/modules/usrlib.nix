@@ -1,3 +1,5 @@
+# usrlib: the mk*Option helpers every module declares its options with.
+# tend: vg-dotfiles/Shared
 { lib, ... }:
 {
   _module.args.usrlib = {

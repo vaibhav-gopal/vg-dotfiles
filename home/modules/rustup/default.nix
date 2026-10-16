@@ -1,3 +1,5 @@
+# rustup as the Rust toolchain manager, with CARGO_HOME and RUSTUP_HOME set.
+# tend: vg-dotfiles/Home/rustup
 { config, lib, pkgs-unstable, usrlib, ... }:
 
 let 

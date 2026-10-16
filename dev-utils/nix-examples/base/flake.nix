@@ -1,3 +1,5 @@
+# base dev-shell flake example, to copy into a project.
+# tend: vg-dotfiles/Dev utils/base
 {
   description = "A general development environment template";
   inputs = {

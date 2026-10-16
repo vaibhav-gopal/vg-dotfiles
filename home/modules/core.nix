@@ -1,3 +1,5 @@
+# the user, home directory, state version, XDG and the common package set.
+# tend: vg-dotfiles/Home
 { config, pkgs, lib, username, version, homedirectory, ... }:
 
 {

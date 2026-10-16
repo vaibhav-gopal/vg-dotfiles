@@ -1,3 +1,5 @@
+# the base environment every NixOS host gets: system and storage packages, zsh, gpg-agent (also the SSH agent), firefox with a desktop, fonts, timezone and locale.
+# tend: vg-dotfiles/NixOS/Core
 { config, pkgs, lib, pkgs-unstable, usrlib, ... }:
 let
   cfg = config.core.env;

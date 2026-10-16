@@ -1,3 +1,5 @@
+# vgmacbook: flips and overrides the home module options for this machine.
+# tend: vg-dotfiles/nix-darwin/vgmacbook
 { config, ... }:
 {
   common.claude-code = {

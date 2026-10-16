@@ -1,3 +1,5 @@
+# home-manager as a system module, wiring the shared home layer to the machine's user.
+# tend: vg-dotfiles/Shared
 { config, lib, usrlib, specialArgs, username, ... }:
 let
   cfg = config.core.home;

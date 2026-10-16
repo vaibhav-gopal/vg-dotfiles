@@ -1,3 +1,5 @@
+# the Spotify client.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, pkgs, usrlib, ... }:
 let
   cfg = config.nixtype.spotify;

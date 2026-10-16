@@ -1,3 +1,5 @@
+# vgsquid-azul (headless server): flips and overrides the system module options for this machine.
+# tend: vg-dotfiles/NixOS/vgsquid-azul
 { ... }:
 {
   # manually add the systems hardware config!

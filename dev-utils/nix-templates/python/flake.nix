@@ -1,3 +1,5 @@
+# flake template for a Python project: a uv workspace built with uv2nix / pyproject.nix, plus its dev shell.
+# tend: vg-dotfiles/Dev utils/python
 {
   description = "A template python project";
   inputs = {

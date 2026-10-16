@@ -1,3 +1,5 @@
+# imports every NixOS home module.
+# tend: vg-dotfiles/NixOS
 { ... }:
 
 {

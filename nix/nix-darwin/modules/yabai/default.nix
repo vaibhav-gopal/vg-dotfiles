@@ -1,3 +1,5 @@
+# the yabai tiling window manager for macOS.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

@@ -1,3 +1,5 @@
+# connectivity: internet, bluetooth and printing.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, ... }:
 let
   cfginternet = config.core.internet;

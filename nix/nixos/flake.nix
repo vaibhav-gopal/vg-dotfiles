@@ -1,3 +1,5 @@
+# NixOS sub-flake: inputs and the system configurations for the NixOS hosts.
+# tend: vg-dotfiles/NixOS
 {
   description = "NixOS configuration for Vaibhav Gopal";
 

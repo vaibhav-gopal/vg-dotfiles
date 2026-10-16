@@ -1,3 +1,5 @@
+# the macOS status bar, customized through sketchybar.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

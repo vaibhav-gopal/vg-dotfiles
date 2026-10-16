@@ -1,6 +1,8 @@
+# git with the user's identity, delta as its pager, and the GitHub CLI.
+# tend: vg-dotfiles/Home/git
 { config, lib, pkgs, usrlib, ... }:
 
-let 
+let
   cfg = config.common.git;
 in {
   options.common.git = {

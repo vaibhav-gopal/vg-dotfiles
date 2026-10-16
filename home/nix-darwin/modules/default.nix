@@ -1,3 +1,5 @@
+# imports every nix-darwin home module.
+# tend: vg-dotfiles/nix-darwin
 { ... }:
 
 {

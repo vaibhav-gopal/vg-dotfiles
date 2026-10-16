@@ -1,3 +1,5 @@
+# imports every shared home module.
+# tend: vg-dotfiles/Home
 { ... }:
 {
   imports = [

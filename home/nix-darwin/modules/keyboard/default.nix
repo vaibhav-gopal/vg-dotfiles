@@ -1,3 +1,5 @@
+# installs the custom macOS keyboard layouts bundle into ~/Library/Keyboard Layouts.
+# tend: vg-dotfiles/nix-darwin
 { config, lib, usrlib, ... }:
 
 let

@@ -1,3 +1,5 @@
+# darwin core: imports its parts and sets the primary user, home directory and hostname.
+# tend: vg-dotfiles/nix-darwin/Core
 { lib, username, homedirectory, hostname, ... }:
 {
   imports = [

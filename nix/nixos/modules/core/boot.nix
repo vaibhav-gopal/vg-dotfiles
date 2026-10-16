@@ -1,3 +1,5 @@
+# boot: the kernel, the bootloader and the plymouth splash.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, ... }:
 let
   cfgboot = config.core.boot;

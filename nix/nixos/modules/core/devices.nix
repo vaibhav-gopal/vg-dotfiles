@@ -1,3 +1,5 @@
+# input devices: the mouse remapper (solaar) and QMK keyboard support.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, ... }:
 let
   cfgmouse = config.core.mouse;

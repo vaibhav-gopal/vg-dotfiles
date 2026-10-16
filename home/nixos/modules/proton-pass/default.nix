@@ -1,3 +1,5 @@
+# Proton Pass, wrapped so its Electron secret store backend can be chosen.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, pkgs, usrlib, ... }:
 let
   cfg = config.nixtype.proton-pass;

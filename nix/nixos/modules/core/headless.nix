@@ -1,3 +1,5 @@
+# headless server profile: desktop and peripheral defaults off, remote access (sshd) on.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, username, ... }:
 let
   cfg = config.core.headless;

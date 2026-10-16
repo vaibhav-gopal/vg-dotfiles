@@ -1,3 +1,5 @@
+# VS Code, from nixpkgs-unstable.
+# tend: vg-dotfiles/NixOS/Apps
 { config, lib, pkgs-unstable, usrlib, ... }:
 let
   cfg = config.nixtype.vscode;

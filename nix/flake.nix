@@ -1,3 +1,5 @@
+# master flake: composes the NixOS, nix-darwin and NixOS-WSL sub-flakes into one set of machines.
+# tend: vg-dotfiles/Composition
 {
   description = "Master Flake Composition";
 

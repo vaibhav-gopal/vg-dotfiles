@@ -1,3 +1,5 @@
+# dev-shell flake example that runs apps expecting a standard Linux filesystem inside an FHS sandbox.
+# tend: vg-dotfiles/Dev utils/fhs
 {
   description = "Adding FHS ; Virtualize a linux file system / sandbox so non-nix minded applications can run (when apps expect standard linux filesystem paths '/bin', '/etc', ...)";
   inputs = {

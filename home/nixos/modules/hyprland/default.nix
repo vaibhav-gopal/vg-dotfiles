@@ -1,3 +1,5 @@
+# the Hyprland desktop: live-edited configs and its companion apps (waybar, mako).
+# tend: vg-dotfiles/NixOS/Hyprland
 { config, lib, usrlib, pkgs, ... }:
 let
   cfg = config.nixtype.hyprland;

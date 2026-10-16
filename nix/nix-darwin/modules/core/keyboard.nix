@@ -1,3 +1,5 @@
+# the hidutil key remap (caps lock, shift, esc and right-cmd swaps): applied on rebuild and again at every login.
+# tend: vg-dotfiles/nix-darwin/Core
 { config, lib, usrlib, ... }:
 
 let

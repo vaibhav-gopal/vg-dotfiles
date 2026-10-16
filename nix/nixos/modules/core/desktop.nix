@@ -1,3 +1,5 @@
+# the login greeter and the desktop sessions it offers.
+# tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, ... }:
 let
   cfglogin = config.core.login;
