@@ -1,4 +1,4 @@
-{ pkgs, lib, username, version, homedirectory, ... }:
+{ config, pkgs, lib, username, version, homedirectory, ... }:
 
 {
   # ─── Core User Configuration ──────────────────────────────────────────────
@@ -108,10 +108,10 @@
     lg = "eza --all --git-ignore";
     llg = "eza --all --long --git-ignore";
     ltg = "eza --all --long --tree --ignore-glob .git --git-ignore --level";
-    dot = "$EDITOR ~/dotfiles";
-    cdot = "code ~/dotfiles";
-    zdot = "zed ~/dotfiles";
-    ndot = "nvim ~/dotfiles";
+    dot = "$EDITOR ${config.extPaths.dotfilesDir}";
+    cdot = "code ${config.extPaths.dotfilesDir}";
+    zdot = "zed ${config.extPaths.dotfilesDir}";
+    ndot = "nvim ${config.extPaths.dotfilesDir}";
   };
 }
 

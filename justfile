@@ -37,7 +37,7 @@ import 'nix/justfile'
 
 # List all recipes
 default:
-    @echo -e "{{BOLD + BLUE}}Listing all recipes for dotfiles{{NORMAL}}"
+    @echo -e "{{BOLD + BLUE}}Listing all recipes for vg-dotfiles{{NORMAL}}"
     @just --list --justfile {{justfile()}} --list-heading '' --unsorted
 
 # Print out .env variables [NIXTYPE, NIXCONFIG, NIXCONFIG_VERSION, NIXCONFIG_USERNAME]

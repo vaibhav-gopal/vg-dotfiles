@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Evaluate every machine in the flake (system + home-manager) without building anything.
-# tend: dotfiles/Composition
+# tend: vg-dotfiles/Composition
 #
 # Forces each host's config.system.build.toplevel.drvPath and each homeConfigurations
 # activationPackage.drvPath, so a broken module, option or assertion fails here instead of

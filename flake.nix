@@ -1,5 +1,5 @@
 {
-  description = "Starter environment for dotfiles";
+  description = "Starter environment for vg-dotfiles";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
