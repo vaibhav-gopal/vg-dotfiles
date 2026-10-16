@@ -1,0 +1,2 @@
+{"batch":"01a1471e-76a9-7115-8f1c-e0a0b6910fd4","after":"01a1471e-759e-753d-8c36-1dd15f363f45","author":"agent:claude-code","at":1792194541225,"message":"The tend: header todo is done (commit b9d587c): every nix module documents what it is for and names its part; docs parity is 1.0 on every part and the score went from 0.60 to 0.79. (proposal 01a1471d-ab9e-72f9-904a-8fc45b2f7eaa, proposed by agent:claude-code, accepted by user)"}
+{"op":"todo.status","id":"01a122ca-1ffe-73be-b97a-bda586c43bae","status":"done","reason":null}
