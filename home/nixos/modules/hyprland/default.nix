@@ -53,6 +53,8 @@ in {
       (pkgs.papirus-icon-theme.override { color = "nordic"; })
       # Qt apps (Prism Launcher, KDE apps) : Fusion style + the kanagawa palette in qt6ct.d
       pkgs.qt6Packages.qt6ct
+      # GTK3 apps (Thunar, pavucontrol) : the Adwaita-dark theme autostart.conf selects ; gtk3 itself ships no dark theme dir
+      pkgs.gnome-themes-extra
     ];
     fonts.fontconfig.enable = true;
 
