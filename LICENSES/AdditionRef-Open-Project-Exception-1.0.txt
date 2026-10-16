@@ -4,7 +4,7 @@
 
 Additional permission under section 7 of the GNU General Public License, version 3 (the "GPL").
 
-Vaibhav Gopal (the "Licensor") offers dotfiles (the "Library") under the GPL with this exception. The
+Vaibhav Gopal (the "Licensor") offers vg-dotfiles (the "Library") under the GPL with this exception. The
 exception only adds permissions. It takes none away from the GPL, and where it doesn't apply, the GPL alone
 governs.
 

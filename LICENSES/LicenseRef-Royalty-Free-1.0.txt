@@ -2,7 +2,7 @@
 
 > **DRAFT.** Not yet reviewed by a lawyer. Don't rely on it until it has been.
 
-Vaibhav Gopal (the "Licensor") licenses dotfiles (the "Software") to you on these terms. This is one of
+Vaibhav Gopal (the "Licensor") licenses vg-dotfiles (the "Software") to you on these terms. This is one of
 the licenses the Software is offered under, and you may use it under any of them. This one allows use in
 closed-source applications free of charge, on the conditions below. For uses beyond them, the Licensor
 offers a commercial license.
@@ -43,7 +43,7 @@ exposes the Software's interfaces. You may not offer a Competing Product.
 (c) **No Embedded Devices.** Distribution on or for Embedded Devices isn't covered. The Licensor licenses
 it commercially, with royalties per device where they apply.
 
-(d) **Attribution.** Each Application names dotfiles and links to its repository, in the application's About screen or legal notices, and on its website or download page where it has one.
+(d) **Attribution.** Each Application names vg-dotfiles and links to its repository, in the application's About screen or legal notices, and on its website or download page where it has one.
 
 (e) **Notices.** The copies You distribute keep the Software's copyright and license notices, and Your
 Application's legal notices say that it uses the Software under this license.

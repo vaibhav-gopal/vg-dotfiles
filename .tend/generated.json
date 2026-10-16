@@ -16,14 +16,14 @@
   ".claude/skills/triage/SKILL.md": "a8de22dda0b4d302e871b3c292bfdb820e9cf1cd629f189e97b709f3c784a34b",
   ".claude/skills/unify/SKILL.md": "c220294e25740cee6b8679f7d210c662633be3685dc17affb126ce11f7015ec8",
   ".mcp.json#mcpServers.tend": "da94930fac786515805febafe208fdd0693a1083387aec4f164f76a34d1b03b0",
-  "AGENTS.md": "a0aeb01584a5c3d0e7dc5d6430bd695d8e498ffdbce7dc6531b2126f941f9067",
+  "AGENTS.md": "e3d656f928f75457d53f7afc222b88a4c543fc935841ca17df08d43a39c3a5a7",
   "CLAUDE.md": "b436b1af060256dcab3e14101f66954b826f4142e74f173630aaf733ee841c41",
-  "CONTACT.md": "20921483be7dd0dbc53f5c4a931539e40caa268a348e0461c5c34088305988de",
-  "LICENSE.md": "de951743523181c0743824e66eb8a49323346103038620eb7c5ff48a56d7ea0e",
-  "LICENSES/AdditionRef-Open-Project-Exception-1.0.txt": "591a86032471929caed54ffab4c64b9e6c03735ab5aa059f0e88ad6134fa4ee5",
+  "CONTACT.md": "3dbe9d690ee24adf37be1150a26d8f148c266538a3af9d7b2ea72a40961c52a2",
+  "LICENSE.md": "b8a2dd630d6a8aa77c4a2046dcde7f4deedf1b2f95619b79b2e28979ac9c4ab5",
+  "LICENSES/AdditionRef-Open-Project-Exception-1.0.txt": "cc99698c72b5717fcd11c9e547584109e659e47081f3afbcfa336580b150bcd6",
   "LICENSES/GPL-3.0-only.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-  "LICENSES/LicenseRef-Commercial-1.0.txt": "fb64268990010353b84e555ba24fbebf432b8ea15791c7ac461e966d75db7ae0",
-  "LICENSES/LicenseRef-Royalty-Free-1.0.txt": "a16ef180ee4d7104d339b69030b52e8376d18b20ac0942acff8365e7e54503c8",
+  "LICENSES/LicenseRef-Commercial-1.0.txt": "c5c5014dec76d9bf6372b521f380aa4f9d51a1fe6d8ec1b2738ea7103b65a086",
+  "LICENSES/LicenseRef-Royalty-Free-1.0.txt": "e594bcddecd501068fc09fbc13e9fe4866eda40efe67f9b8a331d74a7ab55e61",
   "REUSE.toml": "e233b5e9f4400dd980800b899b5d64786e73f4dbe4bb154433190035d84e5287",
-  "SECURITY.md": "500f48204cfe784a0eeee27f7a22aa0c6f6ece71cfdcffa573f3fda38a5c7d94"
+  "SECURITY.md": "7b5a0d0e24ac888b58c0db982aeffc9ae31ff24c53ecbe1e273f10ae64e311a0"
 }
