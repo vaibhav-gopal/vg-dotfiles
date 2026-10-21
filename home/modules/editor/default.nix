@@ -39,6 +39,10 @@ in {
       # home-manager writes its generated lua to nvim/init.lua, which can't land inside the
       # out-of-store nvim.d link below; load it through the wrapper instead
       sideloadInitLua = true;
+      # no plugin here uses the ruby or python providers: 26.05's default (off) on every host,
+      # not only the ones installed on 26.05
+      withRuby = false;
+      withPython3 = false;
     };
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/editor/nvim.d";
     

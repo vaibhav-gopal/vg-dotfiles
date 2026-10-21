@@ -38,6 +38,9 @@ in {
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
+      # zsh's files (and ~/.zsh_history) stay in the home directory on every host; 26.05's new
+      # default (~/.config/zsh) would move them on the hosts installed on 26.05 only
+      dotDir = config.home.homeDirectory;
 
       initContent = cfg.zsh.zshrc;
       profileExtra = cfg.zsh.zprofile;

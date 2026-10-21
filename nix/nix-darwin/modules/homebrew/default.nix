@@ -96,10 +96,7 @@ in {
         # Point HOMEBREW_BUNDLE_FILE at the Brewfile generated here, so a manual
         # `brew bundle` checks against the declared set and not a stray ~/Brewfile.
         brewfile = true;
-
-        # Defaults to !brewfile, but be explicit: brew must not try to write a
-        # lockfile next to a Brewfile that lives in the read-only nix store.
-        lockfiles = false;
+        # (no `lockfiles`: Homebrew Bundle dropped lockfiles in 4.4.0 and nix-darwin 26.05 deprecates the option)
 
         # Don't let `brew install` silently refresh all metadata first.
         autoUpdate = false;
