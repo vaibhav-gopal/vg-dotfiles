@@ -1,58 +1,87 @@
-# vg-dotfiles: Home Manager Flake Setup
+# vg-dotfiles
 
-The Nix side of Vaibhav's dotfiles (NixOS, NixOS-WSL, nix-darwin); Windows has its own repo, vg-dotfiles-windows.
+The Nix side of Vaibhav's dotfiles: every NixOS, NixOS-WSL and nix-darwin machine, with a shared
+home-manager layer. Windows has its own repo, vg-dotfiles-windows.
 
-This repository defines a modular, multi-mode Home Manager setup using Nix flakes.
-It supports:
+- One flake (`nix/flake.nix`) holds the table of machines; each platform's sub-flake builds them.
+- Every module declares options (`core.*`, `modules.*`, `common.*`) and does nothing until a host
+  turns it on; a host's folder only flips and overrides them.
+- App config lives as raw files in a module's `*.d` folder, linked into place, so an edit applies
+  without a rebuild.
+- The design (why things are the way they are) is tracked in Tend: `tend design`.
 
-- Multiple systems and multiple configurations
-- Uses `options.*` for modularizing both home-manager modules and nixos modules
-- Enables per-system overrides for home-manager setups, nixos archetypes
-- Organized `*.d` fragments for shell hooks and modular configuration
+## Machines
 
-## Getting Started
+| Host | Archetype | What it is |
+|---|---|---|
+| `vgkraken` | nixos | Desktop: RX 7800 XT, Hyprland with Plasma as a fallback |
+| `vgsquid-jade` | nixos | Tenstorrent Blackhole p150a box on an X870 board; GNOME at the console, colleagues over the tailnet |
+| `vgsquid-azul`, `vgsquid-onyx` | nixos | Headless GPU-compute servers (RX 7800 XT): one X870, one TUF X670E-PLUS WIFI |
+| `vgnixmini` | nixos | Plasma desktop |
+| `vgwsl2` | nixos-wsl | NixOS under WSL2 on the Windows desktop |
+| `vgmacbook` | nix-darwin | MacBook, with Homebrew for GUI apps |
 
-### Pre-Setup
+## Setting up a machine
 
-- Install nixos/nixos-wsl/nixos-darwin
-- OR Install nix with the multi-user installation
+Install the OS (NixOS, NixOS-WSL, or macOS with nix), then:
 
-1. If on nixos/nixos-wsl will need to first setup `/etc/nixos/configuration.nix` with enabling experimental features. If on nix-darwin (or standalone nix) go into `/etc/nix/nix.conf` and enable experimental features.
-2. Add the following packages to `/etc/nixos/configuration.nix` (optionally: `nix profile install` or `nix profile add`): `git`, and `gh`
-3. Setup `gh` by using `gh auth login` then clone the repo into your home directory with `gh repo clone vaibhav-gopal/vg-dotfiles ~/vg-dotfiles` (the live-edited configs link into `~/vg-dotfiles`; set `extPaths.dotfilesDir` to clone it elsewhere)
-4. Using `nix develop` in the `vg-dotfiles` root directory, will install `just` (task runner), `vim` (editor) into the shell session and `glow` (markdown previewer). (recommended)
-5. Follow instructions for either option A or option B
+```bash
+nix-shell -p git        # NixOS / NixOS-WSL: git isn't there on a fresh install
+git clone https://github.com/vaibhav-gopal/vg-dotfiles.git ~/vg-dotfiles
+cd ~/vg-dotfiles
+./bootstrap.sh <host>   # e.g. ./bootstrap.sh vgsquid-jade
+```
 
-### Option A (System configuration already in `vg-dotfiles/nix/[arch]`)
+`bootstrap.sh` picks the archetype and runs its script in `nix/scripts/bootstrap/`
+(`nixos.sh`, `nixos-wsl.sh`, `nix-darwin.sh`). Every step checks before it changes anything, so
+re-run it whenever; it only does what's left:
 
-1. Skip to final steps
+1. **host**: the machine is in `nix/flake.nix` and of this archetype
+2. **checkout**: the clone is at `~/vg-dotfiles` (where the config links point) and the right user runs it
+3. **env**: writes `.env` for this host (an older one is kept as `.env.bak`)
+4. **hardware** (NixOS): copies `/etc/nixos/hardware-configuration.nix` into `nix/nixos/<host>/` and
+   stages it in git; an existing one that differs is kept unless `--regen-hardware`
+5. **homebrew** (nix-darwin, `--with-homebrew`): installs Homebrew and adopts hand-installed casks
+6. **system**: builds the system and applies it: `switch`, or `boot` when the kernel changes
+   (NixOS) or the default user changes (NixOS-WSL); then reboot and re-run
+7. **tailscale** (NixOS, `--with-tailscale`): `tailscale up` once tailscaled runs
 
-### Option B (System configuration NOT in `vg-dotfiles/nix/[arch]`)
+Flakes are switched on for the bootstrap itself, so a fresh install needs no config first.
+`--dry-run` checks and evaluates without changing anything; `./bootstrap.sh --help` lists the rest.
+After the first build, commit the staged `hardware-configuration.nix`.
 
-1. in the `flake.nix` in `vg-dotfiles/nix/[arch]`, add your system configuration into the `configurations` attribute set (choose username, systemname, stateversion, etc...)
-2. Create a new directory in `vg-dotfiles/nix/[arch]` with your chosen system name
-3. Create a new directory in `vg-dotfiles/home/[arch]` with your chosen system name
-4. Create a blank `default.nix` in the newly created system-specific directories:
+**NixOS-WSL:** a fresh distro logs in as `nixos`. The first run builds with `boot` and prints how
+to restart the distro as your user; then clone again into that user's `~/vg-dotfiles` and re-run.
 
-    ```[nix]
-    { ... }:
-    {
-        imports = [
-            # Add the below, if required ; see step 5
-            # ./hardware-configuration.nix
-        ];
-    }    
-    ```
+### Adding a machine
 
-5. If on nixos, copy the `/etc/nixos/hardware-configuration.nix` file into `vg-dotfiles/nix/[arch]/[system_name]`
+1. Add it to `configurations` in `nix/flake.nix` (username, system, hostname, `version` = the
+   release it's installed with, `nixType`).
+2. Create `nix/<archetype>/<host>/default.nix` and `home/<archetype>/<host>/default.nix`; on NixOS the
+   system one imports `./hardware-configuration.nix` (the bootstrap copies it in).
+3. Turn on what it needs (`core.*`, `modules.*`), then `./bootstrap.sh <host>` on the machine.
 
-    1. Then edit the `default.nix` in `vg-dotfiles/nix/[arch]/[system_name]` by adding `./hardware-configuration.nix` as an import
+### Servers, and giving colleagues access
 
-### Final Steps
+Headless hosts (`core.headless.enable`) run OpenSSH; with `core.headless.sshd.tailnetOnly` it is
+reachable only over the tailnet.
 
-1. You will need to setup the `.env` file in `vg-dotfiles/` with the approriate environment variables selecting your system and nixtype
-2. Then run `just build` (if you are on nix-darwin for the first time, run `just darwin_init` to download nix-darwin and install for the first time)
-3. Enjoy!
+- **Your key:** add it to `core.headless.sshd.authorizedKeys`; password login stays on until one is listed.
+- **A colleague:** add `name = [ "ssh-ed25519 ..." ];` to `core.headless.guests` (key-only, no sudo),
+  rebuild, then share the node with them from the Tailscale admin console.
+
+## Day to day
+
+`just` runs everything once `.env` exists (`just` alone lists the recipes):
+
+- `just build`: rebuild and switch (`just buildboot` applies at the next boot)
+- `just update`: bump `flake.lock`; `just gc`: delete generations older than 7 days
+- `just check-hosts`: evaluate every machine; `just validate`: this one
+- `just sysconfigs`, `just homeconfigs`, `just evalsysconfigs <attr>`: read the config without building
+
+`nix develop` in the repo root gives you `just` and `shellcheck`. CI (`.github/workflows/check.yml`)
+evaluates every host, builds the shared home layer, and runs shellcheck and the bootstrap tests
+(`bash nix/scripts/tests/bootstrap.test.sh`).
 
 #### Imperative package installs
 
@@ -71,7 +100,7 @@ Managed by `modules.homebrew` in `nix/nix-darwin/modules/homebrew/default.nix`.
 ### One-time setup
 
 nix-darwin manages Homebrew's *contents*, but does not install Homebrew itself.
-Bootstrap it once:
+Bootstrap it once (`./bootstrap.sh vgmacbook --with-homebrew` does the same before the first build):
 
 ```bash
 just brew-bootstrap
