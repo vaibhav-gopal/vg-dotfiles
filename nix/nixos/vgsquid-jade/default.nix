@@ -8,8 +8,13 @@
     ./hardware-configuration.nix
   ];
 
-  # Headless server: no desktop/GUI, OpenSSH on (see core/headless.nix); no GPU, so graphics stays off
+  # Server profile (OpenSSH on, see core/headless.nix), with GNOME at the console on the CPU's integrated graphics
   core.headless.enable = true;
+  core.login.enable = true;
+  core.desktop.enable = true;
+  core.desktop.sessions = [ "gnome" ];
+  core.graphics.enable = true;
+  core.graphics.amd.enable = true; # Ryzen iGPU (amdgpu); no discrete GPU
 
   # sshd only over the tailnet: colleagues get this node shared to them from the Tailscale admin console
   core.headless.sshd.tailnetOnly = true;
