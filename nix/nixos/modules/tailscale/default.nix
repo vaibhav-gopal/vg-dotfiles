@@ -15,8 +15,9 @@ in {
   config = lib.mkIf cfg.enable {
     services.tailscale = {
       enable = true;
-      # extraSetFlags, not extraUpFlags: nixpkgs only passes extraUpFlags when authKeyFile is set
-      extraSetFlags = lib.optionals cfg.ssh [ "--ssh" ];
+      # extraSetFlags, not extraUpFlags: nixpkgs only passes extraUpFlags when authKeyFile is set.
+      # Both ways, so turning it off here also undoes an earlier `tailscale up --ssh`.
+      extraSetFlags = [ "--ssh=${lib.boolToString cfg.ssh}" ];
     };
 
     # Trust traffic arriving over the tailnet.

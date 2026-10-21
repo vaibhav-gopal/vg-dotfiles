@@ -23,6 +23,11 @@
   # LTS kernel: tt-kmd 2.7.0 doesn't build on linuxPackages_latest (7.3 dropped zap_vma_ptes)
   core.boot.kernel = "default";
 
-  # Joins the tailnet as its own node `vgsquid-jade`
-  modules.tailscale.enable = true;
+  # Joins the tailnet as its own node `vgsquid-jade`, shared to colleagues from the admin console.
+  # No Tailscale SSH: it answers port 22 on the tailnet address and refuses shared-in users (no SSH
+  # policy can match them), so everyone, me included, logs in through OpenSSH with a key.
+  modules.tailscale = {
+    enable = true;
+    ssh = false;
+  };
 }
