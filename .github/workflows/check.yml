@@ -1,0 +1,37 @@
+# What a change must pass before it reaches a machine: every host evaluates, the shared home layer
+# builds (vgwsl2's home-files, ~1.1 GiB: a build failure that evaluation missed shipped once), and
+# the scripts pass shellcheck and the bootstrap tests.
+# tend: vg-dotfiles/Composition
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  hosts:
+    name: evaluate every host
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+      - run: bash nix/scripts/check-hosts.sh
+
+  home:
+    name: build the home layer (vgwsl2)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+      - run: nix build -L --no-link ./nix#homeConfigurations.vgwsl2.config.home-files
+
+  scripts:
+    name: shellcheck and bootstrap tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+      - run: nix develop --command shellcheck -x bootstrap.sh nix/scripts/*.sh nix/scripts/bootstrap/*.sh nix/scripts/tests/*.sh
+      - run: bash nix/scripts/tests/bootstrap.test.sh

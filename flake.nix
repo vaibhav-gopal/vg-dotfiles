@@ -1,9 +1,9 @@
-# root dev shell for working on this repo (just and friends), built on flake-utils.
+# root dev shell for working on this repo (just, and shellcheck for the scripts), built on flake-utils.
 # tend: vg-dotfiles/Composition
 {
   description = "Starter environment for vg-dotfiles";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -14,6 +14,7 @@
         baseShell = pkgs.mkShellNoCC {
             packages = [
                 pkgs.just
+                pkgs.shellcheck
             ];
         };
     in {
