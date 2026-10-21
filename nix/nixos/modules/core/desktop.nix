@@ -11,7 +11,7 @@ in {
   };
   options.core.desktop = {
     enable = usrlib.mkEnableOptionTrue "enable x11 windowing system and a desktop environment";
-    sessions = usrlib.mkListOfEnumOption "Desktop environments / compositors to install ; each one becomes a session to pick at the login screen" [ "plasma" ] [ "plasma" "hyprland" ];
+    sessions = usrlib.mkListOfEnumOption "Desktop environments / compositors to install ; each one becomes a session to pick at the login screen" [ "plasma" ] [ "plasma" "hyprland" "gnome" ];
   };
 
   config = lib.mkMerge [
@@ -22,6 +22,14 @@ in {
     (lib.mkIf (cfgdesktop.enable && lib.elem "plasma" cfgdesktop.sessions) {
       # Enable the KDE Plasma Desktop Environment.
       services.desktopManager.plasma6.enable = true;
+    })
+    (lib.mkIf (cfgdesktop.enable && lib.elem "gnome" cfgdesktop.sessions) {
+      # Enable the GNOME Desktop Environment ; SDDM stays the greeter, GNOME is one more session there
+      services.desktopManager.gnome.enable = true;
+      # gpg-agent is already the SSH agent (core/env.nix) ; don't let the keyring start a second one
+      services.gnome.gcr-ssh-agent.enable = false;
+      # plasma and gnome both set an ssh askpass ; with both installed, keep plasma's
+      programs.ssh.askPassword = lib.mkIf (lib.elem "plasma" cfgdesktop.sessions) (lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass");
     })
     (lib.mkIf (cfgdesktop.enable && lib.elem "hyprland" cfgdesktop.sessions) {
       programs.hyprland = {
