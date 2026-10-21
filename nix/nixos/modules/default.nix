@@ -12,6 +12,7 @@
     # MODULES
     ./steam
     ./tailscale
+    ./tenstorrent
     ./vivaldi
   ];
 }

@@ -47,6 +47,14 @@
           homedirectory = "/home/vaibhav";
           nixType = "nixos";
         };
+        vgsquid-jade = {
+          username = "vaibhav";
+          system = "x86_64-linux";
+          hostname = "vgsquid-jade";
+          version = "26.05"; # fresh install on 26.05
+          homedirectory = "/home/vaibhav";
+          nixType = "nixos";
+        };
         vgwsl2 = {
           username = "vaibhav";
           hostname = "vgwsl2";

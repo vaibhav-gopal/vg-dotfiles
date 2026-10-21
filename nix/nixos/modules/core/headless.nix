@@ -10,7 +10,10 @@ in {
     sshd = {
       enable = usrlib.mkEnableOptionTrue "enable the OpenSSH server";
       authorizedKeys = usrlib.mkListOfStringsOption "Public keys allowed to log in as the main user. Password login is allowed only while this is empty" [ ];
+      tailnetOnly = usrlib.mkEnableOptionFalse "reach sshd only over the tailnet (tailscale0 is trusted): no firewall port on the LAN";
     };
+    # Other people's accounts: name = [ their public keys ]. Key-only (no password), no sudo, no home-manager.
+    guests = usrlib.mkAttrsOption "Guest accounts, as `name = [ public keys ]`: SSH key login only, no sudo" { };
   };
 
   # Everything is mkDefault, so a host can still opt back in (e.g. `core.graphics.enable = true;` for a GPU compute box)
@@ -36,13 +39,26 @@ in {
     # OpenSSH: key-only once a key is listed; until then passwords work, so a fresh install is reachable
     services.openssh = lib.mkIf cfg.sshd.enable {
       enable = true;
+      openFirewall = !cfg.sshd.tailnetOnly;
       settings = {
         PermitRootLogin = "no";
         PasswordAuthentication = lib.mkDefault noKeys;
         KbdInteractiveAuthentication = lib.mkDefault noKeys;
       };
     };
-    users.users.${username}.openssh.authorizedKeys.keys = cfg.sshd.authorizedKeys;
+    assertions = [{
+      assertion = cfg.sshd.tailnetOnly -> config.modules.tailscale.enable;
+      message = "core.headless.sshd.tailnetOnly needs modules.tailscale.enable, or sshd is unreachable";
+    }];
+
+    users.users = lib.mkMerge [
+      { ${username}.openssh.authorizedKeys.keys = cfg.sshd.authorizedKeys; }
+      # no password is ever set for a guest, so the key is the only way in
+      (lib.mapAttrs (_: keys: {
+        isNormalUser = true;
+        openssh.authorizedKeys.keys = keys;
+      }) cfg.guests)
+    ];
 
     # enable running foreign binaries on NixOS (allows vscode server over Remote-SSH)
     programs.nix-ld.enable = lib.mkDefault true;

@@ -10,6 +10,11 @@
       default = default;
       description = desc;
     };
+    mkIntOption = desc: default: lib.mkOption {
+      type = lib.types.ints.unsigned;
+      default = default;
+      description = desc;
+    };
     mkLinesOption = desc: default: lib.mkOption {
       default = default;
       type = lib.types.lines;
