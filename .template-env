@@ -6,5 +6,5 @@
 # NIXCONFIG_USERNAME : the username for the nix config, to get home manager options using `nix eval`
 NIXTYPE=nix-darwin
 NIXCONFIG=vgmacbook
-NIXCONFIG_VERSION=25.11
+NIXCONFIG_VERSION=26.05
 NIXCONFIG_USERNAME=vaibhav

@@ -14,12 +14,12 @@
 let
   cfg = config.modules.homebrew;
 
-  # `homebrew.brewPrefix` already ends in `/bin` (e.g. `/opt/homebrew/bin`).
-  brewBin = "${config.homebrew.brewPrefix}/brew";
+  # `homebrew.prefix` is Homebrew's root, as `brew --prefix` prints it (e.g. `/opt/homebrew`).
+  brewBin = "${config.homebrew.prefix}/bin/brew";
 
   # launchd agents start from a bare environment, so brew and the base system
   # tools it shells out to have to be put on PATH explicitly.
-  agentPath = "${config.homebrew.brewPrefix}:/usr/bin:/bin:/usr/sbin:/sbin";
+  agentPath = "${config.homebrew.prefix}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
 
   mkAgent = name: calendar: body: {
     script = ''

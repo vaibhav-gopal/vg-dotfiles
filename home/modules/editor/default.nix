@@ -36,6 +36,9 @@ in {
       enable = cfg.nvim.enable;
       package = cfg.nvim.package;
       defaultEditor = lib.mkIf (cfg.default == "nvim") true;
+      # home-manager writes its generated lua to nvim/init.lua, which can't land inside the
+      # out-of-store nvim.d link below; load it through the wrapper instead
+      sideloadInitLua = true;
     };
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/editor/nvim.d";
     
