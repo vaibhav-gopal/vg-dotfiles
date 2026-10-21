@@ -18,6 +18,9 @@
     opencl.enable = true; # ROCm compute
   };
 
+  # Wifi: azul and onyx are one X870 (MT7927) and one TUF X670E-PLUS WIFI (wifi 6E), which is which isn't
+  # known yet; both work on the latest kernel. Set core.wireless.chip from `lspci -nn` after install.
+
   # Joins the tailnet as its own node `vgsquid-azul`
   modules.tailscale.enable = true;
 }

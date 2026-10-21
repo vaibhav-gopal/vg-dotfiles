@@ -1,5 +1,5 @@
 # vgsquid-jade (headless server, Tenstorrent Blackhole p150a, no GPU): flips and overrides the system module options for this machine.
-# Same base hardware as vgsquid-azul and vgsquid-onyx; colleagues log in here with their own accounts.
+# X870 board (MediaTek MT7927 wifi 7); colleagues log in here with their own accounts.
 # tend: vg-dotfiles/NixOS/vgsquid-jade
 { ... }:
 {
@@ -18,10 +18,11 @@
   core.headless.guests = {
   };
 
-  # Tenstorrent Blackhole p150a: tt-kmd, tt-smi, tt-flash, 4x 1G hugepages
+  # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
   modules.tenstorrent.enable = true;
-  # LTS kernel: tt-kmd 2.7.0 doesn't build on linuxPackages_latest (7.3 dropped zap_vma_ptes)
-  core.boot.kernel = "default";
+
+  # X870 board: MediaTek MT7927 wifi 7, which needs kernel 7.2+ (the default, latest)
+  core.wireless.chip = "mt7927";
 
   # Joins the tailnet as its own node `vgsquid-jade`, shared to colleagues from the admin console.
   # No Tailscale SSH: it answers port 22 on the tailnet address and refuses shared-in users (no SSH
