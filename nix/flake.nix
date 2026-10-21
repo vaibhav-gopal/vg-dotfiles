@@ -4,7 +4,7 @@
   description = "Master Flake Composition";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     # Local sub-flakes
     nixos-src.url = "path:./nixos";
     darwin-src.url = "path:./nix-darwin";
@@ -19,7 +19,7 @@
           username = "vaibhav";
           system = "x86_64-linux";
           hostname = "vgkraken";
-          version = "25.11"; # remember this is state version not nixpkgs version!
+          version = "26.05"; # remember this is state version not nixpkgs version! (fresh install on 26.05)
           homedirectory = "/home/vaibhav";
           nixType = "nixos";
         };

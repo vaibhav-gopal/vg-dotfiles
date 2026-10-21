@@ -27,12 +27,7 @@ in {
           editor = "nvim";
         };
 
-        # Per git command overrides for pager
-        pager = {
-          diff = "delta";
-          log = "delta";
-          show = "delta";
-        };
+        # pager.{diff,log,show,blame} come from programs.delta.enableGitIntegration below
 
         init.defaultBranch = "main";
 
