@@ -78,6 +78,10 @@
         rootSelf = self;
       };
     in {
+      # the machine table itself, so scripts can look a host up without evaluating its system
+      # (nix/scripts/bootstrap reads its nixType and username before any hardware config exists)
+      inherit configurations;
+
       # make all nixos configurations
       nixosConfigurations = (nixos-src.outputs.mkNixos baseArgs) // (wsl-src.outputs.mkNixos baseArgs);
       darwinConfigurations = (darwin-src.outputs.mkNixos baseArgs);

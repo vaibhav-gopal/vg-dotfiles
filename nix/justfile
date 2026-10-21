@@ -84,9 +84,6 @@ _nix_updatechannel:
 ######################################
 
 [group('nix-darwin')]
-_nix-darwin_init: _nix-darwin_check
-    sudo -H nix --extra-experimental-features "nix-command flakes" run nix-darwin/nix-darwin-{{nixpkgs}}#darwin-rebuild -- switch --flake {{nix_directory}}#{{nixconfig}}
-[group('nix-darwin')]
 _nix-darwin_build_boot: _nix-darwin_check
     sudo -H darwin-rebuild boot --flake {{nix_directory}}#{{nixconfig}}
 [group('nix-darwin')]
@@ -108,8 +105,6 @@ _nix-darwin_unstable-channel: _nix-darwin_check _nix_removechannel && _nix_updat
 ######################################
 
 [group('nixos')]
-_nixos_init: _nixos_check
-[group('nixos')]
 _nixos_build_boot: _nixos_check
     sudo -H nixos-rebuild boot --flake {{nix_directory}}#{{nixconfig}}
 [group('nixos')]
@@ -130,8 +125,6 @@ _nixos_unstable-channel: _nixos_check _nix_removechannel && _nix_updatechannel
 ############### NIX-WSL ##############
 ######################################
 
-[group('nixos-wsl')]
-_nixos-wsl_init: _nixos-wsl_check
 [group('nixos-wsl')]
 _nixos-wsl_build_boot: _nixos-wsl_check
     sudo -H nixos-rebuild boot --flake {{nix_directory}}#{{nixconfig}}

@@ -89,11 +89,6 @@ brewfile:
     source {{justfile_directory()/scripts-dir/brew-script}} && \
     brew_brewfile "$(just --justfile {{justfile()}} _{{nixtype}}_system)"
 
-# Switch / rebuild nixos configuration for the first time (mainly for nix-darwin ; installs nix-darwin)
-init:
-    @echo -e "{{BOLD + BLUE}}Building first-time {{nixtype}} for config '{{nixconfig}}' @ {{nixpkgs}}{{NORMAL}}"
-    @just --justfile {{justfile()}} _{{nixtype}}_init
-
 # Switch / rebuild nixos configuration (with updated kernel or boot params ; applies changes only on next boot) (if supported on archetype)
 buildboot:
     @echo -e "{{BOLD + BLUE}}Building {{nixtype}} for config '{{nixconfig}}' @ {{nixpkgs}} : Applying on next boot{{NORMAL}}"
