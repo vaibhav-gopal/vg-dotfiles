@@ -11,5 +11,6 @@
     ./proton-pass
     ./spotify
     ./vscode
+    ./wallpaper
   ];
 }

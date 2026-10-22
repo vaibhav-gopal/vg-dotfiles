@@ -35,3 +35,4 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v23
       - run: nix develop --command shellcheck -x bootstrap.sh nix/scripts/*.sh nix/scripts/bootstrap/*.sh nix/scripts/tests/*.sh
       - run: bash nix/scripts/tests/bootstrap.test.sh
+      - run: bash nix/scripts/tests/wallpaper.test.sh

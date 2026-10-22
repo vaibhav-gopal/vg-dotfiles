@@ -9,5 +9,6 @@
     ./homebrew
     ./keyboard
     ./tailscale
+    ./wallpaper
   ];
 }

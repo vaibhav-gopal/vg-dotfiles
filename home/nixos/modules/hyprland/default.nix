@@ -70,10 +70,30 @@ in {
     xdg.configFile."uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
     xdg.configFile."uwsm/env-hyprland".source = link "uwsm.d/env-hyprland";
 
-    # The Great Wave off Kanagawa (Hokusai, public domain) ; referenced by hypr.d/hyprpaper.conf
+    # The Great Wave off Kanagawa (Hokusai, public domain) ; the wallpaper when the slideshow is off
     home.file.".local/share/wallpapers/great-wave.jpg".source = pkgs.fetchurl {
       url = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Tsunami_by_hokusai_19th_century.jpg";
       hash = "sha256-MMFwJg3jk/Ub1ZKtrMbwcUtg8VfAl0TpxbbUbmphNxg=";
     };
+
+    # hypr.d/hyprpaper.conf sources this: hyprpaper 0.8 runs the slideshow itself (a folder path,
+    # a timeout, random-shuffle order), filling the screen (cover)
+    xdg.configFile."hyprpaper/wallpaper.conf".text = let
+      wp = config.common.wallpapers;
+    in if wp.slideshow then ''
+      wallpaper {
+          monitor =
+          path = ${wp.folder}
+          fit_mode = cover
+          timeout = ${toString (wp.minutes * 60)}
+          order = random-shuffle
+      }
+    '' else ''
+      wallpaper {
+          monitor =
+          path = ${config.home.homeDirectory}/.local/share/wallpapers/great-wave.jpg
+          fit_mode = cover
+      }
+    '';
   };
 }

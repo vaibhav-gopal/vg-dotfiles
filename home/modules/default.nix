@@ -18,5 +18,6 @@
     ./shell
     ./ssh
     ./term
+    ./wallpapers
   ];
 }

@@ -31,6 +31,19 @@ directory: `~/vg-workspace/{projects,school,work}`, `~/vg-studio/{music,projects
 run, else SSH with the host's key). A missing one is cloned at the next rebuild; an existing one is
 never pulled or reset (`git pull` is yours).
 
+Desktops show `~/vg-wallpapers/wallpapers` as a shuffled slideshow, a new image every 30 minutes,
+filling the screen (`common.wallpapers`): hyprpaper cycles the folder itself on Hyprland, Plasma's
+own slideshow is pointed at it at login, and GNOME and macOS run `vg-wallpaper` (`vg-wallpaper pick`
+shows what it would choose next).
+
+## Claude Code
+
+Every machine has two profiles, as on Windows: `claude` (personal, `~/.claude-personal`) and
+`claude-work` (`~/.claude-work`); each clears `CLAUDE_CODE_OAUTH_TOKEN` so one profile's token never
+reaches the other, and `claude` still follows a project's own `CLAUDE_CONFIG_DIR` (direnv). A host
+that's only ever one of them sets `common.claude-code.profiles = [ "work" ];` (or `[ ]`);
+`claude-profiles` shows which are logged in.
+
 ## Setting up a machine
 
 Install the OS (NixOS, NixOS-WSL, or macOS with nix), then:
