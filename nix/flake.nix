@@ -92,11 +92,17 @@
       # -- Hence, we do both!
       homeConfigurations = (nixos-src.outputs.mkHome baseArgs) // (wsl-src.outputs.mkHome baseArgs) // (darwin-src.outputs.mkHome baseArgs);
 
+      # per host: the system services it runs (and where it's hosted), for Tend's estate:
+      # `nix eval --json nix#estate` (modules/estate.nix ; a host without its hardware config yet still answers)
+      estate = nixpkgs.lib.mapAttrs (_: sys: sys.config.estate.export)
+        (self.nixosConfigurations // self.darwinConfigurations);
+
       # reusable modules ; use within sub-flakes by accessing rootSelf.nixosModules
       nixosModules = {
         usrlib = import ./modules/usrlib.nix;
         home = import ./modules/home.nix;
         nix = import ./modules/nix.nix;
+        estate = import ./modules/estate.nix;
       };
 
       homeModules = {

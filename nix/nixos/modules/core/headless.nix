@@ -46,6 +46,15 @@ in {
         KbdInteractiveAuthentication = lib.mkDefault noKeys;
       };
     };
+    estate.services = lib.optional cfg.sshd.enable {
+      name = "openssh";
+      unit = "sshd.service";
+      tailnet_only = cfg.sshd.tailnetOnly;
+      notes = lib.concatStringsSep "; " ([
+        (if noKeys then "password login until a key is listed" else "key login only")
+      ] ++ lib.optional (cfg.guests != { }) "guest accounts (key only, no sudo): ${lib.concatStringsSep ", " (lib.attrNames cfg.guests)}");
+    };
+
     assertions = [{
       assertion = cfg.sshd.tailnetOnly -> config.modules.tailscale.enable;
       message = "core.headless.sshd.tailnetOnly needs modules.tailscale.enable, or sshd is unreachable";

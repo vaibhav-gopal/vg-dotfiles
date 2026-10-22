@@ -12,4 +12,7 @@
   # .wslconfig's nestedVirtualization=true, and the user opens /dev/kvm through its group. Nix's
   # system-features already include kvm and nixos-test (the NixOS default).
   users.users.${username}.extraGroups = [ "kvm" ];
+
+  # a WSL2 distro on the Windows desktop (vg-dotfiles-windows' VGHYDRA)
+  estate.hostedOn = "vghydra";
 }

@@ -39,6 +39,11 @@ in {
     # LACT daemon (applies saved fan / power profiles at boot) + overdrive (amdgpu.ppfeaturemask) so it may change them
     services.lact.enable = lib.mkIf (cfg.amd.enable && cfg.amd.lact.enable) true;
     hardware.amdgpu.overdrive.enable = lib.mkIf (cfg.amd.enable && cfg.amd.lact.enable) true;
+    estate.services = lib.optional (cfg.amd.enable && cfg.amd.lact.enable) {
+      name = "lact";
+      unit = "lactd.service";
+      notes = "AMD GPU fan curves and power limits (overdrive on)";
+    };
 
     # ROCm OpenCL ; compute needs /dev/kfd + the render node, owned by the render / video groups
     hardware.amdgpu.opencl.enable = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) true;

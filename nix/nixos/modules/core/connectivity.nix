@@ -43,11 +43,13 @@ in {
     (lib.mkIf (cfginternet.enable && cfginternet.method == "networkmanager") {
       # Enable networking via networkmanager
       networking.networkmanager.enable = true;
+      estate.services = [{ name = "networkmanager"; unit = "NetworkManager.service"; }];
     })
     # Handle wpa_supplicant
     (lib.mkIf (cfginternet.enable && cfginternet.method == "wpa_supplicant") {
       # Enables wireless support via wpa_supplicant.
       networking.wireless.enable = true;
+      estate.services = [{ name = "wpa_supplicant"; unit = "wpa_supplicant.service"; }];
     })
 
     # Both chips load their firmware from linux-firmware (core.boot turns on hardware.enableAllFirmware)
@@ -78,11 +80,13 @@ in {
       };
       # Boot (load bluetooth kernel modules, explicitly)
       boot.kernelModules = ["btusb" "bluetooth"];
+      estate.services = [{ name = "bluetooth"; unit = "bluetooth.service"; }];
     })
 
     (lib.mkIf cfgprinting.enable {
       # Enable CUPS to print documents.
       services.printing.enable = true;
+      estate.services = [{ name = "cups"; unit = "cups.service"; }];
     })
   ];
 }

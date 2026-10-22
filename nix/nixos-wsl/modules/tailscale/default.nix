@@ -21,5 +21,11 @@ in {
 
     # Trust traffic arriving over the tailnet.
     networking.firewall.trustedInterfaces = [ "tailscale0" ];
+
+    estate.services = [{
+      name = "tailscale";
+      unit = "tailscaled.service";
+      notes = "own tailnet node, separate from the Windows host; Tailscale SSH ${if cfg.ssh then "on" else "off"}";
+    }];
   };
 }

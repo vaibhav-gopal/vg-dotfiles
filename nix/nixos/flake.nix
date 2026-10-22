@@ -49,6 +49,7 @@
             rootSelf.nixosModules.usrlib
             rootSelf.nixosModules.home
             rootSelf.nixosModules.nix
+            rootSelf.nixosModules.estate
             ./modules
 
             #################USER#################

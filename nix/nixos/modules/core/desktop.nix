@@ -18,6 +18,11 @@ in {
     (lib.mkIf (cfglogin.enable && cfglogin.select == "sddm") {
       # Enable the simple desktop display manager (SDDM)
       services.displayManager.sddm.enable = true;
+      estate.services = [{
+        name = "sddm";
+        unit = "display-manager.service";
+        notes = "login screen; sessions: ${if cfgdesktop.enable then lib.concatStringsSep ", " cfgdesktop.sessions else "none"}";
+      }];
     })
     (lib.mkIf (cfgdesktop.enable && lib.elem "plasma" cfgdesktop.sessions) {
       # Enable the KDE Plasma Desktop Environment.

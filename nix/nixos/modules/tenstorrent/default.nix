@@ -31,6 +31,10 @@ in {
     boot.extraModulePackages = [ tt-kmd ];
     boot.kernelModules = [ "tenstorrent" ];
     services.udev.packages = [ tt-kmd ];
+    estate.services = [{
+      name = "tenstorrent";
+      notes = "tt-kmd ${tt-kmd.version} kernel driver (/dev/tenstorrent/*, open to every user), ${toString cfg.hugepages}x 1G hugepages at /dev/hugepages-1G; tt-smi";
+    }];
 
     # nixpkgs 26.05's tt-smi pins tt-tools-common==1.4.28 but ships 1.6.0, so its runtime-deps check fails the
     # build. pythonRelaxDeps doesn't reach it (the relax hook never runs before the check in this package), so

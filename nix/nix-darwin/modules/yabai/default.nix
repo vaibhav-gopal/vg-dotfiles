@@ -15,9 +15,16 @@ in {
     config = usrlib.mkAttrsOption "Yabai config, (key-value pairs)" {};
   };
 
-  config.services.yabai = lib.mkIf cfg.enable {
-    enable = true;
-    config = cfg.config;
-    enableScriptingAddition = cfg.enable_full_features;
+  config = lib.mkIf cfg.enable {
+    services.yabai = {
+      enable = true;
+      config = cfg.config;
+      enableScriptingAddition = cfg.enable_full_features;
+    };
+    estate.services = [{
+      name = "yabai";
+      unit = "org.nixos.yabai";
+      notes = "tiling window manager; scripting addition ${if cfg.enable_full_features then "on (SIP partly off)" else "off"}";
+    }];
   };
 }
