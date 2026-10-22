@@ -26,8 +26,10 @@ home-manager layer. Windows has its own repo, vg-dotfiles-windows.
 Every machine gets the same user-data tree as Windows (where it's `C:\vg-*`), in the home
 directory: `~/vg-workspace/{projects,school,work}`, `~/vg-studio/{music,projects,samples,.scratch}`,
 `~/vg-documents`, `~/vg-library`, `~/vg-tools/{bin,installers,licenses,standalone}`
-(`common.folders`). Machines with a desktop also clone the private `vg-wallpapers` repo into
-`~/Pictures/vg-wallpapers` once `gh auth login` has run; a rebuild never pulls it (`git pull` there does).
+(`common.folders`). Every machine also clones the machine repos beside `~/vg-dotfiles`:
+`~/vg-paradigms`, `~/vg-deployments`, `~/vg-wallpapers` (private: HTTPS once `gh auth login` has
+run, else SSH with the host's key). A missing one is cloned at the next rebuild; an existing one is
+never pulled or reset (`git pull` is yours).
 
 ## Setting up a machine
 

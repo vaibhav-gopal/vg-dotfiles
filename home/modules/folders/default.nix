@@ -1,14 +1,30 @@
 # the user-data folders every machine shares with vg-dotfiles-windows (~/vg-workspace, ~/vg-studio, ...
-# where Windows has C:\vg-*), and the vg-wallpapers repo cloned into ~/Pictures.
+# where Windows has C:\vg-*), and the machine repos (vg-paradigms, vg-deployments, vg-wallpapers)
+# cloned beside this repo's checkout, as Windows clones them beside its own.
 # tend: vg-dotfiles/Home/folders
 { config, lib, pkgs, usrlib, ... }:
 let
   cfg = config.common.folders;
   home = config.home.homeDirectory;
-  wallpapersDir = "${home}/${cfg.wallpapers.path}";
+
+  # Clone-only: a missing repo is cloned, an existing one is never pulled or reset, so work in it is
+  # never clobbered (`git pull` is the user's). All are private: HTTPS through gh's credentials first,
+  # then SSH with the host's key; neither may prompt during activation. A clone that can't happen yet
+  # warns and leaves the rebuild alone; the next one tries again.
+  cloneRepo = name: url: let
+    dir = "${home}/${name}";
+    ssh = lib.replaceStrings [ "https://github.com/" ] [ "git@github.com:" ] url;
+  in ''
+    if [ ! -d "${dir}/.git" ]; then
+      if ! GIT_TERMINAL_PROMPT=0 run ${pkgs.git}/bin/git clone --quiet "${url}" "${dir}" 2>/dev/null \
+        && ! GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new" run ${pkgs.git}/bin/git clone --quiet "${ssh}" "${dir}" 2>/dev/null; then
+        warnEcho "${name} not cloned (\`gh auth login\` or an SSH key on GitHub, then rebuild)"
+      fi
+    fi
+  '';
 in {
   options.common.folders = {
-    enable = usrlib.mkEnableOptionTrue "Create the shared user-data folders in the home directory";
+    enable = usrlib.mkEnableOptionTrue "Create the shared user-data folders and clone the machine repos";
     # The same tree as vg-dotfiles-windows' home.psd1 `folders`, relative to the home directory
     dirs = usrlib.mkListOfStringsOption "Folders created (if missing) under the home directory" [
       "vg-documents/receipts"
@@ -25,10 +41,11 @@ in {
       "vg-workspace/school"
       "vg-workspace/work"
     ];
-    wallpapers = {
-      enable = usrlib.mkEnableOptionTrue "Clone the vg-wallpapers repo (private) if it's missing; never pulled by a rebuild";
-      repo = usrlib.mkStringOption "The wallpaper repo, over HTTPS so gh's credentials clone it before the machine has an SSH key" "https://github.com/vaibhav-gopal/vg-wallpapers.git";
-      path = usrlib.mkStringOption "Where it's cloned, under the home directory (images in its wallpapers/ folder)" "Pictures/vg-wallpapers";
+    # Project repos are deliberately not here: projects start blank
+    repos = usrlib.mkAttrsOption "Repos cloned (if missing) to ~/<name>, beside the vg-dotfiles checkout: name = HTTPS URL" {
+      vg-paradigms = "https://github.com/vaibhav-gopal/vg-paradigms.git"; # the baseline (Tend's home)
+      vg-deployments = "https://github.com/vaibhav-gopal/vg-deployments.git";
+      vg-wallpapers = "https://github.com/vaibhav-gopal/vg-wallpapers.git"; # images in wallpapers/
     };
   };
 
@@ -36,17 +53,8 @@ in {
     home.activation = {
       vgFolders = lib.hm.dag.entryAfter [ "writeBoundary" ]
         (lib.concatMapStringsSep "\n" (d: ''run mkdir -p "${home}/${d}"'') cfg.dirs);
-
-      # A clone that can't happen yet (gh not logged in, offline) warns and leaves the rebuild alone;
-      # the next one tries again. `git pull` in it brings new images.
-      vgWallpapers = lib.mkIf cfg.wallpapers.enable (lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" ] ''
-        if [ ! -d "${wallpapersDir}/.git" ]; then
-          run mkdir -p "$(dirname "${wallpapersDir}")"
-          if ! GIT_TERMINAL_PROMPT=0 run ${pkgs.git}/bin/git clone --quiet "${cfg.wallpapers.repo}" "${wallpapersDir}"; then
-            warnEcho "vg-wallpapers not cloned (log in with \`gh auth login\`, then rebuild)"
-          fi
-        fi
-      '');
+      vgRepos = lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" ]
+        (lib.concatStringsSep "\n" (lib.mapAttrsToList cloneRepo cfg.repos));
     };
   };
 }
