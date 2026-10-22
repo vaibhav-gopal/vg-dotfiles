@@ -2,11 +2,6 @@
 # tend: vg-dotfiles/nix-darwin/vgmacbook
 { config, ... }:
 {
-  common.claude-code = {
-    profiles = [ "personal" "work" ];
-    defaultProfile = "personal";
-  };
-
   common.freerdp = {
     enable = true;
     defaultArgs = [
