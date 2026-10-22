@@ -10,6 +10,7 @@
     ./bun
     ./claude-code
     ./editor
+    ./folders
     ./freerdp
     ./git
     ./java

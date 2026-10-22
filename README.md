@@ -21,6 +21,14 @@ home-manager layer. Windows has its own repo, vg-dotfiles-windows.
 | `vgwsl2` | nixos-wsl | NixOS under WSL2 on the Windows desktop |
 | `vgmacbook` | nix-darwin | MacBook, with Homebrew for GUI apps |
 
+## Folders
+
+Every machine gets the same user-data tree as Windows (where it's `C:\vg-*`), in the home
+directory: `~/vg-workspace/{projects,school,work}`, `~/vg-studio/{music,projects,samples,.scratch}`,
+`~/vg-documents`, `~/vg-library`, `~/vg-tools/{bin,installers,licenses,standalone}`
+(`common.folders`). Machines with a desktop also clone the private `vg-wallpapers` repo into
+`~/Pictures/vg-wallpapers` once `gh auth login` has run; a rebuild never pulls it (`git pull` there does).
+
 ## Setting up a machine
 
 Install the OS (NixOS, NixOS-WSL, or macOS with nix), then:

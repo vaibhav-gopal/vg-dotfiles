@@ -18,6 +18,7 @@ in {
     nixtype.spotify.enable = lib.mkDefault false;
     nixtype.vscode.enable = lib.mkDefault false;
 
+    common.folders.wallpapers.enable = lib.mkDefault false; # no desktop to show them
     common.term.kitty.enable = lib.mkDefault false;
     common.editor.zed.enable = lib.mkDefault false;
   };
