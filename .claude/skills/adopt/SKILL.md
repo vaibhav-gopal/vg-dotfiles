@@ -15,7 +15,7 @@ theirs, with its command.
    stops at, with its command, and wait. The first draft (a part per folder of unowned code, filed as a
    proposal) and the documents (the repo's Markdown held where it is, its TODO list made todos) are Tend's:
    `tend adopt` takes them when the user runs it.
-2. **Refine the root:** `design_refine` with the root node. It reads what the code shows, without a model:
+2. **Refine the root:** `impl_score` with the root node and `refine: true`. It reads what the code shows, without a model:
    the parts its folders suggest, what each uses, its tests, the rules its code keeps, its packages and
    their licenses, what's unowned, and its parity (owned, tested, checked, documented).
 3. **Propose what it found**, in one `design_propose`: its mechanical changes as they are, and the drafts
@@ -23,10 +23,10 @@ theirs, with its command.
    its todos: each part's intent (what it's for, not how), with status `done` for what works and `building`
    for what's partial. Relations the code shows aren't declared: they're read from the code. Declare only
    what code can't show (planned parts, `conflicts_with`, `replaces`, other projects).
-4. **Work down:** once the user accepts it, `design_refine` each part, and propose again. A part is adopted
+4. **Work down:** once the user accepts it, refine each part (`impl_score` with `refine: true`), and propose again. A part is adopted
    when its parity is full or what's missing is a todo. In a large repo the code's scope `design` reads only
    what's refined so far; widen it a folder at a time.
-5. **Decisions already made:** from commit history (`code_history`) and the docs, record the big ones as
+5. **Decisions already made:** from commit history (`design_history` with a file) and the docs, record the big ones as
    journal decisions, with what they rest on. Where a document's section describes a node, it can name it in
    a `<!-- rests on: design:... -->` comment, so it's flagged when the node changes.
 6. **Check it:** `design_review` and `impl_score`. Leave gaps in docs and tests as todos rather than

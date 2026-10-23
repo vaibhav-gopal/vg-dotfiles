@@ -53,11 +53,12 @@ The accepted way first:
 
 Then the code:
 
-- `tend_find`, `code_refs` and `code_symbol` for the concern's markers (an error crate, `unwrap`,
+- `tend_find`, and your own search (grep), for the concern's markers (an error crate, `unwrap`,
   `map_err`, a logger, `println!`, a config loader).
 - `code_outline` of a few files that are typical of the repo.
-- `code_graph {node}` to see which parts of the design do it which way.
-- `code_history` for when each way appeared. The newer one is the way the repo is moving.
+- `design_impact {node, graph: true}` to see which parts of the design do it which way.
+- `design_history` with the file or symbol, for when each way appeared. The newer one is the way the repo
+  is moving.
 
 Write it down as a table: each variant, the files and nodes using it, how many, its newest use, and
 whether a toolbox pattern, rule or decision names it.

@@ -26,7 +26,7 @@ For each changed file, from Tend:
 - `design_rules {file}`, with the node each rule comes from.
 - `design_journal {node, kind: "misstep"}` for each owning node: what went wrong here before.
 - `design_node {node}` for each owning node: its checks, and whether each reaches its code.
-- For each new or changed dependency: `env_dependency {package}` (used elsewhere already? its license
+- For each new or changed dependency: `env_toolbox {package}` (used elsewhere already? its license
   allowed?) and `env_toolbox {name}` (approved, or to avoid, and what instead).
 - `tend_conduct` for how this project works.
 
@@ -42,12 +42,12 @@ with why each was flagged and the evidence: a line, and a rule, decision or comm
    superseding it. Quote the rule or decision.
 2. **Bugs:** a shallow scan of the diff for real bugs. Stay within the changes. Look for bugs that will
    bite, not nitpicks.
-3. **History:** `code_history` for the touched files and symbols, and the owning nodes' missteps. Is a
+3. **History:** `design_history` with the touched files and symbols, and the owning nodes' missteps. Is a
    past mistake being made again? Is something being undone that was done for a reason?
 4. **Toolbox and dependencies:** new imports against the toolbox (`avoid`, `instead_of`), and licenses
    against the policy.
 5. **Documentation:** the changed symbols' doc comments still say what the code does, `tend:` tags still
-   resolve and fit, and changed behavior a document describes is reflected (`code_docs`).
+   resolve and fit, and changed behavior a document describes is reflected (`code_outline` with `docs`).
 6. **Tests and freshness:** new behavior in a node that has tests but no test reaching it, and tests
    linked to a node that don't reach its code. Also what the change leaves stale: `tend_basis` on each
    owning node, and the document sections and decisions resting on them.
