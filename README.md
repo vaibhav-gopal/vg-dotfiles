@@ -93,6 +93,14 @@ reachable only over the tailnet.
 - **A colleague:** add `name = [ "ssh-ed25519 ..." ];` to `core.headless.guests` (key-only, no sudo),
   rebuild, then share the node with them from the Tailscale admin console.
 
+## Exports others read
+
+`nix eval --json nix#configurations` (the machine table) and `nix#estate` (per host, the system services
+it runs, from `estate.services` in the modules that turn them on) are read by Tend and the layers above
+it. Their shape is a contract versioned by `nix#exports.version`: renaming or removing a field, or
+changing what one means, bumps it (adding one doesn't), and `nix/scripts/tests/exports.test.sh` (in CI)
+fails until it does.
+
 ## Day to day
 
 `just` runs everything once `.env` exists (`just` alone lists the recipes):

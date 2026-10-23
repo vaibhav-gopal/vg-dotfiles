@@ -78,8 +78,18 @@
         rootSelf = self;
       };
     in {
+      # EXPORTS: `configurations` and `estate` are read by others (Tend's estate, vg-paradigms' layers
+      # above), so their shape is a contract: renaming or removing a field, or changing what one means,
+      # bumps `exports.version` (adding a field doesn't). nix/scripts/tests/exports.test.sh checks the shape.
+      # The version lives here, not inside them: both are keyed by host name.
+      exports = {
+        version = 1;
+        outputs = [ "configurations" "estate" ];
+      };
+
       # the machine table itself, so scripts can look a host up without evaluating its system
       # (nix/scripts/bootstrap reads its nixType and username before any hardware config exists)
+      # Export (exports.version): host = { username, system, hostname, version, homedirectory, nixType }
       inherit configurations;
 
       # make all nixos configurations
@@ -94,6 +104,7 @@
 
       # per host: the system services it runs (and where it's hosted), for Tend's estate:
       # `nix eval --json nix#estate` (modules/estate.nix ; a host without its hardware config yet still answers)
+      # Export (exports.version): host = { services = [ { name, kind, unit?, tailnet_only?, notes? } ], hosted_on? }
       estate = nixpkgs.lib.mapAttrs (_: sys: sys.config.estate.export)
         (self.nixosConfigurations // self.darwinConfigurations);
 
