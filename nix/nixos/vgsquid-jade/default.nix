@@ -20,6 +20,11 @@
   # sshd only over the tailnet: colleagues get this node shared to them from the Tailscale admin console
   core.headless.sshd.tailnetOnly = true;
 
+  # My own logins (key only from here on: password SSH turns off once a key is listed)
+  core.headless.sshd.authorizedKeys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2FsO6M1RRG5pCaYEJej7umAreRYVuNSiWDZ2+RWSDK vaibhav@vghydra"
+  ];
+
   # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo; each also
   # gets a Slurm association (modules.slurm).
   core.headless.guests = {
