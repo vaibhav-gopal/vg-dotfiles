@@ -27,7 +27,11 @@
 
   # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo; each also
   # gets a Slurm association (modules.slurm).
+  # (the repo is public: keys go in without their email comments)
   core.headless.guests = {
+    yaxpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC+9kv47Xz056iKwY72jNH3VS3VlwmgVpa+gZy4LOp6T" ];
+    sameerjuin = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHvW68NIUNs1iZpFVqa8krdwWhOI99DcTYfyUmD4MyVW" ];
+    siddhpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOqv/C//S5qW07M7/Mj7B2BnotUfcgOkvrvMmogum5QE" ];
   };
 
   # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
