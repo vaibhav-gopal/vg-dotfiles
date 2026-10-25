@@ -1,0 +1,2 @@
+{"batch":"01a165ad-0438-7009-b77c-a9578b162f19","after":"01a15fba-d409-74b9-8d0b-b5835becb6c2","author":"agent:claude-code","at":1792707200056,"message":"News reviewed: 1 item(s)"}
+{"op":"reply.add","id":"01a165ad-0436-773d-a677-6f745a7498e6","kind":"news","title":"News reviewed: 1 item(s)","body":"- autodyne finished milestones 2 (lanes M2 to lanes M3) (progress:autodyne/milestone:lanes M3): no effect here: autodyne's lane milestones change its own Rust/Python toolbox entries; nothing in vg-dotfiles builds with autodyne or those stacks."}
