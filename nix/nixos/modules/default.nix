@@ -11,6 +11,7 @@
 
     # MODULES
     ./steam
+    ./slurm
     ./tailscale
     ./tenstorrent
     ./vivaldi

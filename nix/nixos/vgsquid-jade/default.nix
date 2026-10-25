@@ -20,12 +20,20 @@
   # sshd only over the tailnet: colleagues get this node shared to them from the Tailscale admin console
   core.headless.sshd.tailnetOnly = true;
 
-  # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo.
+  # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo; each also
+  # gets a Slurm association (modules.slurm).
   core.headless.guests = {
   };
 
   # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
   modules.tenstorrent.enable = true;
+
+  # Slurm schedules the cores and the card: the card is root-only outside a job, logins get 2 CPUs
+  # and 8 GiB between them, fairshare from slurmdbd. Node line from `slurmd -C` on jade (Ryzen, 12 cores).
+  modules.slurm = {
+    enable = true;
+    node = "CPUs=24 Boards=1 SocketsPerBoard=1 CoresPerSocket=12 ThreadsPerCore=2 RealMemory=63432";
+  };
 
   # X870 board: MediaTek MT7927 wifi 7, which needs kernel 7.2+ (the default, latest)
   core.wireless.chip = "mt7927";
