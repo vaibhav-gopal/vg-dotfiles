@@ -112,6 +112,7 @@
       nixosModules = {
         usrlib = import ./modules/usrlib.nix;
         home = import ./modules/home.nix;
+        profiles = import ./modules/profiles.nix;
         nix = import ./modules/nix.nix;
         estate = import ./modules/estate.nix;
       };

@@ -84,14 +84,40 @@ to restart the distro as your user; then clone again into that user's `~/vg-dotf
    system one imports `./hardware-configuration.nix` (the bootstrap copies it in).
 3. Turn on what it needs (`core.*`, `modules.*`), then `./bootstrap.sh <host>` on the machine.
 
+### Users and profiles
+
+`profiles.users` in a host's `nix/<platform>/<host>/default.nix` is the one list of who logs in there.
+The configuration's user is the **admin**: sudo, the full home layer linked live into this checkout,
+and the host's own home folder (`home/<platform>/<host>`). Everyone else is **standard**: their own
+account and home layer, no sudo, config files copied into the store (they can't read the checkout).
+
+```nix
+profiles.users.alex.logins = [ "ssh" ];           # or [ "console" "ssh" ]
+core.headless.sshd.userKeys.alex = [ "ssh-ed25519 AAAA..." ];
+```
+
+- **Logins:** sshd admits only users with `ssh`; the tty and SDDM refuse those without `console`.
+- **Passwords:** the admin's comes from the install. A standard user's first shell asks them to set
+  one (`vg-first-password`, the one thing they may run as root, once).
+- **What each profile gets:** each home feature has a mask, the profiles it's on for
+  (`usrlib.mkProfileEnableOption`). Opinionated or personal features (folders and repo clones, zellij
+  auto-start, kitty, Zed, the desktop apps, your git identity and Claude accounts) are admin-only;
+  toolchains, Claude Code and `gh` are for everyone. A host changes a mask with
+  `profiles.masks."term.zellij.auto_start" = [ "admin" "standard" ];`, and one user's own settings go in
+  `profiles.users.<name>.home`.
+- **Help:** a module sets `dot.help.<topic>` (inline `text`, a `.md` `file` in the repo, or both) inside
+  its `mkIf enable`, so the topic comes and goes with it; system topics say whose `dot` shows them.
+
 ### Servers, and giving colleagues access
 
 Headless hosts (`core.headless.enable`) run OpenSSH; with `core.headless.sshd.tailnetOnly` it is
 reachable only over the tailnet.
 
 - **Your key:** add it to `core.headless.sshd.authorizedKeys`; password login stays on until one is listed.
-- **A colleague:** add `name = [ "ssh-ed25519 ..." ];` to `core.headless.guests` (key-only, no sudo),
-  rebuild, then share the node with them from the Tailscale admin console.
+- **A colleague:** list them in `profiles.users` with their keys in `core.headless.sshd.userKeys`,
+  rebuild, then share the node with them from the Tailscale admin console. With
+  `core.headless.isolation.enable` they can't reach the tailnet or LAN from the host, see only their
+  own processes and get a private `/tmp` (`nix/nixos/modules/core/isolation.nix`).
 
 ## Exports others read
 

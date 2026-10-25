@@ -26,10 +26,17 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ8q3ar8jmEBCUxLGgXU2CgTlivUv9nIkbNbbk8Y0BGA vaibhav@iphone-14-pro-max"
   ];
 
-  # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo; each also
-  # gets a Slurm association (modules.slurm).
+  # Who logs in here (I'm the admin, from the configuration): colleagues over ssh only, as standard
+  # users; each also gets a Slurm association (modules.slurm) and the isolation below
+  profiles.users = {
+    yaxpatel.logins = [ "ssh" ];
+    sameerjuin.logins = [ "ssh" ];
+    siddhpatel.logins = [ "ssh" ];
+  };
+
+  # Their keys: name = [ "ssh-ed25519 AAAA..." ]. Key login only, no sudo
   # (the repo is public: keys go in without their email comments)
-  core.headless.guests = {
+  core.headless.sshd.userKeys = {
     yaxpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC+9kv47Xz056iKwY72jNH3VS3VlwmgVpa+gZy4LOp6T" ];
     sameerjuin = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHvW68NIUNs1iZpFVqa8krdwWhOI99DcTYfyUmD4MyVW" ];
     siddhpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOqv/C//S5qW07M7/Mj7B2BnotUfcgOkvrvMmogum5QE" ];

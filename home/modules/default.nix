@@ -5,6 +5,7 @@
   imports = [
     # Core configuration
     ./core.nix
+    ./profile.nix
 
     # Features
     ./bun

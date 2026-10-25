@@ -6,7 +6,7 @@ let
 in {
   # MODULE OPTIONS DECLARATION
   options.nixtype.vscode = {
-    enable = usrlib.mkEnableOptionTrue "Enable vscode application";
+    enable = usrlib.mkProfileEnableOption config "vscode" "Enable vscode application" [ "admin" ];
     package = usrlib.mkPackageOption "The vscode package to use" pkgs-unstable.vscode;
   };
 

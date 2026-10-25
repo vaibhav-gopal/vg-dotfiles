@@ -19,6 +19,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v23
       - run: bash nix/scripts/check-hosts.sh
       - run: bash nix/scripts/tests/exports.test.sh
+      - run: bash nix/scripts/tests/profiles.test.sh
 
   home:
     name: build the home layer (vgwsl2)

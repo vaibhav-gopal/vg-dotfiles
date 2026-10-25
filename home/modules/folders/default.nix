@@ -24,7 +24,7 @@ let
   '';
 in {
   options.common.folders = {
-    enable = usrlib.mkEnableOptionTrue "Create the shared user-data folders and clone the machine repos";
+    enable = usrlib.mkProfileEnableOption config "folders" "Create the shared user-data folders and clone the machine repos" [ "admin" ];
     # The same tree as vg-dotfiles-windows' home.psd1 `folders`, relative to the home directory
     dirs = usrlib.mkListOfStringsOption "Folders created (if missing) under the home directory" [
       "vg-documents/receipts"

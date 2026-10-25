@@ -11,7 +11,7 @@ in {
       enable = usrlib.mkEnableOptionTrue "Enable zellij the terminal multiplexer";
       enable_config = usrlib.mkEnableOptionTrue "Enable zellij config setup";
       package = usrlib.mkPackageOption "Default zellij package to use" pkgs.zellij;
-      auto_start = usrlib.mkEnableOptionTrue "Enable zellij auto-start on shell start (shell-integration recommended)";
+      auto_start = usrlib.mkProfileEnableOption config "term.zellij.auto_start" "Enable zellij auto-start on shell start (shell-integration recommended)" [ "admin" ];
     };
     yazi = {
       enable = usrlib.mkEnableOptionTrue "Enable yazi the terminal file explorer";
@@ -24,7 +24,7 @@ in {
       package = usrlib.mkPackageOption "Default starship package to use" pkgs.starship;
     };
     kitty = {
-      enable = usrlib.mkEnableOptionTrue "Enable kitty terminal emulator";
+      enable = usrlib.mkProfileEnableOption config "term.kitty" "Enable kitty terminal emulator" [ "admin" ];
       enable_config = usrlib.mkEnableOptionTrue "Enable kitty config setup";
       package = usrlib.mkPackageOption "Default kitty package to use" pkgs.kitty;
     };
@@ -38,9 +38,7 @@ in {
       attachExistingSession = false; # attach existing session when auto-start'ing zellij
       exitShellOnExit = false; # exit shell when exiting an auto-start'ed zellij session
     };
-    xdg.configFile."zellij".source = lib.mkIf cfg.zellij.enable_config (
-      config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/term/zellij.d"
-    );
+    xdg.configFile."zellij" = lib.mkIf (cfg.zellij.enable && cfg.zellij.enable_config) { source = config.lib.dot.source "home/modules/term/zellij.d"; };
     common.shell.zsh.zshrc = lib.mkIf cfg.zellij.auto_start ''
       eval "$(zellij setup --generate-auto-start zsh)"
     '';
@@ -54,17 +52,13 @@ in {
       package = cfg.yazi.package;
       shellWrapperName = "y";
     };
-    xdg.configFile."yazi".source = lib.mkIf cfg.yazi.enable_config (
-      config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/term/yazi.d"
-    );
+    xdg.configFile."yazi" = lib.mkIf (cfg.yazi.enable && cfg.yazi.enable_config) { source = config.lib.dot.source "home/modules/term/yazi.d"; };
 
     # starship : terminal prompt
     programs.starship = lib.mkIf cfg.starship.enable {
       enable = true;
     };
-    xdg.configFile."starship.toml".source = lib.mkIf cfg.starship.enable_config (
-      config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/term/starship.d/starship.toml"
-    );
+    xdg.configFile."starship.toml" = lib.mkIf (cfg.starship.enable && cfg.starship.enable_config) { source = config.lib.dot.source "home/modules/term/starship.d/starship.toml"; };
 
     # kitty : terminal emulator (fairly simple, and barebones)
     programs.kitty = lib.mkIf cfg.kitty.enable {
@@ -75,9 +69,7 @@ in {
         shell ${pkgs.zsh}/bin/zsh
       '';
     };
-    xdg.configFile."kitty/kitty_custom.conf".source = lib.mkIf cfg.kitty.enable_config (
-      config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/term/kitty.d/kitty.conf"
-    );
+    xdg.configFile."kitty/kitty_custom.conf" = lib.mkIf (cfg.kitty.enable && cfg.kitty.enable_config) { source = config.lib.dot.source "home/modules/term/kitty.d/kitty.conf"; };
     
     # Home shell aliases
     home.shellAliases = {

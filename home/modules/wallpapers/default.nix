@@ -71,7 +71,7 @@ let
   '';
 in {
   options.common.wallpapers = {
-    slideshow = usrlib.mkEnableOptionTrue "Run the desktop wallpaper as a shuffled slideshow over the vg-wallpapers clone";
+    slideshow = usrlib.mkProfileEnableOption config "wallpapers.slideshow" "Run the desktop wallpaper as a shuffled slideshow over the vg-wallpapers clone" [ "admin" ];
     folder = usrlib.mkStringOption "The images (vg-wallpapers' contract: wallpapers/ holds images and nothing else)" "${config.home.homeDirectory}/vg-wallpapers/wallpapers";
     minutes = usrlib.mkIntOption "Minutes each image shows" 30;
     # for the platform modules that start it by path (launchd has no PATH to find it on)

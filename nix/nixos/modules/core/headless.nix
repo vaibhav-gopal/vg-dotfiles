@@ -11,9 +11,9 @@ in {
       enable = usrlib.mkEnableOptionTrue "enable the OpenSSH server";
       authorizedKeys = usrlib.mkListOfStringsOption "Public keys allowed to log in as the main user. Password login is allowed only while this is empty" [ ];
       tailnetOnly = usrlib.mkEnableOptionFalse "reach sshd only over the tailnet (tailscale0 is trusted): no firewall port on the LAN";
+      # Other users' keys; their accounts come from profiles.users
+      userKeys = usrlib.mkAttrsOption "Public keys for the other users in profiles.users, as `name = [ keys ]`" { };
     };
-    # Other people's accounts: name = [ their public keys ]. Key-only (no password), no sudo, no home-manager.
-    guests = usrlib.mkAttrsOption "Guest accounts, as `name = [ public keys ]`: SSH key login only, no sudo" { };
   };
 
   # Everything is mkDefault, so a host can still opt back in (e.g. `core.graphics.enable = true;` for a GPU compute box)
@@ -55,21 +55,20 @@ in {
       tailnet_only = cfg.sshd.tailnetOnly;
       notes = lib.concatStringsSep "; " ([
         (if noKeys then "password login until a key is listed" else "key login only")
-      ] ++ lib.optional (cfg.guests != { }) "guest accounts (key only, no sudo): ${lib.concatStringsSep ", " (lib.attrNames cfg.guests)}");
+      ] ++ lib.optional (config.profiles.standard != [ ]) "standard users (key only, no sudo): ${lib.concatStringsSep ", " config.profiles.standard}");
     };
 
     assertions = [{
       assertion = cfg.sshd.tailnetOnly -> config.modules.tailscale.enable;
       message = "core.headless.sshd.tailnetOnly needs modules.tailscale.enable, or sshd is unreachable";
-    }];
+    }] ++ map (name: {
+      assertion = config.profiles.users ? ${name};
+      message = "core.headless.sshd.userKeys.${name}: not a user in profiles.users";
+    }) (lib.attrNames cfg.sshd.userKeys);
 
     users.users = lib.mkMerge [
       { ${username}.openssh.authorizedKeys.keys = cfg.sshd.authorizedKeys; }
-      # no password is ever set for a guest, so the key is the only way in
-      (lib.mapAttrs (_: keys: {
-        isNormalUser = true;
-        openssh.authorizedKeys.keys = keys;
-      }) cfg.guests)
+      (lib.mapAttrs (_: keys: { openssh.authorizedKeys.keys = keys; }) cfg.sshd.userKeys)
     ];
 
     # enable running foreign binaries on NixOS (allows vscode server over Remote-SSH)

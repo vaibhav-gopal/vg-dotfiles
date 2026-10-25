@@ -46,9 +46,10 @@ in {
       (claude-code.packages.${pkgs.stdenv.hostPlatform.system}.claude-code or pkgs.claude-code);
     alias = usrlib.mkStringOption "Optional shell alias for Claude Code (empty disables alias)" "";
 
-    # Both on every machine; a host that's only ever one of them (a work-only server) lists just that, or none
+    # Both on every machine for the admin (a work-only server lists just that, or none); other users
+    # get plain `claude` with its own ~/.claude
     profiles = usrlib.mkListOfStringsOption
-      "Isolated account profiles (CLAUDE_CONFIG_DIR = ~/.claude-<name>); each gets its own `claude-<name>` binary" [ "personal" "work" ];
+      "Isolated account profiles (CLAUDE_CONFIG_DIR = ~/.claude-<name>); each gets its own `claude-<name>` binary" (if config.profile.isAdmin then [ "personal" "work" ] else [ ]);
     defaultProfile = usrlib.mkNullOrStringOption
       "Profile bound to the bare `claude` command (null installs the unwrapped binary); personal when it's a profile, else the first"
       (if lib.elem "personal" cfg.profiles then "personal" else if cfg.profiles != [ ] then lib.head cfg.profiles else null);

@@ -1,4 +1,4 @@
-# Guest isolation on a box shared with other people (core.headless.guests): the host is the owner's
+# Guest isolation on a box shared with other people (the standard users in profiles.users): the host is the owner's
 # own tailnet node, so a guest must not reach past it, nor see the owner's or each other's work.
 # - network: guests (primary group `guests`, which their Slurm jobs run under too) reach the internet
 #   and MagicDNS only, never the tailnet or the LAN; inbound, the tailnet gets sshd alone
@@ -11,7 +11,7 @@
 { config, lib, usrlib, pkgs, username, ... }:
 let
   cfg = config.core.headless.isolation;
-  guests = lib.attrNames config.core.headless.guests;
+  guests = config.profiles.standard;
   procGid = config.ids.gids.proc;
 
   # MagicDNS (the host's only resolver) stays reachable inside the blocked ranges
@@ -71,6 +71,17 @@ in {
     users.groups.proc.gid = procGid;
     systemd.services.systemd-logind.serviceConfig.SupplementaryGroups = [ "proc" ];
     systemd.services.polkit.serviceConfig.SupplementaryGroups = [ "proc" ];
+
+    dot.help.privacy = {
+      title = "What's private on this shared machine, and what you can reach from it";
+      profiles = [ "standard" ];
+      text = ''
+        Your home directory, your /tmp, /var/tmp and /dev/shm are yours alone (a job gets its own /tmp too).
+        You see only your own processes (ps, top) and your own Slurm jobs.
+        From here you reach the internet, not the machine owner's network or tailnet.
+        Something blocked that your work needs? Ask the admin.
+      '';
+    };
 
     environment.etc."security/namespace.conf".text = ''
       /tmp     ${instances}/tmp-     user   ${users}

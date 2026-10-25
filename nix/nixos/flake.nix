@@ -48,6 +48,7 @@
             # core modules
             rootSelf.nixosModules.usrlib
             rootSelf.nixosModules.home
+            rootSelf.nixosModules.profiles
             rootSelf.nixosModules.nix
             rootSelf.nixosModules.estate
             ./modules

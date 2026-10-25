@@ -110,6 +110,8 @@
     lg = "eza --all --git-ignore";
     llg = "eza --all --long --git-ignore";
     ltg = "eza --all --long --tree --ignore-glob .git --git-ignore --level";
+  } // lib.optionalAttrs config.profile.isAdmin {
+    # the checkout is the admin's
     dot = "$EDITOR ${config.extPaths.dotfilesDir}";
     cdot = "code ${config.extPaths.dotfilesDir}";
     zdot = "zed ${config.extPaths.dotfilesDir}";

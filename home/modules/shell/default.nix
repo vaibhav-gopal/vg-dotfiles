@@ -29,7 +29,7 @@ in {
     home.shell.enableShellIntegration = true;
 
     common.shell.zsh.zshrc = ''
-      source ${config.extPaths.commonModulesDir}/shell/shell.d/hotkeys.zshrc
+      source ${config.lib.dot.path "home/modules/shell/shell.d/hotkeys.zshrc"}
     '';
 
     programs.zsh = {

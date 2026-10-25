@@ -6,7 +6,7 @@ let
 in {
   # MODULE OPTIONS DECLARATION
   options.nixtype.minecraft = {
-    enable = usrlib.mkEnableOptionTrue "Enable prism launcher for minecraft";
+    enable = usrlib.mkProfileEnableOption config "minecraft" "Enable prism launcher for minecraft" [ "admin" ];
     package = usrlib.mkPackageOption "The prism launcher package for minecraft" pkgs.prismlauncher;
   };
 

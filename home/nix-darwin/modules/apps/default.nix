@@ -84,7 +84,7 @@ let
   ) (lib.filterAttrs (_: h: h.app) rdp.hosts);
 in {
   options.nixtype.apps = {
-    enable = usrlib.mkEnableOptionTrue "Build dockable .app bundles from `nixtype.apps.apps`";
+    enable = usrlib.mkProfileEnableOption config "apps" "Build dockable .app bundles from `nixtype.apps.apps`" [ "admin" ];
     terminalCommand = usrlib.mkStringOption
       "Command prefix that runs its (single, quoted) argument as a shell snippet in a terminal window"
       "open -na Ghostty.app --args -e /bin/bash -lc";

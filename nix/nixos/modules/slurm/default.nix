@@ -1,5 +1,5 @@
 # Slurm as a one-node cluster on a shared box: it schedules the cores, memory and Tenstorrent cards
-# between the owner and the guest accounts (core.headless.guests), with fairshare priority from
+# between the owner and the standard users (profiles.users), with fairshare priority from
 # slurmdbd accounting on a local MariaDB.
 # Access is gated, not advisory: the cards are root-only until a job is given one (the prolog adds
 # the job user's ACL, the epilog takes it back, kills what still holds the card and clears the
@@ -15,7 +15,7 @@ let
   slurmConf = "${config.services.slurm.etcSlurm}/slurm.conf";
   slurm = config.services.slurm.package;
   account = "colleagues";
-  members = [ username ] ++ lib.attrNames config.core.headless.guests;
+  members = [ username ] ++ config.profiles.standard;
   cards = lib.optionals tt.enable (map toString (lib.range 0 (cfg.cards - 1)));
   # memory kept out of jobs: the login sessions, the cards' 1G hugepages and the daemons (MiB)
   reservedMemory = cfg.login.memory + (if tt.enable then tt.hugepages * 1024 else 0) + 2048;
@@ -97,6 +97,8 @@ in {
         SchedulerType=sched/backfill
         SelectType=select/cons_tres
         SelectTypeParameters=CR_Core_Memory
+        # a job that asks for no memory gets 2 GiB per CPU, not the whole node (which blocks everyone)
+        DefMemPerCPU=2048
         TaskPlugin=task/cgroup,task/affinity
         JobAcctGatherType=jobacct_gather/cgroup
         ${lib.optionalString tt.enable "GresTypes=tt"}
@@ -198,7 +200,7 @@ in {
         after = [ "slurmdbd.service" ];
       };
 
-      # every login account (the owner and core.headless.guests) gets an association, without
+      # every login account (the owner and the standard users) gets an association, without
       # which AccountingStorageEnforce refuses its jobs
       slurm-accounts = {
         description = "Add the host's users to Slurm accounting";
@@ -216,6 +218,30 @@ in {
           done
           # PrivateData hides other users' jobs; the owner still sees and manages them all
           ${slurm}/bin/sacctmgr -i modify user ${username} set AdminLevel=Admin || true
+        '';
+      };
+    };
+
+    dot.help = {
+      slurm = {
+        title = "Running jobs: the cores, memory${lib.optionalString tt.enable " and the Tenstorrent card"} through Slurm";
+        text = ''
+          srun -c 8 --mem=16G --pty bash${lib.optionalString tt.enable "              # a shell; add --gres=tt:1 for the card"}
+          sbatch job.sh                               # unattended (#SBATCH lines at its top)
+          squeue -u $USER / scancel <id> / sinfo      # yours, stop one, how busy it is
+          Jobs default to ${cfg.defaultTime} (max ${cfg.maxTime}) and 2 GiB per CPU; logins share ${toString cfg.login.cpus} CPUs and ${toString (cfg.login.memory / 1024)} GiB.
+        '';
+        file = "nix/nixos/modules/slurm/slurm.md";
+      };
+      slurm-admin = {
+        title = "Slurm: accounts, the queue and the card (admin)";
+        profiles = [ "admin" ];
+        text = ''
+          Every user in profiles.users gets an association in `${account}` at boot (slurm-accounts.service).
+          sacctmgr show assoc format=account,user,adminlevel   # who's in
+          squeue / scontrol show job <id>                    # everyone's jobs (you're a Slurm admin)
+          scontrol update nodename=${host} state=resume      # after a drain
+          getfacl /dev/tenstorrent/0                         # who holds the card now (only a job's user)
         '';
       };
     };
