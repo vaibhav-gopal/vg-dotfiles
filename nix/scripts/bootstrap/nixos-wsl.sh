@@ -45,4 +45,4 @@ EOF
 }
 
 bs_parse_args "$@"
-bs_steps step_host step_checkout step_env step_system
+bs_steps step_host step_checkout step_env step_system step_repos

@@ -161,3 +161,15 @@ bs_build_system() { # bs_build_system <flake attribute of the system toplevel>
   fi
   nix build --no-link --print-out-paths --no-write-lock-file "$BS_FLAKE#$1"
 }
+
+# step: clone the machine repos beside the checkout (vg-repos, from the home layer's folders
+# feature), logging gh in if it has to; it only exists once the system is applied
+step_repos() {
+  local repos="${BS_REPOS:-/etc/profiles/per-user/$(id -un)/bin/vg-repos}" # the tests stand one in
+  if (( ${BS_REBOOT:-0} )) || [[ ! -x "$repos" ]]; then
+    bs_info "skipped until the system is applied (or the folders feature is off)"
+    return 0
+  fi
+  if (( BS_DRY_RUN )); then bs_info "would run: $repos --interactive"; return 0; fi
+  "$repos" --interactive || bs_warn "some repos aren't cloned yet: dot repos once gh can reach them"
+}

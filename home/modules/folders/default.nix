@@ -9,19 +9,44 @@ let
 
   # Clone-only: a missing repo is cloned, an existing one is never pulled or reset, so work in it is
   # never clobbered (`git pull` is the user's). All are private: HTTPS through gh's credentials first,
-  # then SSH with the host's key; neither may prompt during activation. A clone that can't happen yet
-  # warns and leaves the rebuild alone; the next one tries again.
-  cloneRepo = name: url: let
-    dir = "${home}/${name}";
-    ssh = lib.replaceStrings [ "https://github.com/" ] [ "git@github.com:" ] url;
-  in ''
-    if [ ! -d "${dir}/.git" ]; then
-      if ! GIT_TERMINAL_PROMPT=0 run ${pkgs.git}/bin/git clone --quiet "${url}" "${dir}" 2>/dev/null \
-        && ! GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new" run ${pkgs.git}/bin/git clone --quiet "${ssh}" "${dir}" 2>/dev/null; then
-        warnEcho "${name} not cloned (\`gh auth login\` or an SSH key on GitHub, then rebuild)"
+  # then SSH with the user's key. Not at activation: that runs as a system service, outside the
+  # session, where gh's keyring token can't be read. `vg-repos` runs at login instead (a user service,
+  # in the session) and never prompts; `vg-repos --interactive` (`dot repos`, the end of `dot
+  # bootstrap`) logs gh in first when it has to.
+  repos = pkgs.writeShellApplication {
+    name = "vg-repos";
+    runtimeInputs = [ pkgs.git pkgs.gh pkgs.openssh pkgs.coreutils ];
+    text = ''
+      interactive=0
+      [[ "''${1:-}" == --interactive ]] && interactive=1
+      # nothing may prompt unless asked: a desktop session's SSH_ASKPASS (GNOME's seahorse) pops a
+      # password dialog even with GIT_TERMINAL_PROMPT=0
+      if (( ! interactive )); then
+        unset SSH_ASKPASS GIT_ASKPASS SSH_ASKPASS_REQUIRE
+        export GIT_TERMINAL_PROMPT=0
       fi
-    fi
-  '';
+      missing=0
+      while read -r name url; do
+        dir="$HOME/$name"
+        [[ -d "$dir/.git" ]] && continue
+        if (( interactive )) && ! gh auth status >/dev/null 2>&1; then
+          echo "$name is private: log gh in first"
+          gh auth login --git-protocol https
+        fi
+        ssh_url="git@github.com:''${url#https://github.com/}"
+        if git clone --quiet "$url" "$dir" 2>/dev/null \
+          || GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new" git clone --quiet "$ssh_url" "$dir" 2>/dev/null; then
+          echo "cloned $name"
+        else
+          echo "$name not cloned (gh auth login, or an SSH key on GitHub; then vg-repos --interactive)" >&2
+          missing=1
+        fi
+      done <<'LIST'
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (n: u: "${n} ${u}") cfg.repos)}
+      LIST
+      exit "$missing"
+    '';
+  };
 in {
   options.common.folders = {
     enable = usrlib.mkProfileEnableOption config "folders" "Create the shared user-data folders and clone the machine repos" [ "admin" ];
@@ -53,8 +78,26 @@ in {
     home.activation = {
       vgFolders = lib.hm.dag.entryAfter [ "writeBoundary" ]
         (lib.concatMapStringsSep "\n" (d: ''run mkdir -p "${home}/${d}"'') cfg.dirs);
-      vgRepos = lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" ]
-        (lib.concatStringsSep "\n" (lib.mapAttrsToList cloneRepo cfg.repos));
+    };
+
+    home.packages = [ repos ];
+    # at login, in the session (where gh's token is); a repo it can't clone yet waits for the next one
+    systemd.user.services.vg-repos = lib.mkIf pkgs.stdenv.isLinux {
+      Unit.Description = "Clone the machine repos that are missing";
+      Service = { Type = "oneshot"; ExecStart = "${repos}/bin/vg-repos"; SuccessExitStatus = [ 1 ]; };
+      Install.WantedBy = [ "default.target" ];
+    };
+    launchd.agents.vg-repos = lib.mkIf pkgs.stdenv.isDarwin {
+      enable = true;
+      config = { ProgramArguments = [ "${repos}/bin/vg-repos" ]; RunAtLoad = true; };
+    };
+
+    dot.help.repos = {
+      title = "The machine repos cloned beside the checkout (vg-repos)";
+      text = ''
+        ${lib.concatStringsSep ", " (lib.attrNames cfg.repos)} are cloned to ~/<name> when missing: at every login, and by
+        `dot repos` (logs gh in first if it has to). A cloned repo is never pulled or reset.
+      '';
     };
   };
 }

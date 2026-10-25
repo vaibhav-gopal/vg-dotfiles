@@ -53,4 +53,4 @@ step_system() {
 
 command -v nix >/dev/null || bs_die "nix isn't installed: install it first (https://nixos.org/download), then re-run"
 bs_parse_args "$@"
-bs_steps step_host step_checkout step_env step_homebrew step_system
+bs_steps step_host step_checkout step_env step_homebrew step_system step_repos

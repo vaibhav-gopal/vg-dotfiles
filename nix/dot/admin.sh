@@ -34,6 +34,7 @@ ${B}Users${N}
   dot passwd                    change your password (at the machine, not over ssh)
 ${B}Setup${N}
   dot bootstrap [host] [opts]   bring this machine up to its configuration (clones the repo first)
+  dot repos                     clone the machine repos that are missing (logs gh in if it has to)
   dot brew <bootstrap|adopt|check|file>   Homebrew on nix-darwin
   dot cd | dot edit             print the checkout's path (cd "\$(dot cd)") | open it in \$EDITOR
   dot help [topic]              this, or a help topic
@@ -223,6 +224,11 @@ cmd_bootstrap() {
   exec bash "$r/nix/scripts/bootstrap/$archetype.sh" "$@"
 }
 
+cmd_repos() {
+  command -v vg-repos >/dev/null || die "no vg-repos here (the folders feature is off for you)"
+  vg-repos --interactive
+}
+
 cmd_brew() {
   [[ "$(nixtype)" == nix-darwin ]] || die "Homebrew is for nix-darwin machines"
   local cfg; cfg="$(repo)/nix#darwinConfigurations.$(host).config"
@@ -240,7 +246,7 @@ cmd_brew() {
 main() {
   local cmd="${1:-help}"; shift || true
   case "$cmd" in
-    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew)
+    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew | repos)
       "cmd_$cmd" "$@" ;;
     cd) repo ;;
     edit) exec "${EDITOR:-vi}" "$(repo)" ;;
