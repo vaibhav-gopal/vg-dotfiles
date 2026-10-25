@@ -35,6 +35,10 @@
     siddhpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOqv/C//S5qW07M7/Mj7B2BnotUfcgOkvrvMmogum5QE" ];
   };
 
+  # jade is my own tailnet node: guests can't reach the tailnet or LAN from it, see only their own
+  # processes, and get private /tmp (core/isolation.nix); the tailnet reaches only sshd here
+  core.headless.isolation.enable = true;
+
   # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
   modules.tenstorrent.enable = true;
 

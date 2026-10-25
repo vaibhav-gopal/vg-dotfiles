@@ -10,6 +10,7 @@ in {
   options.modules.tailscale = {
     enable = usrlib.mkEnableOptionFalse "Enable tailscaled on this host";
     ssh = usrlib.mkEnableOptionTrue "Advertise Tailscale SSH (`tailscale set --ssh`, applied at every boot)";
+    trustTailnet = usrlib.mkEnableOptionTrue "Trust every port arriving over the tailnet; off, tailscale0 gets only the ports the host opens on it";
   };
 
   config = lib.mkIf cfg.enable {
@@ -20,8 +21,8 @@ in {
       extraSetFlags = [ "--ssh=${lib.boolToString cfg.ssh}" ];
     };
 
-    # Trust traffic arriving over the tailnet.
-    networking.firewall.trustedInterfaces = [ "tailscale0" ];
+    # Trust traffic arriving over the tailnet (a host shared with other people turns it off).
+    networking.firewall.trustedInterfaces = lib.mkIf cfg.trustTailnet [ "tailscale0" ];
 
     estate.services = [{
       name = "tailscale";

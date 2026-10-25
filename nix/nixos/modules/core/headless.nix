@@ -46,6 +46,9 @@ in {
         KbdInteractiveAuthentication = lib.mkDefault noKeys;
       };
     };
+    # tailnet-only sshd still answers on tailscale0 when that interface isn't trusted
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts = lib.mkIf (cfg.sshd.enable && cfg.sshd.tailnetOnly) [ 22 ];
+
     estate.services = lib.optional cfg.sshd.enable {
       name = "openssh";
       unit = "sshd.service";

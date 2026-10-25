@@ -24,7 +24,10 @@ let
   # they can't name slurm.conf (or the wrappers that carry it)
   scriptPath = "export PATH=/run/current-system/sw/bin:${lib.makeBinPath [ pkgs.coreutils pkgs.findutils ]}";
 
-  # the card indices a job holds, from its detailed record (GRES=tt:p150a:1(IDX:0) or IDX:0-1,3)
+  # the card indices a job holds, from its detailed record (GRES=tt:p150a:1(IDX:0) or IDX:0-1,3).
+  # Only a running job's record carries IDX (a finished one prints GRES=tt:p150a:1), so the prolog
+  # reads it and keeps the list in cardsDir for the epilog.
+  cardsDir = "/run/slurm-tt";
   jobCards = ''
     job_cards() {
       scontrol show job -d "$SLURM_JOB_ID" \
@@ -37,19 +40,21 @@ let
     set -eu
     ${scriptPath}
     ${jobCards}
-    for i in $(job_cards); do
+    install -d -m 0700 ${cardsDir}
+    job_cards >"${cardsDir}/$SLURM_JOB_ID"
+    for i in $(cat "${cardsDir}/$SLURM_JOB_ID"); do
       ${pkgs.acl}/bin/setfacl -m "u:$SLURM_JOB_USER:rw" "/dev/tenstorrent/$i"
     done
   '';
   epilog = pkgs.writeShellScript "slurm-epilog" ''
     set -u
     ${scriptPath}
-    ${jobCards}
-    for i in $(job_cards); do
+    for i in $(cat "${cardsDir}/$SLURM_JOB_ID" 2>/dev/null); do
       ${pkgs.acl}/bin/setfacl -x "u:$SLURM_JOB_USER" "/dev/tenstorrent/$i"
       # an fd opened during the job outlives the ACL: the card is free only once nothing holds it
       ${pkgs.psmisc}/bin/fuser -k -s "/dev/tenstorrent/$i" || true
     done
+    rm -f "${cardsDir}/$SLURM_JOB_ID"
     # their hugepage files, unless another of their jobs is still running
     if [ -z "$(squeue -h -u "$SLURM_JOB_USER" -t RUNNING -o %i)" ]; then
       find /dev/hugepages-1G -maxdepth 1 -user "$SLURM_JOB_USER" -delete 2>/dev/null || true
@@ -104,16 +109,24 @@ in {
         PriorityWeightFairshare=10000
         PriorityWeightAge=1000
         PriorityWeightJobSize=100
-        PrologFlags=Alloc
+        PrologFlags=Alloc,Contain
         Prolog=${prolog}
         Epilog=${epilog}
+        # each job gets its own /tmp and /dev/shm (job_container.conf), removed when it ends
+        NamespaceType=namespace/tmpfs
+        # users see only their own jobs (sinfo still shows the node busy); the owner is a Slurm admin
+        PrivateData=jobs
       '';
       extraCgroupConfig = ''
         ConstrainCores=yes
         ConstrainRAMSpace=yes
         ConstrainDevices=yes
       '';
-      extraConfigPaths = lib.optional tt.enable (pkgs.writeTextDir "gres.conf" ''
+      extraConfigPaths = [
+        (pkgs.writeTextDir "job_container.conf" ''
+          BasePath=/var/lib/slurm-tmp AutoBasePath=true Dirs=/tmp,/dev/shm
+        '')
+      ] ++ lib.optional tt.enable (pkgs.writeTextDir "gres.conf" ''
         Name=tt Type=${cfg.cardType} File=/dev/tenstorrent/[0-${toString (cfg.cards - 1)}]
       '');
       dbdserver = {
@@ -125,6 +138,8 @@ in {
     services.mysql = {
       enable = true;
       package = pkgs.mariadb;
+      # slurmdbd is its only client, on this host
+      settings.mysqld.bind-address = "127.0.0.1";
       ensureDatabases = [ "slurm_acct_db" ];
       ensureUsers = [{
         name = "slurm";
@@ -199,6 +214,8 @@ in {
           for user in ${lib.escapeShellArgs members}; do
             ${slurm}/bin/sacctmgr -i add user "$user" Account=${account} Cluster=${host} || true
           done
+          # PrivateData hides other users' jobs; the owner still sees and manages them all
+          ${slurm}/bin/sacctmgr -i modify user ${username} set AdminLevel=Admin || true
         '';
       };
     };

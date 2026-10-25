@@ -12,6 +12,7 @@
     ./env.nix
     ./graphics.nix
     ./headless.nix
+    ./isolation.nix
   ];
 
   # This value determines the NixOS release from which the default
