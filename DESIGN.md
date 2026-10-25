@@ -6,7 +6,7 @@
 
 - `nix` directory contains different nixos archetypes
 - `nix/modules` directory contains shared nixos modules, for use across all nixos archetypes
-- `nix/[arch]` directory contains the base `flake.nix` and `justfile`
+- `nix/[arch]` directory contains the base `flake.nix`
 - `nix/[arch]/[hostname]` directory contains the host/system specific overrides
 - `nix/[arch]/modules` directory contains core configs, and modules, modularized with `options.*` which enables the configs in `nix/[arch]/[hostname]` to override/customize them
 

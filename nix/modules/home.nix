@@ -16,11 +16,15 @@ in {
     # the user's name and home come per user (below), not from the configuration's
     home-manager.extraSpecialArgs = removeAttrs specialArgs [ "username" "homedirectory" ] // { inherit usrlib; };
     home-manager.backupFileExtension = "backup-before-home-manager";
+    # the layer is shared, so its options are the user type's own (what `dot` lists for any user)
+    home-manager.sharedModules = [
+      ../../home/default.nix
+      { profile.masks = config.profiles.masks; }
+    ];
     home-manager.users = lib.mapAttrs (name: user: {
-      imports = [ ../../home/default.nix user.home ];
+      imports = [ user.home ];
       _module.args = { username = name; homedirectory = home name; };
       profile.name = user.profile;
-      profile.masks = config.profiles.masks;
     }) config.profiles.users;
   };
 }

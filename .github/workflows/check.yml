@@ -1,6 +1,6 @@
 # What a change must pass before it reaches a machine: every host evaluates, the shared home layer
 # builds (vgwsl2's home-files, ~1.1 GiB: a build failure that evaluation missed shipped once), and
-# the scripts pass shellcheck and the bootstrap tests.
+# the scripts pass shellcheck and their tests (bootstrap, wallpaper, dot).
 # tend: vg-dotfiles/Composition
 name: check
 
@@ -35,6 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
-      - run: nix develop --command shellcheck -x bootstrap.sh nix/scripts/*.sh nix/scripts/bootstrap/*.sh nix/scripts/tests/*.sh
+      # nix/dot/*.sh are shellchecked as one script when dot builds (writeShellApplication)
+      - run: nix develop --command shellcheck -x nix/scripts/*.sh nix/scripts/bootstrap/*.sh nix/scripts/tests/*.sh
       - run: bash nix/scripts/tests/bootstrap.test.sh
       - run: bash nix/scripts/tests/wallpaper.test.sh
+      - run: bash nix/scripts/tests/dot.test.sh

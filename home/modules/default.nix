@@ -6,6 +6,7 @@
     # Core configuration
     ./core.nix
     ./profile.nix
+    ./dot
 
     # Features
     ./bun

@@ -28,10 +28,18 @@ in {
     # shell integration if not already enabled
     home.shell.enableShellIntegration = true;
 
-    common.shell.zsh.zshrc = ''
-      source ${config.lib.dot.path "home/modules/shell/shell.d/hotkeys.zshrc"}
+    common.shell.zsh.zshrc = lib.mkMerge [
+      ''
+        source ${config.lib.dot.path "home/modules/shell/shell.d/hotkeys.zshrc"}
+      ''
+      # the user's own additions, which the managed rc files can't hold (they're rewritten on rebuild)
+      (lib.mkAfter ''
+        [ -r "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
+      '')
+    ];
+    common.shell.bash.bashrc = lib.mkAfter ''
+      [ -r "$HOME/.bashrc.local" ] && source "$HOME/.bashrc.local"
     '';
-
     programs.zsh = {
       enable = true;
       autocd = true;

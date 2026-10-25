@@ -127,7 +127,7 @@ step_checkout() {
   fi
 }
 
-# The .env the justfile reads, for this host
+# The .env `dot` reads, for this host
 bs_env_text() {
   local version
   version="$(bs_env_get "$BS_ROOT/.template-env" NIXCONFIG_VERSION)"

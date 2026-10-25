@@ -6,7 +6,7 @@
 # and it cannot take over apps that were installed by hand. These functions
 # cover both one-time gaps. See the Homebrew section of README.md.
 #
-# NOTE: unlike nixeval.sh these are not `export -f`'d - they are called in the
+# NOTE: these are not `export -f`'d - they are called in the
 #       same shell that sources this file, and `export -f` is a bashism that
 #       dumps function bodies when sourced from zsh.
 
@@ -178,7 +178,7 @@ brew_adopt() {
     echo "Adoption is usually a version mismatch - the installed app is older"
     echo "than the cask. A repair is usually a download that never finished."
     echo "Either update the app and retry, or move it to the Trash and let"
-    echo "\`just build\` install it fresh, e.g.:"
+    echo "\`dot apply\` install it fresh, e.g.:"
     echo
     echo "  mv \"/Applications/<App Name>.app\" ~/.Trash/"
     return 1
@@ -191,11 +191,11 @@ brew_adopt() {
 # changing nothing. Read-only counterpart to brew_adopt: no sudo, no installs,
 # no GUI installers - safe to run any time.
 #
-# `just build` cannot fix either kind of drift reported here. `brew bundle`
+# `dot apply` cannot fix either kind of drift reported here. `brew bundle`
 # trusts Homebrew's receipts, so a cask whose app was deleted is skipped rather
 # than reinstalled, and a hand-installed app has no receipt to skip on.
 #
-# Returns 1 if anything needs `just brew-adopt`.
+# Returns 1 if anything needs `dot brew adopt`.
 #
 # Usage: brew_check <config_path>
 brew_check() {
@@ -233,7 +233,7 @@ brew_check() {
 
   if (( drift )); then
     echo
-    echo "Run \`just brew-adopt\` to adopt or repair the casks marked DRIFT."
+    echo "Run \`dot brew adopt\` to adopt or repair the casks marked DRIFT."
     return 1
   fi
 
@@ -253,5 +253,5 @@ brew_bootstrap() {
   brew_adopt "$config_path" || true # non-fatal: reported, then continue
   echo
 
-  echo "Next: run \`just build\` to apply the declared Homebrew state."
+  echo "Next: run \`dot apply\` to apply the declared Homebrew state."
 }

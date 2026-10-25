@@ -14,7 +14,7 @@
   #
   # FIRST RUN: most of the casks below are already installed by hand. Homebrew
   #            will not install a cask over an .app it did not place, so each
-  #            one needs adopting ONCE before the first `just build`:
+  #            one needs adopting ONCE before the first `dot apply`:
   #
   #              brew install --cask --adopt <token>
   #
