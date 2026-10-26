@@ -19,6 +19,12 @@ ln -s /srv/shared/everyone ~/everyone               # a shortcut from your home
 A new membership shows up at your next login: log out and back in (or start a new `ssh`).
 Already-running zellij sessions keep the old groups until you start a new one.
 
+If you linger (`dot help background`), your user services and the containers you started with
+`podman run -d` don't pick it up at login: they run under your user manager, which keeps going
+across logins with the groups it started with. They get the new one at the next reboot, or sooner
+if the admin restarts your user manager (`systemctl restart user@<your uid>`), which stops them all
+first, so say when that's convenient.
+
 ## From a job or a container
 
 Slurm jobs reach the folders like your shell does. A rootless container needs your groups passed
