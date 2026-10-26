@@ -1,5 +1,5 @@
 # headless server profile: desktop and peripheral defaults off, remote access (sshd) on, and kept up
-# (core.headless.uptime): it never sleeps, whoever asks (GNOME at the console suspended jade under
+# (core.headless.uptime): it never sleeps, blanks, dims or locks, whoever asks (GNOME at the console suspended jade under
 # running jobs once: it counts only console input), Wi-Fi doesn't power-save, and a panic or a hang
 # reboots it instead of leaving it stuck.
 # tend: vg-dotfiles/NixOS/Core
@@ -18,7 +18,7 @@ in {
       userKeys = usrlib.mkAttrsOption "Public keys for the other users in profiles.users, as `name = [ keys ]`" { };
     };
     uptime = {
-      enable = usrlib.mkEnableOptionTrue "keep the server up: no sleep of any kind, no Wi-Fi power saving, reboot after a panic or a hang";
+      enable = usrlib.mkEnableOptionTrue "keep the server up: no sleep of any kind, no screen blanking, screensaver or lock, no Wi-Fi power saving, reboot after a panic or a hang";
       watchdog = usrlib.mkStringOption "Reboot through the hardware watchdog when systemd stops answering it for this long (\"off\": don't)" "60s";
     };
   };
@@ -94,13 +94,40 @@ in {
       HandleLidSwitch = "ignore";
       IdleAction = "ignore";
     };
-    # and GNOME doesn't try (nor warn that it's about to): only the screen blanks and locks
+    # and nothing idles at the console either: no GNOME sleep, dimming, blanking, screensaver or
+    # lock, for every user, locked so no one's own settings bring it back
     programs.dconf.profiles.user.databases = lib.mkIf config.services.desktopManager.gnome.enable [{
-      settings."org/gnome/settings-daemon/plugins/power" = {
-        sleep-inactive-ac-type = "nothing";
-        sleep-inactive-battery-type = "nothing";
+      settings = {
+        "org/gnome/settings-daemon/plugins/power" = {
+          sleep-inactive-ac-type = "nothing";
+          sleep-inactive-battery-type = "nothing";
+          idle-dim = false;
+        };
+        "org/gnome/desktop/session".idle-delay = lib.gvariant.mkUint32 0;
+        "org/gnome/desktop/screensaver" = {
+          idle-activation-enabled = false;
+          lock-enabled = false;
+        };
+        "org/gnome/desktop/lockdown".disable-lock-screen = true;
       };
+      locks = [
+        "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
+        "/org/gnome/settings-daemon/plugins/power/sleep-inactive-battery-type"
+        "/org/gnome/settings-daemon/plugins/power/idle-dim"
+        "/org/gnome/desktop/session/idle-delay"
+        "/org/gnome/desktop/screensaver/idle-activation-enabled"
+        "/org/gnome/desktop/screensaver/lock-enabled"
+        "/org/gnome/desktop/lockdown/disable-lock-screen"
+      ];
     }];
+    # the login screen's X server: no screensaver blanking, no DPMS standby/off
+    services.xserver.serverFlagsSection = lib.mkIf config.services.xserver.enable ''
+      Option "BlankTime" "0"
+      Option "StandbyTime" "0"
+      Option "SuspendTime" "0"
+      Option "OffTime" "0"
+    '';
+    boot.kernelParams = [ "consoleblank=0" ]; # the text console never blanks
     networking.networkmanager.wifi.powersave = lib.mkIf config.networking.networkmanager.enable false;
     # a panic reboots after 10 s; a hang (systemd stops answering the hardware watchdog) too. Out of
     # memory (a user's share, a job's) kills a process, never the machine: 0 is the kernel's

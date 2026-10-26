@@ -49,6 +49,10 @@ facts() {
     help = builtins.attrNames c.dot.help;
     news = builtins.fromJSON c.environment.etc.\"dot/news.json\".text;
     newsAtLogin = sys.pkgs.lib.hasInfix \"dot news --login\" c.environment.interactiveShellInit;
+    sleep = c.systemd.sleep.settings.Sleep;
+    gnomeLocks = builtins.concatMap (d: d.locks or [ ]) c.programs.dconf.profiles.user.databases;
+    xFlags = c.services.xserver.serverFlagsSection;
+    kernelParams = c.boot.kernelParams;
     sharedGroups = builtins.mapAttrs (_: g: g.members)
       (sys.pkgs.lib.filterAttrs (n: _: sys.pkgs.lib.hasPrefix \"shared-\" n) c.users.groups);
     sharedRules = builtins.filter (sys.pkgs.lib.hasInfix \"/srv/shared\") c.systemd.tmpfiles.rules;
@@ -83,6 +87,9 @@ check "a shared folder is members-only and setgid, with the group's default ACL"
 check "the shared help topic is there" "$base" '.help | index("shared") != null'
 check "jade's news reaches /etc/dot/news.json, dated, for its standard users" "$base" '(.news | keys == ["2026-10-25-help","2026-10-25-shared-folders","2026-10-25-ttnn-pin"]) and all(.news[]; .date == "2026-10-25" and .profiles == ["standard"])'
 check "and a login points at what's unread" "$base" '.newsAtLogin'
+check "jade never sleeps (every kind refused at systemd)" "$base" '.sleep == {"AllowHibernation":"no","AllowHybridSleep":"no","AllowSuspend":"no","AllowSuspendThenHibernate":"no"}'
+check "nor idles at the console: GNOME's sleep, dim, blank, screensaver and lock off and locked" "$base" '["/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type","/org/gnome/settings-daemon/plugins/power/idle-dim","/org/gnome/desktop/session/idle-delay","/org/gnome/desktop/screensaver/idle-activation-enabled","/org/gnome/desktop/screensaver/lock-enabled"] - .gnomeLocks == []'
+check "nor at the login screen (X never blanks) or the text console" "$base" '(.xFlags | test("\"BlankTime\" \"0\"") and test("\"OffTime\" \"0\"")) and (.kernelParams | index("consoleblank=0") != null)'
 check "no assertion fails" "$base" '.failed == []'
 
 echo "overrides"
