@@ -3,9 +3,10 @@
 # (which also answers on MagicDNS's addresses) and an "internet" host. The guest reaches the internet
 # and MagicDNS but not the LAN or the tailnet: from their shell, from a build (the daemon downloads as
 # nixbld) and from a rootless container (their subordinate uids). They see only their own processes,
-# can't read the admin's home, and their ssh sessions get a private /tmp. Every refusal has a control:
-# root, or the admin, reaches the same address and port.
-# Not covered here: Slurm (jade's own module, needing slurmdbd) and the console refusal (pam_access).
+# can't read the admin's home, and their ssh sessions get a private /tmp. In Slurm (slurmdbd on
+# MariaDB, as on jade) they have an account and see only their own jobs; the console refuses them
+# (pam_access). Every refusal has a control: root, or the admin, gets through.
+# Not covered here: the Tenstorrent card's per-job ACL (it needs the card).
 # Run: nix build -L ./nix#checks.x86_64-linux.isolation
 # tend: vg-dotfiles/NixOS/Core
 { nixpkgs, modules, specialArgsFor }:
@@ -31,6 +32,8 @@ let
   neighbour = { vlan, v4, v6 ? [ ], ports }: {
     virtualisation.vlans = [ vlan ];
     networking.firewall.enable = false;
+    networking.primaryIPAddress = lib.mkForce (lib.head v4).address;
+    networking.primaryIPv6Address = lib.mkForce (if v6 == [ ] then "" else (lib.head v6).address);
     networking.interfaces.eth1 = {
       ipv4.addresses = lib.mkForce (map (a: { address = a.address; prefixLength = a.prefix; }) v4);
       ipv6.addresses = lib.mkForce (map (a: { address = a.address; prefixLength = a.prefix; }) v6);
@@ -68,6 +71,12 @@ pkgs.testers.runNixOSTest {
       modules.containers.enable = true;
       profiles.users.${guest} = { logins = [ "ssh" ]; linger = true; };
       core.headless.sshd.userKeys.${guest} = [ keys.snakeOilPublicKey ];
+      # sized for the VM: 2 CPUs, 3.5 of its 4 GiB for Slurm, of which logins and daemons keep 3
+      modules.slurm = {
+        enable = true;
+        node = "CPUs=2 RealMemory=3600";
+        login.memory = 1024;
+      };
 
       # not what's tested, and heavy or in the way in a VM: the bootloader and firmware (the VM boots
       # its own kernel), the home layer (profiles.test.sh evaluates it), NetworkManager (the
@@ -79,9 +88,13 @@ pkgs.testers.runNixOSTest {
 
       virtualisation = {
         vlans = [ 1 2 3 ];
-        memorySize = 2048;
+        cores = 2;
+        memorySize = 4096;
         diskSize = 4096;
       };
+      # the hosts file's address for `machine` (Slurm finds its controller by name)
+      networking.primaryIPAddress = lib.mkForce "192.168.1.1";
+      networking.primaryIPv6Address = lib.mkForce "fd00:1::1";
       networking.interfaces = {
         # LAN
         eth1.ipv4.addresses = lib.mkForce [{ address = "192.168.1.1"; prefixLength = 24; }];
@@ -195,5 +208,35 @@ pkgs.testers.runNixOSTest {
         router.succeed(f"{ssh} 'test ! -e /tmp/admins-file && echo mine > /tmp/guests-file'")
         machine.fail("test -e /tmp/guests-file")
         machine.succeed("cat /var/lib/guest-tmp/tmp-*/guests-file | grep -qx mine")
+
+    with subtest("Slurm: the guest has an account, runs jobs, and sees only their own"):
+        machine.wait_until_succeeds("sacctmgr -n show assoc user=colleague format=account | grep -qw colleagues", timeout=180)
+        machine.wait_until_succeeds("sinfo -h -o %t | grep -qx idle", timeout=120)
+        machine.succeed(as_guest("srun --mem=100M -c1 true"))
+        job = machine.succeed(as_user("vaibhav", "sbatch --parsable --mem=100M -c1 --wrap 'sleep 600'")).strip()
+        machine.wait_until_succeeds(f"squeue -h -j {job} -o %T | grep -qx RUNNING", timeout=60)
+        machine.succeed(f"squeue -h -o %i | grep -qx {job}")  # control: root sees it
+        machine.succeed(as_user("vaibhav", f"squeue -h -o %i | grep -qx {job}"))  # and the admin
+        assert machine.succeed(as_guest("squeue -h -o %u")).strip() == "", "the guest sees others' jobs"
+        machine.succeed(f"scancel {job}")
+
+    with subtest("the console refuses the guest, and lets the admin in"):
+        machine.succeed("echo 'colleague:guest-pw' | chpasswd", "echo 'vaibhav:admin-pw' | chpasswd")
+        machine.wait_for_unit("getty@tty1.service")
+        machine.wait_until_tty_matches("1", "login: ")
+        machine.send_chars("colleague\n")
+        machine.wait_until_tty_matches("1", "Password: ")
+        machine.send_chars("guest-pw\n")
+        # the password is right: the refusal is pam_access's (login shows it only for a moment)
+        machine.wait_until_succeeds("journalctl -b -t login | grep -q \"pam_access(login:account): access denied for user .colleague. from .tty1.\"", timeout=60)
+        machine.fail("loginctl list-sessions --no-legend | grep -w colleague | grep -w tty1")
+        machine.send_key("alt-f2")
+        machine.wait_until_succeeds("[ $(fgconsole) = 2 ]")
+        machine.wait_for_unit("getty@tty2.service")
+        machine.wait_until_tty_matches("2", "login: ")
+        machine.send_chars("vaibhav\n")
+        machine.wait_until_tty_matches("2", "Password: ")
+        machine.send_chars("admin-pw\n")
+        machine.wait_until_succeeds("loginctl list-sessions --no-legend | grep -w vaibhav | grep -qw tty2")
   '';
 }
