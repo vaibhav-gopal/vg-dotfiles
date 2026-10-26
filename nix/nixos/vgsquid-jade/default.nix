@@ -28,11 +28,15 @@
 
   # Who logs in here (I'm the admin, from the configuration): colleagues over ssh only, as standard
   # users; each also gets a Slurm association (modules.slurm) and the isolation below
+  # (linger: their containers and user services keep running after they log out)
   profiles.users = {
-    yaxpatel.logins = [ "ssh" ];
-    sameerjuin.logins = [ "ssh" ];
-    siddhpatel.logins = [ "ssh" ];
+    yaxpatel = { logins = [ "ssh" ]; linger = true; };
+    sameerjuin = { logins = [ "ssh" ]; linger = true; };
+    siddhpatel = { logins = [ "ssh" ]; linger = true; };
   };
+
+  # Rootless Podman and distrobox for everyone (an Ubuntu userland, or an app's image)
+  modules.containers.enable = true;
 
   # Their keys: name = [ "ssh-ed25519 AAAA..." ]. Key login only, no sudo
   # (the repo is public: keys go in without their email comments)

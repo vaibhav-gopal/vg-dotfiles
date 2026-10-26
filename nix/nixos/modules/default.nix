@@ -4,6 +4,7 @@
 {
   imports = [
     # CORE MODULES
+    ./containers
     ./core
 
     # OVERLAYS

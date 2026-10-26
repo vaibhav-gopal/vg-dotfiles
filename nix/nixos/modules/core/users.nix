@@ -36,10 +36,13 @@ let
   };
 in {
   config = {
-    users.users = lib.genAttrs standard (name: {
-      isNormalUser = true;
-      inherit (users.${name}) description;
-    });
+    users.users = lib.mkMerge [
+      (lib.genAttrs standard (name: {
+        isNormalUser = true;
+        inherit (users.${name}) description;
+      }))
+      (lib.mapAttrs (_: u: { inherit (u) linger; }) users)
+    ];
 
     services.openssh.settings.AllowUsers = lib.mkIf config.services.openssh.enable (withLogin "ssh");
 

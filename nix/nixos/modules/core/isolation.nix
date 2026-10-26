@@ -5,7 +5,8 @@
 #   (modules.tailscale.trustTailnet off). The same holds for the Nix daemon's build users (nixbld):
 #   a fixed-output derivation downloads as one, so a guest's build would otherwise reach the LAN for
 #   them. The pool is shared, so the admin's builds can't fetch from there either (substitution runs
-#   as root and flake inputs as the user, so neither is affected)
+#   as root and flake inputs as the user, so neither is affected). A guest's rootless containers are
+#   theirs too: their subordinate uids (a container's own users) get the rule
 # - processes: /proc is mounted hidepid=invisible, so a guest sees only their own; the owner and the
 #   services that inspect other users' processes are in `proc`
 # - /tmp, /var/tmp, /dev/shm: each guest's sessions get private ones (pam_namespace), and each Slurm
@@ -25,9 +26,19 @@ let
   blocked6 = [ "fd7a:115c:a1e0::/48" "fc00::/7" "fe80::/10" ];
   # the guests' own processes and jobs, and every build's downloads
   groups = [ "guests" "nixbld" ];
+  # A rootless container's own users are the guest's subordinate uids (/etc/subuid, assigned at
+  # activation, so read when the firewall starts): with --network host their sockets are theirs, not
+  # the guest's, and would pass the group match
+  subRanges = ''
+    for u in ${lib.escapeShellArgs guests}; do
+      ${pkgs.gawk}/bin/awk -F: -v u="$u" '$1 == u { print $2 "-" $2 + $3 - 1 }' /etc/subuid 2>/dev/null
+    done
+  '';
   unhook = ipt: lib.concatMapStrings (g: ''
     ${ipt} -D OUTPUT -m owner --gid-owner ${g} --suppl-groups -j guest-egress 2>/dev/null || true
-  '') groups;
+  '') groups + ''
+    for r in $(${subRanges}); do ${ipt} -D OUTPUT -m owner --uid-owner "$r" -j guest-egress 2>/dev/null || true; done
+  '';
   egressRules = ipt: dns: blocked: ''
     ${ipt} -N guest-egress 2>/dev/null || ${ipt} -F guest-egress
     ${ipt} -A guest-egress -d ${dns} -p udp --dport 53 -j RETURN
@@ -35,6 +46,7 @@ let
     ${lib.concatMapStrings (net: "${ipt} -A guest-egress -d ${net} -j REJECT\n") blocked}
     ${unhook ipt}
     ${lib.concatMapStrings (g: "${ipt} -I OUTPUT 1 -m owner --gid-owner ${g} --suppl-groups -j guest-egress\n") groups}
+    for r in $(${subRanges}); do ${ipt} -I OUTPUT 1 -m owner --uid-owner "$r" -j guest-egress; done
   '';
   egressStop = ipt: ''
     ${unhook ipt}

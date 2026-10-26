@@ -43,6 +43,8 @@ facts() {
     standardGroup = c.users.users.yaxpatel.group;
     sshUsers = c.services.openssh.settings.AllowUsers;
     egress = c.networking.firewall.extraCommands;
+    linger = c.users.users.yaxpatel.linger;
+    podman = c.virtualisation.podman.enable;
     help = builtins.attrNames c.dot.help;
     failed = map (a: a.message) (builtins.filter (a: !a.assertion) c.assertions);
   }" 2>"$errlog" || tail -3 "$errlog"
@@ -66,6 +68,8 @@ check "standard user's configs are store copies" "$base" '.standard.liveNvim | n
 check "standard users are isolated (group guests)" "$base" '.standardGroup == "guests"'
 check "sshd admits exactly the users with ssh logins" "$base" '.sshUsers == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
 check "the egress rule covers the guests and the build users (a build downloads as nixbld)" "$base" '(.egress | test("gid-owner guests")) and (.egress | test("gid-owner nixbld"))'
+check "the egress rule covers the guests' container users (their subordinate uids)" "$base" '.egress | test("/etc/subuid") and test("uid-owner")'
+check "jade's colleagues linger, and have containers" "$base" '.linger and .podman'
 check "Slurm's help topics are there (its module is on)" "$base" '.help | index("slurm") != null and index("slurm-admin") != null'
 check "no assertion fails" "$base" '.failed == []'
 

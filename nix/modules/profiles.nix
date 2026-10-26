@@ -18,6 +18,7 @@ in {
           profile = usrlib.mkEnumOption "admin (only the configuration's user) or standard" "standard" profileNames;
           logins = usrlib.mkListOfEnumOption "Where this user may log in: console (a tty or the display manager) and ssh (with a key from core.headless.sshd)" [ "ssh" ] [ "console" "ssh" ];
           description = usrlib.mkStringOption "The user's full name" name;
+          linger = usrlib.mkEnableOptionFalse "keep this user's services and containers running after they log out (systemd lingering)";
           home = lib.mkOption {
             type = lib.types.deferredModule;
             default = { };
