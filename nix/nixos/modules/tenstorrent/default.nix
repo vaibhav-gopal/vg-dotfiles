@@ -45,10 +45,12 @@ in {
         title = "Updating the card's firmware (admin)";
         profiles = [ "admin" ];
         text = ''
-          ttnn needs the firmware its release was built for (tt-metal's INSTALLING.md, per release; 0.81.1: 19.8.1).
+          ttnn needs the firmware its release was built for (tt-metal's INSTALLING.md, per release; 0.81.1: 19.8.1,
+          flashed 2026-10-25 from 18.8.0).
           Bundles: https://github.com/tenstorrent/tt-system-firmware/releases (fw_pack-<version>.fwbundle).
             curl -LO https://github.com/tenstorrent/tt-system-firmware/releases/download/v19.8.1/fw_pack-19.8.1.fwbundle
-            ${if config.modules.slurm.enable then "srun --gres=tt:1 -c 2 --mem=4G --pty " else "sudo "}nix shell nixpkgs#uv -c uvx tt-flash flash fw_pack-19.8.1.fwbundle
+            # in your home (a job's /tmp is its own); tt-flash 4.1.0's `verify` is broken, `flash` works
+            ${if config.modules.slurm.enable then "sbatch --gres=tt:1 -c 2 --mem=4G --wrap " else "sudo sh -c "}'nix shell nixpkgs#uv -c uvx --from tt-flash==4.1.0 tt-flash --no-tty flash fw_pack-19.8.1.fwbundle'
             tt-smi -s | grep fw_bundle_version       # then reboot, and check it again
           Nothing else may hold the card while it flashes; don't interrupt it.
         '';

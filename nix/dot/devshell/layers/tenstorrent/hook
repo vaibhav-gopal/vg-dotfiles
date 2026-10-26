@@ -1,4 +1,21 @@
 # ttnn from PyPI, once (pin a version with `uv pip install ttnn==<version>`; it must match the
 # card's firmware: dot help tenstorrent)
 uv pip show --quiet ttnn >/dev/null 2>&1 || { echo "installing ttnn into .venv..."; uv pip install --quiet ttnn; }
+# SFPI, the RISC-V compiler ttnn builds the card's kernels with: the release this ttnn pins (its
+# sfpi-version), checked against the pinned hash, unpacked where ttnn looks (its runtime/sfpi).
+# A prebuilt Debian build: its libraries are on LD_LIBRARY_PATH, and nix-ld runs it.
+tt_pkg="$(python -c 'import importlib.util, os; print(os.path.dirname(importlib.util.find_spec("ttnn").origin))' 2>/dev/null)"
+if [ -n "$tt_pkg" ] && [ -r "$tt_pkg/tt_metal/sfpi-version" ] && [ ! -x "$tt_pkg/runtime/sfpi/compiler/bin/riscv-tt-elf-gcc" ]; then
+  (
+    . "$tt_pkg/tt_metal/sfpi-version"
+    echo "installing SFPI $sfpi_version for ttnn..."
+    tarball="$(mktemp)"
+    curl -sfL -o "$tarball" "$sfpi_repo/releases/download/$sfpi_version/sfpi_$sfpi_version""_x86_64_debian.txz" \
+      && echo "$sfpi_x86_64_debian_txz_hash  $tarball" | sha256sum -c --quiet \
+      && mkdir -p "$tt_pkg/runtime" && tar -xJf "$tarball" -C "$tt_pkg/runtime" \
+      || echo "SFPI didn't install (download or checksum failed); ttnn can't build kernels until it does"
+    rm -f "$tarball"
+  )
+fi
+unset tt_pkg
 echo "The card is only usable inside a Slurm job: srun --gres=tt:1 -c 8 --mem=16G --pty bash (dot help slurm)"

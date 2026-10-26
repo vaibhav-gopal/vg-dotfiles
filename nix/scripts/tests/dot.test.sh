@@ -82,7 +82,8 @@ if [[ ! -e flake.nix ]]; then pass "--print writes no file"; else fail "--print 
 order="$(grep -oE '^ +# (base|python|tenstorrent)$' <<<"$out" | awk '{print $2}' | awk '!seen[$0]++' | paste -sd' ')"
 if [[ "$order" == "base python tenstorrent" ]]; then pass "layers in order: base, then requirements, each once"; else fail "layers in order: base, then requirements, each once" "$order"; fi
 if [[ "$(grep -c '^ *python312$' <<<"$out")" -eq 1 ]]; then pass "a layer named twice (python, and through tenstorrent) lands once"; else fail "a layer named twice lands once" "$out"; fi
-has "the libraries wheels need are on LD_LIBRARY_PATH" "makeLibraryPath (with pkgs; \\[ stdenv.cc.cc.lib zlib \\])"
+has "the libraries wheels need are on LD_LIBRARY_PATH" "makeLibraryPath (with pkgs; \\[.*stdenv.cc.cc.lib.*\\])"
+has "and the ones the prebuilt SFPI compiler needs (tenstorrent)" "makeLibraryPath (with pkgs; \\[.*libmpc.*mpfr.*\\])"
 out="$("$standard" devshell tenstorrent 2>&1)"
 has "tenstorrent alone pulls in python" "layers: base python tenstorrent"
 if [[ -f flake.nix && -f .envrc && -f .gitignore ]]; then pass "it writes flake.nix, .envrc and .gitignore"; else fail "it writes flake.nix, .envrc and .gitignore" "$out"; fi
