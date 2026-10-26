@@ -51,7 +51,7 @@ in {
             curl -LO https://github.com/tenstorrent/tt-system-firmware/releases/download/v19.8.1/fw_pack-19.8.1.fwbundle
             # in your home (a job's /tmp is its own); tt-flash 4.1.0's `verify` is broken, `flash` works
             ${if config.modules.slurm.enable then "sbatch --gres=tt:1 -c 2 --mem=4G --wrap " else "sudo sh -c "}'nix shell nixpkgs#uv -c uvx --from tt-flash==4.1.0 tt-flash --no-tty flash fw_pack-19.8.1.fwbundle'
-            tt-smi -s | grep fw_bundle_version       # then reboot, and check it again
+            ${lib.optionalString config.modules.slurm.enable "srun --gres=tt:1 "}tt-smi -s | grep fw_bundle_version   # then reboot, and check it again
           Nothing else may hold the card while it flashes; don't interrupt it.
         '';
       };
