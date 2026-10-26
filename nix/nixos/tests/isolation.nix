@@ -7,7 +7,8 @@
 # MariaDB, as on jade) they have an account and see only their own jobs; the console refuses them
 # (pam_access). A shared folder (core/shared.nix) is open to its members, whatever their umask, and
 # to their containers given their groups; a non-member is refused. Every refusal has a control:
-# root, or the admin, gets through.
+# root, or the admin, gets through. And the machine stays up: it refuses to sleep, each user's work
+# is held to their own share, and a lingering guest's own service comes back after a reboot.
 # Not covered here: the Tenstorrent card's per-job ACL (it needs the card).
 # Run: nix build -L ./nix#checks.x86_64-linux.isolation
 # tend: vg-dotfiles/NixOS/Core
@@ -80,6 +81,7 @@ pkgs.testers.runNixOSTest {
         enable = true;
         node = "CPUs=2 RealMemory=3600";
         login.memory = 1024;
+        login.perUser.memory = 256; # small enough to hit on purpose
       };
 
       # not what's tested, and heavy or in the way in a VM: the bootloader and firmware (the VM boots
@@ -257,5 +259,32 @@ pkgs.testers.runNixOSTest {
         machine.wait_until_tty_matches("2", "Password: ")
         machine.send_chars("admin-pw\n")
         machine.wait_until_succeeds("loginctl list-sessions --no-legend | grep -w vaibhav | grep -qw tty2")
+
+    with subtest("the server never sleeps, and a panic reboots it"):
+        for verb in ["suspend", "hibernate", "hybrid-sleep"]:
+            rc, out = machine.execute(f"systemctl {verb} 2>&1")
+            assert rc != 0 and "disabled" in out, f"systemctl {verb} wasn't refused: {out}"
+        assert machine.succeed("sysctl -n kernel.panic").strip() == "10"
+
+    with subtest("each user gets their own share: past it, their own work is killed"):
+        mem = machine.succeed(f"systemctl show user-{uid}.slice -p MemoryMax --value").strip()
+        assert mem == str(256 * 1024 * 1024), f"user-{uid}.slice MemoryMax is {mem}"
+        # under the guest's user manager, so in their slice: tail holds what it reads (no newline)
+        def hold(mib):
+            return as_guest(f"systemd-run --user --wait --quiet sh -c 'head -c {mib}M /dev/zero | tail >/dev/null'")
+        machine.succeed(hold(64))  # control: within the share
+        machine.fail(hold(400))
+
+    with subtest("a guest's own service keeps running across a reboot (they linger)"):
+        machine.succeed(as_guest(
+            "mkdir -p ~/.config/systemd/user && printf '%s\\n' '[Service]' 'ExecStart=/run/current-system/sw/bin/sleep infinity' "
+            "'[Install]' 'WantedBy=default.target' > ~/.config/systemd/user/probe.service "
+            "&& systemctl --user daemon-reload && systemctl --user enable --now probe"))
+        machine.succeed(as_guest("systemctl --user is-active probe"))
+        machine.shutdown()
+        machine.start()
+        machine.wait_for_unit(f"user@{uid}.service")
+        machine.wait_until_succeeds(as_guest("systemctl --user is-active probe"), timeout=60)
+        machine.succeed(f"systemctl status user@{uid}.service | grep -q 'sleep infinity'")
   '';
 }

@@ -200,6 +200,14 @@ slice "user-$(id -u).slice" 3670016000 8589934592 3330000000 716 # 3.4G, peak 8.
 slice user-99999.slice 7340032 14680064 0 4                       # 7M, peak 14M
 slice user-500.slice 1048576000 1048576000 0 1                    # a system user: left out
 touch "$tmp/tt/0"
+# each user's cap (the user-.slice drop-in), and what this user's manager runs: a service of theirs,
+# a container, and the manager's and desktop's own plumbing (left out)
+for s in "user-$(id -u).slice" user-99999.slice; do echo 4294967296 >"$cg/$s/memory.max"; echo "100000 100000" >"$cg/$s/cpu.max"; done
+mgr="$cg/user-$(id -u).slice/user@$(id -u).service"
+mkdir -p "$mgr/app.slice/notebook.service" "$mgr/app.slice/dbus.socket" "$mgr/app.slice/evolution-alarm-notify.service" \
+  "$mgr/user.slice/libpod-0123456789abcdef0123456789abcdef.scope" "$mgr/user.slice/podman-pause-ac5c1f35.scope"
+echo 385875968 >"$mgr/app.slice/notebook.service/memory.current"                          # 368M
+echo 52428800 >"$mgr/user.slice/libpod-0123456789abcdef0123456789abcdef.scope/memory.current" # 50M
 cat >"$tmp/usagebin/loginctl" <<EOF
 #!/usr/bin/env bash
 printf '%s\n' " 2 $(id -u) $me seat0 1711 user    tty1 no -" " 3 $(id -u) $me - 1722 manager - no -"
@@ -220,6 +228,12 @@ has "who holds the card" "^card 0: alice$"
 hasnt "only cards, not by-id/" "by-id"
 has "the logins' share and their cap" "logins   3.4G of 8.0G memory, 2 CPUs between them"
 has "and Slurm's CPUs" "allocated/idle/other/total 24/0/0/24"
+has "each user's own cap" "per user 4.0G memory, 1 CPUs"
+hasnt "what managers run only with --services" "notebook.service"
+out="$(PATH="$tmp/usagebin:$PATH" DOT_CGROUP="$tmp/cg" DOT_TT_DIR="$tmp/tt" "$admin" usage --services 2>&1)"
+has "--services: a user's own service and its memory" "^  $me  *notebook.service  *368M$"
+has "and their containers, by short id" "^  $me  *container 0123456789ab  *50M$"
+hasnt "not the manager's or the desktop's plumbing" "dbus.socket\|evolution\|podman-pause"
 out="$("$admin" usage --nosuch 2>&1)"; rc=$?
 fails "an unknown option fails"
 

@@ -24,7 +24,7 @@ ${B}Check${N}
   dot status                    machine, generation, checkout
 ${B}Inspect${N}  (--home: the home layer, of --user <name> or yours)
   dot users                     who logs in here: profile, logins, keys
-  dot usage [--disk]            who uses the machine now: memory, CPU, jobs, the card (--disk: homes)
+  dot usage [--services] [--disk] who uses the machine now: memory, CPU, jobs, the card
   dot features                  every masked home feature, on or off for each user
   dot options [--home] [path]   options with type, value and default (default: this repo's)
   dot config [--home] <path>    a configuration value, as JSON
@@ -159,23 +159,33 @@ cmd_users() {
     | { printf '%s%-14s %-9s %-14s %s%s\n' "$B" USER PROFILE LOGINS KEYS "$N"; while IFS=$'\t' read -r u p l k; do printf '%-14s %-9s %-14s %s\n' "$u" "$p" "$l" "$k"; done; }
 }
 
-# dot usage [--disk]: who's using this machine now. Per user (uid 1000 and up), their sessions'
-# share (the user-<uid>.slice cgroup, lingering services and containers included: memory, its
-# peak, CPU time since it started, tasks), their logins, and their Slurm jobs (running/waiting, and
-# what the running ones hold); then who holds each Tenstorrent card, the logins' cap and the
-# machine. --disk adds each home's and shared folder's size (du through sudo: homes are private).
+# dot usage [--services] [--disk]: who's using this machine now. Per user (uid 1000 and up), their
+# sessions' share (the user-<uid>.slice cgroup, lingering services and containers included: memory,
+# its peak, CPU time since it started, tasks), their logins, and their Slurm jobs (running/waiting,
+# and what the running ones hold); then who holds each Tenstorrent card, the caps and the machine.
+# --services lists what each user's manager runs (their own services, apps and containers, not its
+# plumbing); --disk adds each home's and shared folder's size (du through sudo: homes are private).
 size_awk='function size(x) { return x >= 1073741824 ? sprintf("%.1fG", x / 1073741824) : sprintf("%.0fM", x / 1048576) }'
+user_slices() { # user_slices <cgroup root>: "<slice dir>|<name>" for each uid 1000 and up
+  local s uid u
+  for s in "$1"/user.slice/user-*.slice; do
+    uid="${s##*/user-}"; uid="${uid%.slice}"
+    if ! [[ "$uid" =~ ^[0-9]+$ ]] || (( uid < 1000 )); then continue; fi
+    u="$(getent passwd "$uid" | cut -d: -f1 || true)" # a removed user's slice: the uid
+    printf '%s|%s\n' "$s" "${u:-$uid}"
+  done
+}
 cmd_usage() {
-  local disk=0 cg="${DOT_CGROUP:-/sys/fs/cgroup}" jobs="" sessions s uid u d holders
-  case "${1:-}" in --disk) disk=1 ;; "") ;; *) die "dot usage [--disk]" ;; esac
+  local disk=0 services=0 cg="${DOT_CGROUP:-/sys/fs/cgroup}" jobs="" sessions s u d n holders
+  while [[ $# -gt 0 ]]; do
+    case "$1" in --disk) disk=1 ;; --services) services=1 ;; *) die "dot usage [--services] [--disk]" ;; esac
+    shift
+  done
   [[ -d "$cg/user.slice" ]] || die "no $cg/user.slice: dot usage reads Linux's cgroups"
   if command -v squeue >/dev/null 2>&1; then jobs="$(squeue -h -o '%u|%T|%C|%m|%b' 2>/dev/null)"; fi
   sessions="$(loginctl list-sessions --no-legend 2>/dev/null)"
   head1 "Users on $(uname -n)"
-  for s in "$cg"/user.slice/user-*.slice; do
-    uid="${s##*/user-}"; uid="${uid%.slice}"
-    if ! [[ "$uid" =~ ^[0-9]+$ ]] || (( uid < 1000 )); then continue; fi
-    u="$(getent passwd "$uid" | cut -d: -f1 || true)"; u="${u:-$uid}" # a removed user's slice: the uid
+  user_slices "$cg" | while IFS='|' read -r s u; do
     printf '%s|%s|%s|%s|%s|%s\n' "$u" "$(cat "$s/memory.current" 2>/dev/null || echo 0)" "$(cat "$s/memory.peak" 2>/dev/null || echo 0)" \
       "$(awk '$1 == "usage_usec" { print $2 }' "$s/cpu.stat" 2>/dev/null)" "$(cat "$s/pids.current" 2>/dev/null || echo 0)" \
       "$(awk -v u="$u" '$3 == u && $6 == "user"' <<<"$sessions" | wc -l)"
@@ -200,11 +210,32 @@ cmd_usage() {
     holders="$(getfacl -p "$d" 2>/dev/null | sed -n 's/^user:\([^:][^:]*\):.*/\1/p' | paste -sd, -)"
     say "card ${d##*/}: ${holders:-free}"
   done
+  if (( services )); then
+    head1 "What the users' managers run (their services, apps and containers)"
+    user_slices "$cg" | while IFS='|' read -r s u; do
+      for d in "$s"/user@*.service/app.slice/* "$s"/user@*.service/user.slice/libpod-*.scope; do
+        [[ -d "$d" ]] || continue
+        n="${d##*/}"
+        case "$n" in # the manager's and the desktop's own
+          *.socket | dbus* | app-dbus* | app-gnome* | app-org.gnome* | *xdg-* | *portal* | evolution-* | gnome-* | dconf.service \
+            | gpg-agent* | obex.service | at-spi* | pipewire* | wireplumber* | tracker* | podman-pause*) continue ;;
+        esac
+        [[ "$n" == libpod-* ]] && n="container ${n:7:12}"
+        printf '%s|%s|%s\n' "$u" "$n" "$(cat "$d/memory.current" 2>/dev/null || echo 0)"
+      done
+    done | awk -F'|' "$size_awk"'{ printf "  %-12s %-40s %8s\n", $1, $2, size($3); any = 1 } END { if (!any) print "  none" }'
+  fi
   head1 "Machine"
   awk "$size_awk"'
     FILENAME ~ /memory.current$/ { used = $1 } FILENAME ~ /memory.max$/ { max = $1 } FILENAME ~ /cpu.max$/ { q = $1; p = $2 }
     END { printf "  logins   %s of %s memory, %s CPUs between them\n", size(used), max == "max" ? "no cap on" : size(max), q == "max" ? "all" : q / p }' \
     "$cg/user.slice/memory.current" "$cg/user.slice/memory.max" "$cg/user.slice/cpu.max" 2>/dev/null
+  s="$(user_slices "$cg" | awk -F'|' 'NR == 1 { print $1 }')" # (head would cut the pipe: pipefail)
+  if [[ -n "$s" ]]; then
+    awk "$size_awk"'FILENAME ~ /memory.max$/ { max = $1 } FILENAME ~ /cpu.max$/ { q = $1; p = $2 }
+      END { printf "  per user %s memory, %s CPUs (their logins, services and containers)\n", max == "max" ? "no cap on" : size(max), q == "max" ? "all" : q / p }' \
+      "$s/memory.max" "$s/cpu.max" 2>/dev/null
+  fi
   awk "$size_awk"'/^MemTotal:/ { t = $2 * 1024 } /^MemAvailable:/ { a = $2 * 1024 }
     END { printf "  memory   %s used of %s (%s available)\n", size(t - a), size(t), size(a) }' /proc/meminfo
   say "  load     $(cut -d' ' -f1-3 /proc/loadavg) on $(getconf _NPROCESSORS_ONLN) CPUs"

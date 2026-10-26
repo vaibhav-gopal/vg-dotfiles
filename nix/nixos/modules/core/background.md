@@ -45,6 +45,18 @@ systemctl --user disable --now notebook     # stop it for good
 `%h` is your home directory. A service starts with a bare environment, not your shell's: give
 programs by their full path, as above.
 
+**Reaching it:** the firewall keeps a service's port on this machine (it's shared). From your own
+computer, tunnel to it over ssh, then open `http://localhost:8888` there:
+
+```sh
+ssh -N -L 8888:localhost:8888 <you>@<this machine>
+```
+
+**Its share:** where Slurm runs, your services and containers count against your share of the
+machine, with your logins: a memory and CPU cap per user, and one for all logins together
+(`dot help slurm` gives the numbers). Past your memory share, the biggest of your processes is
+killed: put heavy work in a Slurm job instead. The admin sees what runs under each user.
+
 ## Containers
 
 A container started with `podman run -d` keeps running after you log out while you linger. To have

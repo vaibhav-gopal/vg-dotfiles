@@ -72,6 +72,11 @@ in {
     login = {
       cpus = usrlib.mkIntOption "CPUs' worth of time all login sessions share (user.slice CPUQuota)" 2;
       memory = usrlib.mkIntOption "MiB all login sessions share (user.slice MemoryMax)" 8192;
+      # within that, one user's sessions, services and containers (user-<uid>.slice)
+      perUser = {
+        cpus = usrlib.mkIntOption "CPUs' worth of time one user's sessions, services and containers get (user-.slice CPUQuota)" 1;
+        memory = usrlib.mkIntOption "MiB one user's sessions, services and containers get (user-.slice MemoryMax)" 4096;
+      };
     };
   };
 
@@ -159,6 +164,16 @@ in {
       CPUQuota = "${toString (cfg.login.cpus * 100)}%";
       MemoryMax = "${toString cfg.login.memory}M";
     };
+    # and each user's share of it, so one user's service can't starve everyone's shells. Every
+    # user-<uid>.slice reads user-.slice.d/ (a drop-in by prefix); systemd ships no user-.slice unit,
+    # so NixOS's default would write one, which no user's slice reads: asDropin
+    systemd.slices."user-" = {
+      overrideStrategy = "asDropin";
+      sliceConfig = {
+        CPUQuota = "${toString (cfg.login.perUser.cpus * 100)}%";
+        MemoryMax = "${toString cfg.login.perUser.memory}M";
+      };
+    };
 
     systemd.services = {
       # the cluster's munge key, made once on this host
@@ -229,7 +244,7 @@ in {
           srun -c 8 --mem=16G --pty bash${lib.optionalString tt.enable "              # a shell; add --gres=tt:1 for the card"}
           sbatch job.sh                               # unattended (#SBATCH lines at its top)
           squeue -u $USER / scancel <id> / sinfo      # yours, stop one, how busy it is
-          Jobs default to ${cfg.defaultTime} (max ${cfg.maxTime}) and 2 GiB per CPU; logins share ${toString cfg.login.cpus} CPUs and ${toString (cfg.login.memory / 1024)} GiB.
+          Jobs default to ${cfg.defaultTime} (max ${cfg.maxTime}) and 2 GiB per CPU; logins share ${toString cfg.login.cpus} CPUs and ${toString (cfg.login.memory / 1024)} GiB, at most ${toString cfg.login.perUser.cpus} CPU and ${toString (cfg.login.perUser.memory / 1024)} GiB each (with your services and containers).
         '';
         file = "nix/nixos/modules/slurm/slurm.md";
       };
