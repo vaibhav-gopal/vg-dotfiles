@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Tests for profiles (nix/modules/profiles.nix, home/modules/profile.nix): evaluates vgsquid-jade, the
-# host with standard users, and checks what each profile gets, that a host mask and a user's own
-# settings override a feature's default, that the assertions refuse a second admin and keys for an
-# unknown user, and that help topics come and go with their module. Nothing is built.
+# host with standard users, and checks what each profile gets, who shares which folder, that a host
+# mask and a user's own settings override a feature's default, that the assertions refuse a second
+# admin and keys or folders for an unknown user, and that help topics come and go with their module.
+# Nothing is built.
 # Usage: bash nix/scripts/tests/profiles.test.sh   (exit 1 if any check fails)
 # tend: vg-dotfiles/Shared
 set -uo pipefail
@@ -46,6 +47,9 @@ facts() {
     linger = c.users.users.yaxpatel.linger;
     podman = c.virtualisation.podman.enable;
     help = builtins.attrNames c.dot.help;
+    sharedGroups = builtins.mapAttrs (_: g: g.members)
+      (sys.pkgs.lib.filterAttrs (n: _: sys.pkgs.lib.hasPrefix \"shared-\" n) c.users.groups);
+    sharedRules = builtins.filter (sys.pkgs.lib.hasInfix \"/srv/shared\") c.systemd.tmpfiles.rules;
     failed = map (a: a.message) (builtins.filter (a: !a.assertion) c.assertions);
   }" 2>"$errlog" || tail -3 "$errlog"
 }
@@ -71,6 +75,10 @@ check "the egress rule covers the guests and the build users (a build downloads 
 check "the egress rule covers the guests' container users (their subordinate uids)" "$base" '.egress | test("/etc/subuid") and test("uid-owner")'
 check "jade's colleagues linger, and have containers" "$base" '.linger and .podman'
 check "Slurm's help topics are there (its module is on)" "$base" '.help | index("slurm") != null and index("slurm-admin") != null'
+check "every user shares the everyone folder (the default)" "$base" '.sharedGroups["shared-everyone"] | sort == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
+check "jade's capstone folder: the three colleagues and the admin" "$base" '.sharedGroups["shared-capstone"] | sort == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
+check "a shared folder is members-only and setgid, with the group's default ACL" "$base" '(.sharedRules | index("d /srv/shared/capstone 2770 root shared-capstone -") != null) and (.sharedRules | any(test("^a\\+ /srv/shared/capstone .*default:group::rwx,default:mask::rwx,default:other::---")))'
+check "the shared help topic is there" "$base" '.help | index("shared") != null'
 check "no assertion fails" "$base" '.failed == []'
 
 echo "overrides"
@@ -78,12 +86,16 @@ masked="$(facts '{ profiles.masks."term.zellij.auto_start" = [ "admin" "standard
 check "a host mask turns a feature on for standard users" "$masked" '.standard.autostart and .admin.autostart'
 own="$(facts '{ profiles.users.yaxpatel.home.common.folders.enable = true; }')"
 check "a user's own settings turn one on just for them" "$own" '.standard.folders'
+noEveryone="$(facts '{ profiles.shared.everyone = [ ]; }')"
+check "a host can drop the everyone folder, and keeps its own" "$noEveryone" '(.sharedGroups | has("shared-everyone") | not) and (.sharedGroups | has("shared-capstone"))'
 
 echo "refused"
 twoAdmins="$(facts '{ profiles.users.yaxpatel.profile = "admin"; }')"
 check "a second admin" "$twoAdmins" '.failed | any(test("the only admin"))'
 strayKeys="$(facts '{ core.headless.sshd.userKeys.nobody = [ "ssh-ed25519 AAAA" ]; }')"
 check "keys for a user who isn't in profiles.users" "$strayKeys" '.failed | any(test("userKeys.nobody"))'
+strayMember="$(facts '{ profiles.shared.capstone = [ "nobody" ]; }')"
+check "a shared folder member who isn't in profiles.users" "$strayMember" '.failed | any(test("profiles.shared.capstone: nobody "))'
 
 echo "help comes and goes with its module"
 noSlurm="$(facts '{ lib, ... }: { modules.slurm.enable = lib.mkForce false; }')"

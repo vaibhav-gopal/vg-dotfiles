@@ -13,6 +13,7 @@
     ./graphics.nix
     ./headless.nix
     ./isolation.nix
+    ./shared.nix
     ./users.nix
   ];
 

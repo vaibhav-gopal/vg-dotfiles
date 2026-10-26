@@ -35,6 +35,9 @@
     siddhpatel = { logins = [ "ssh" ]; linger = true; };
   };
 
+  # Shared folders (/srv/shared/<name>): `everyone` comes by default; the capstone project's own
+  profiles.shared.capstone = [ "yaxpatel" "sameerjuin" "siddhpatel" "vaibhav" ];
+
   # Rootless Podman and distrobox for everyone (an Ubuntu userland, or an app's image)
   modules.containers.enable = true;
 

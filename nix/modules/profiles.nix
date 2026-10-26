@@ -2,6 +2,7 @@
 # configuration's own user (sudo, the full home layer linked live into the checkout, the admin
 # `dot`); everyone else is `standard` (their own account and home layer, masked to what a non-admin
 # user needs, and the standard `dot`). SSH keys stay with sshd (core.headless.sshd), not here.
+# Who shares which folder is here too (profiles.shared; NixOS makes them, core/shared.nix).
 # Every user gets the home layer (nix/modules/home.nix); a host's `dot.help` topics reach every
 # user's `dot help` (/etc/dot/help.json), filtered by profile.
 # tend: vg-dotfiles/Shared
@@ -34,6 +35,11 @@ in {
       default = { };
       description = "Per home feature (its mask name, e.g. term.zellij.auto_start): the profiles it's on for on this machine";
     };
+    shared = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+      default = { };
+      description = "Shared folders, as `name = [ members ]` (NixOS: /srv/shared/<name>, core/shared.nix). `everyone` is every user in profiles.users unless the host lists its own (or [ ] for none)";
+    };
     standard = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       readOnly = true;
@@ -49,6 +55,8 @@ in {
       profile = "admin";
       logins = lib.mkDefault [ "console" "ssh" ];
     };
+    # a default for the one name, not the option's, so a host's own folders add to it
+    profiles.shared.everyone = lib.mkDefault (lib.attrNames cfg.users);
 
     environment.etc."dot/help.json".text = usrlib.helpJSON ../.. config.dot.help;
 

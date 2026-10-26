@@ -5,7 +5,9 @@
 # nixbld) and from a rootless container (their subordinate uids). They see only their own processes,
 # can't read the admin's home, and their ssh sessions get a private /tmp. In Slurm (slurmdbd on
 # MariaDB, as on jade) they have an account and see only their own jobs; the console refuses them
-# (pam_access). Every refusal has a control: root, or the admin, gets through.
+# (pam_access). A shared folder (core/shared.nix) is open to its members, whatever their umask, and
+# to their containers given their groups; a non-member is refused. Every refusal has a control:
+# root, or the admin, gets through.
 # Not covered here: the Tenstorrent card's per-job ACL (it needs the card).
 # Run: nix build -L ./nix#checks.x86_64-linux.isolation
 # tend: vg-dotfiles/NixOS/Core
@@ -71,6 +73,8 @@ pkgs.testers.runNixOSTest {
       modules.containers.enable = true;
       profiles.users.${guest} = { logins = [ "ssh" ]; linger = true; };
       core.headless.sshd.userKeys.${guest} = [ keys.snakeOilPublicKey ];
+      # `everyone` (the guest and the admin) comes by default; `solo` leaves the admin out
+      profiles.shared.solo = [ guest ];
       # sized for the VM: 2 CPUs, 3.5 of its 4 GiB for Slurm, of which logins and daemons keep 3
       modules.slurm = {
         enable = true;
@@ -208,6 +212,19 @@ pkgs.testers.runNixOSTest {
         router.succeed(f"{ssh} 'test ! -e /tmp/admins-file && echo mine > /tmp/guests-file'")
         machine.fail("test -e /tmp/guests-file")
         machine.succeed("cat /var/lib/guest-tmp/tmp-*/guests-file | grep -qx mine")
+
+    with subtest("a shared folder: its members share files, whatever their umask; others are refused"):
+        machine.succeed(as_guest("umask 077 && mkdir /srv/shared/everyone/proj && echo v1 > /srv/shared/everyone/proj/notes"))
+        machine.succeed(as_user("vaibhav", "echo v2 >> /srv/shared/everyone/proj/notes && touch /srv/shared/everyone/proj/more"))
+        machine.succeed("[ \"$(stat -c %G /srv/shared/everyone/proj/more)\" = shared-everyone ]")
+        machine.succeed(as_guest("grep -qx v2 /srv/shared/everyone/proj/notes"))
+        machine.succeed(as_guest("touch /srv/shared/solo/mine"))  # control: a member gets in
+        machine.fail(as_user("vaibhav", "ls /srv/shared/solo"))  # the admin isn't a member
+        # a rootless container sees the folder only with the guest's groups passed in
+        def pod_ls(extra):
+            return as_guest(f"podman run --rm --pull=never {extra} -v /srv/shared/everyone:/data localhost/probe:latest ls /data/proj")
+        machine.succeed(pod_ls("--group-add keep-groups"))
+        machine.fail(pod_ls(""))
 
     with subtest("Slurm: the guest has an account, runs jobs, and sees only their own"):
         machine.wait_until_succeeds("sacctmgr -n show assoc user=colleague format=account | grep -qw colleagues", timeout=180)
