@@ -24,6 +24,9 @@ in {
     enable = usrlib.mkEnableOptionFalse "Tenstorrent driver, tools and hugepages";
     # upstream's hugepages-setup (tt-system-tools) wants 4 per Blackhole or Wormhole card, 1 per Grayskull
     hugepages = usrlib.mkIntOption "1G hugepages reserved at boot for the cards (4 per Blackhole card)" 4;
+    # the host's own pair, moved together: flash the firmware, then set both (dot help tenstorrent-firmware)
+    firmware = usrlib.mkStringOption "The firmware bundle flashed on the cards (tt-smi: fw_bundle_version); empty if unknown" "";
+    ttnn = usrlib.mkStringOption "The ttnn release built for that firmware (tt-metal's INSTALLING.md, per release): what new dev shells install; empty, the newest" "";
   };
 
   config = lib.mkIf cfg.enable {
@@ -31,6 +34,8 @@ in {
     boot.extraModulePackages = [ tt-kmd ];
     boot.kernelModules = [ "tenstorrent" ];
     services.udev.packages = [ tt-kmd ];
+    # read by the dev shells' tenstorrent layer (nix/dot/devshell), which installs this ttnn
+    environment.etc."tenstorrent/ttnn-version" = lib.mkIf (cfg.ttnn != "") { text = cfg.ttnn; };
     dot.help = {
       tenstorrent = {
         title = "The Tenstorrent card: what's installed, getting it, and the SDK (TT-NN)";
@@ -45,14 +50,14 @@ in {
         title = "Updating the card's firmware (admin)";
         profiles = [ "admin" ];
         text = ''
-          ttnn needs the firmware its release was built for (tt-metal's INSTALLING.md, per release; 0.81.1: 19.8.1,
-          flashed 2026-10-25 from 18.8.0).
+          ttnn needs the firmware its release was built for (tt-metal's INSTALLING.md, per release). Here:
+          firmware ${if cfg.firmware == "" then "(not set)" else cfg.firmware}, ttnn ${if cfg.ttnn == "" then "(not set: new dev shells take the newest)" else "${cfg.ttnn} (what new dev shells install)"}: modules.tenstorrent.firmware and .ttnn.
           Bundles: https://github.com/tenstorrent/tt-system-firmware/releases (fw_pack-<version>.fwbundle).
-            curl -LO https://github.com/tenstorrent/tt-system-firmware/releases/download/v19.8.1/fw_pack-19.8.1.fwbundle
+            curl -LO https://github.com/tenstorrent/tt-system-firmware/releases/download/v<version>/fw_pack-<version>.fwbundle
             # in your home (a job's /tmp is its own); tt-flash 4.1.0's `verify` is broken, `flash` works
-            ${if config.modules.slurm.enable then "sbatch --gres=tt:1 -c 2 --mem=4G --wrap " else "sudo sh -c "}'nix shell nixpkgs#uv -c uvx --from tt-flash==4.1.0 tt-flash --no-tty flash fw_pack-19.8.1.fwbundle'
+            ${if config.modules.slurm.enable then "sbatch --gres=tt:1 -c 2 --mem=4G --wrap " else "sudo sh -c "}'nix shell nixpkgs#uv -c uvx --from tt-flash==4.1.0 tt-flash --no-tty flash fw_pack-<version>.fwbundle'
             ${lib.optionalString config.modules.slurm.enable "srun --gres=tt:1 "}tt-smi -s | grep fw_bundle_version   # then reboot, and check it again
-          Nothing else may hold the card while it flashes; don't interrupt it.
+          Nothing else may hold the card while it flashes; don't interrupt it. Then set both options and apply.
         '';
       };
     };

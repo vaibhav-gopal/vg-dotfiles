@@ -55,6 +55,9 @@
 
   # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
   modules.tenstorrent.enable = true;
+  # flashed 2026-10-25 (from 18.8.0) for ttnn 0.81.1, which new dev shells here install
+  modules.tenstorrent.firmware = "19.8.1";
+  modules.tenstorrent.ttnn = "0.81.1";
 
   # Slurm schedules the cores and the card: the card is root-only outside a job, logins get 2 CPUs
   # and 8 GiB between them, fairshare from slurmdbd. Node line from `slurmd -C` on jade (Ryzen, 12 cores).

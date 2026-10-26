@@ -1,6 +1,13 @@
-# ttnn from PyPI, once (pin a version with `uv pip install ttnn==<version>`; it must match the
-# card's firmware: dot help tenstorrent)
-uv pip show --quiet ttnn >/dev/null 2>&1 || { echo "installing ttnn into .venv..."; uv pip install --quiet ttnn; }
+# ttnn from PyPI, once: the release built for this machine's card firmware, when the machine names
+# it (/etc/tenstorrent/ttnn-version), else the newest. Another one: `uv pip install ttnn==<version>`,
+# which must match the firmware too (dot help tenstorrent)
+if ! uv pip show --quiet ttnn >/dev/null 2>&1; then
+  tt_spec=ttnn
+  [ -s /etc/tenstorrent/ttnn-version ] && tt_spec="ttnn==$(cat /etc/tenstorrent/ttnn-version)"
+  echo "installing $tt_spec into .venv..."
+  uv pip install --quiet "$tt_spec"
+  unset tt_spec
+fi
 # SFPI, the RISC-V compiler ttnn builds the card's kernels with: the release this ttnn pins (its
 # sfpi-version), checked against the pinned hash, unpacked where ttnn looks (its runtime/sfpi).
 # A prebuilt Debian build: its libraries are on LD_LIBRARY_PATH, and nix-ld runs it.

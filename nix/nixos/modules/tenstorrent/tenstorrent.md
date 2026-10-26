@@ -51,10 +51,19 @@ installed ttnn pins (its `tt_metal/sfpi-version`), checks its hash, and unpacks 
 re-enter the shell to get the matching one.
 
 **Versions have to line up:** each ttnn release is built for a firmware version (tt-metal's
-`INSTALLING.md` for that release lists it). Pin the one that matches the card,
-`uv pip install ttnn==<version>`, and check the card's firmware with `tt-smi` (`fw_bundle_version`).
-If they don't match, `open_device` fails or misbehaves: ask the admin to update the firmware, or use
-an older ttnn.
+`INSTALLING.md` for that release lists it). A new dev shell installs the ttnn that matches this
+machine's card (`cat /etc/tenstorrent/ttnn-version`), so a fresh project works as is. Keep that pin
+in the project (`uv pip freeze > requirements.txt`, or `uv add ttnn==<version>` with a
+`pyproject.toml`), so everyone who clones it gets the same. Another version:
+`uv pip install ttnn==<version>`, after checking the card's firmware with `tt-smi`
+(`fw_bundle_version`). If they don't match, `open_device` fails or misbehaves: ask the admin to
+update the firmware, or use an older ttnn.
+
+**Working on it with others:** share the project, not the environment. Keep its `flake.nix`,
+`flake.lock`, pinned requirements and code in one git repo (in a shared folder, `dot help shared`,
+or on GitHub); everyone clones it and runs `nix develop` for an identical shell of their own. Put
+datasets, weights and results in the shared folder. One `.venv` used by several people breaks
+when one of them upgrades it, and files installed by one aren't writable by the others.
 
 ## C++ (TT-Metalium)
 

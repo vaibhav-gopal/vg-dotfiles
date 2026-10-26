@@ -106,6 +106,25 @@ mkdir -p "$tmp/all" && cd "$tmp/all" || exit 1
 rev="$(jq -r .nodes.nixpkgs.locked.rev "$src/nix/flake.lock")"
 out="$(nix eval --raw "path:$tmp/all#devShells.x86_64-linux.default.drvPath" --override-input nixpkgs "github:nixos/nixpkgs/$rev" 2>&1)"
 has "every layer composed together evaluates" "nix-shell.drv"
+# the tenstorrent hook installs the machine's ttnn: run as shipped, with the machine's file moved
+# into $tmp and a uv that records what it's asked to install (no ttnn yet; python finds none, so
+# no SFPI download)
+hook="$(sed -n 's/^DOT_SHARE="\(.*\)"$/\1/p' "$standard")/devshell/layers/tenstorrent/hook"
+mkdir -p "$tmp/fakebin"
+cat >"$tmp/fakebin/uv" <<EOF
+#!/usr/bin/env bash
+[[ "\$1 \$2" == "pip show" ]] && exit 1
+echo "\$*" >>"$tmp/uv.log"
+EOF
+printf '#!/usr/bin/env bash\nexit 1\n' >"$tmp/fakebin/python"
+chmod +x "$tmp/fakebin/uv" "$tmp/fakebin/python"
+runhook() { rm -f "$tmp/uv.log"; PATH="$tmp/fakebin:$PATH" bash -c "$(sed "s|/etc/tenstorrent/ttnn-version|$tmp/ttnn-version|g" "$hook")" >/dev/null 2>&1; cat "$tmp/uv.log" 2>/dev/null; }
+echo "0.81.1" >"$tmp/ttnn-version"
+out="$(runhook)"
+has "the tenstorrent shell installs the ttnn the machine names" "^pip install --quiet ttnn==0.81.1$"
+rm -f "$tmp/ttnn-version"
+out="$(runhook)"
+has "and the newest where the machine names none" "^pip install --quiet ttnn$"
 cd "$tmp/home" || exit 1
 
 echo "refusals"
@@ -134,6 +153,8 @@ else
 fi
 out="$(DOT_REPO="$src" DOT_HOST=vgsquid-jade "$admin" options modules.slurm 2>&1)"
 has "dot options shows a value beside its default" "modules.slurm.enable"
+out="$(nix eval --raw "$src/nix#nixosConfigurations.vgsquid-jade.config.environment.etc.\"tenstorrent/ttnn-version\".text" 2>&1)"
+has "jade names the ttnn its card's firmware takes, for the dev shells" "^0.81.1$"
 
 (( failures == 0 )) || { echo "$failures check(s) failed"; exit 1; }
 echo "all checks passed"
