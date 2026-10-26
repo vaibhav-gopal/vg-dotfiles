@@ -1,6 +1,7 @@
 # What a change must pass before it reaches a machine: every host evaluates, the shared home layer
-# builds (vgwsl2's home-files, ~1.1 GiB: a build failure that evaluation missed shipped once), and
-# the scripts pass shellcheck and their tests (bootstrap, wallpaper, dot).
+# builds (vgwsl2's home-files, ~1.1 GiB: a build failure that evaluation missed shipped once), the
+# guests stay isolated on a shared host (a VM test), and the scripts pass shellcheck and their tests
+# (bootstrap, wallpaper, dot).
 # tend: vg-dotfiles/Composition
 name: check
 
@@ -28,6 +29,14 @@ jobs:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
       - run: nix build -L --no-link ./nix#homeConfigurations.vgwsl2.config.home-files
+
+  isolation:
+    name: guest isolation (NixOS VM test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23 # turns on KVM for the VMs
+      - run: nix build -L --no-link ./nix#checks.x86_64-linux.isolation
 
   scripts:
     name: shellcheck and bootstrap tests

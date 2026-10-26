@@ -11,6 +11,7 @@
 #   services that inspect other users' processes are in `proc`
 # - /tmp, /var/tmp, /dev/shm: each guest's sessions get private ones (pam_namespace), and each Slurm
 #   job its own (modules.slurm)
+# Tested end to end in a VM, every refusal beside a control: nix/nixos/tests/isolation.nix
 # tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, username, ... }:
 let

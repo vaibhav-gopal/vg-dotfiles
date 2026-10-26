@@ -150,7 +150,11 @@ Standard users get their own `dot`: `dot tools`, `dot find`, `dot shell <pkg>`, 
 
 CI (`.github/workflows/check.yml`) evaluates every host, builds the shared home layer, runs the
 profiles and exports tests, and runs shellcheck and the bootstrap, wallpaper and `dot` tests
-(`bash nix/scripts/tests/<name>.test.sh`, or `dot test` for all of them).
+(`bash nix/scripts/tests/<name>.test.sh`, or `dot test` for all of them). It also runs the NixOS VM
+tests in `nix/nixos/tests`, the master flake's `checks` (`nix build -L ./nix#checks.x86_64-linux.isolation`:
+a standard user on a shared host reaches the internet but not the LAN or the tailnet, from a shell, a
+build or a container, and sees only their own processes and /tmp). They boot VMs, so `dot test` leaves
+them out.
 
 #### Imperative package installs
 
