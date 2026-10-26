@@ -148,6 +148,11 @@ Standard users get their own `dot`: `dot tools`, `dot find`, `dot shell <pkg>`, 
 `dot whoami`, `dot passwd`, and the help topics of the features on the machine. Both are
 `nix/dot/package.nix`; topics come from `dot.help` (see Users and profiles).
 
+**News for a machine's users** goes in its host folder (`dot.news`, e.g. `nix/nixos/vgsquid-jade/news.nix`):
+a note per change that reaches them, with a date and the profiles it's for. Each user's `dot` shows
+an unread note once before any command (one or two in full, more as a count), a login says when
+some are unread, and `dot news` shows them all. A note's name is its id: never reuse one.
+
 CI (`.github/workflows/check.yml`) evaluates every host, builds the shared home layer, runs the
 profiles and exports tests, and runs shellcheck and the bootstrap, wallpaper and `dot` tests
 (`bash nix/scripts/tests/<name>.test.sh`, or `dot test` for all of them). It also runs the NixOS VM

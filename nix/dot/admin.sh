@@ -39,6 +39,7 @@ ${B}Setup${N}
   dot devshell [layer...]       a dev shell for a project (python, tenstorrent, cpp, ...)
   dot cd | dot edit             print the checkout's path (cd "\$(dot cd)") | open it in \$EDITOR
   dot help [topic]              this, or a help topic
+  dot news                      what changed on this machine (dot.news, in its host folder)
 EOF
 }
 
@@ -246,8 +247,9 @@ cmd_brew() {
 
 main() {
   local cmd="${1:-help}"; shift || true
+  [[ "$cmd" == news ]] || news_brief
   case "$cmd" in
-    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew | repos | devshell)
+    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew | repos | devshell | news)
       "cmd_$cmd" "$@" ;;
     cd) repo ;;
     edit) exec "${EDITOR:-vi}" "$(repo)" ;;

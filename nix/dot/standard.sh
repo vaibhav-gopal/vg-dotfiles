@@ -16,6 +16,7 @@ ${B}dot${N} - your tools and help on $(uname -n)
   dot whoami                    your account here
   dot passwd                    set or change your password
   dot help [topic]              this, or a help topic
+  dot news                      what's changed on this machine
 
 You can't use sudo or install system-wide; everything above stays in your account.
 EOF
@@ -71,8 +72,9 @@ cmd_passwd() {
 
 main() {
   local cmd="${1:-help}"; shift || true
+  [[ "$cmd" == news ]] || news_brief
   case "$cmd" in
-    tools | find | shell | run | devshell | whoami | passwd) "cmd_$cmd" "$@" ;;
+    tools | find | shell | run | devshell | whoami | passwd | news) "cmd_$cmd" "$@" ;;
     help | -h | --help) cmd_help "$@" ;;
     *) die "no command '$cmd' (dot help)" ;;
   esac

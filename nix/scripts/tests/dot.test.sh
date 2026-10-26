@@ -31,7 +31,9 @@ admin="$(nix build --no-link --print-out-paths "$src#dot")/bin/dot" || exit 1
 standard="$(nix build --no-link --print-out-paths "$src#dot-standard")/bin/dot" || exit 1
 
 # A throwaway home, a checkout with one doc in it, and the machine's help as Nix would write it
-export HOME="$tmp/home" XDG_CONFIG_HOME="$tmp/home/.config"
+# (every XDG directory dot uses, not just HOME: a session's own XDG_STATE_HOME would put the read
+# news in the real home)
+export HOME="$tmp/home" XDG_CONFIG_HOME="$tmp/home/.config" XDG_STATE_HOME="$tmp/home/.local/state"
 mkdir -p "$XDG_CONFIG_HOME/dot" "$tmp/repo/nix" "$tmp/store"
 touch "$tmp/repo/nix/flake.nix"
 echo "LIVE copy of the guide" >"$tmp/repo/guide.md"
@@ -72,6 +74,51 @@ has "a topic's inline text shows" "my tip"
 out="$("$standard" help nosuch 2>&1)"; rc=$?
 fails "an unknown topic fails"
 has "and says so" "no help topic 'nosuch'"
+
+echo "news"
+# the machine's notes as Nix writes them (notes <id:date:profiles>...), and dot run in a terminal
+# (script gives it one: the brief only shows to a terminal)
+export DOT_SYSTEM_NEWS="$tmp/news.json"
+notes() {
+  local n id date profiles json='{}'
+  for n in "$@"; do
+    IFS=: read -r id date profiles <<<"$n"
+    json="$(jq --arg id "$id" --arg d "$date" --arg p "$profiles" \
+      '.[$id] = { date: $d, title: "note \($id)", text: "about \($id)", profiles: ($p | split(",")) }' <<<"$json")"
+  done
+  printf '%s\n' "$json" >"$DOT_SYSTEM_NEWS"
+}
+interm() { script -qec "$*" /dev/null 2>&1 | tr -d '\r'; }
+notes n1:2026-01-01:admin,standard n2:2026-01-02:standard a1:2026-01-02:admin
+out="$("$standard" help 2>&1)"
+hasnt "not a terminal (a script, a pipe): no news" "note n1"
+if [[ ! -e "$tmp/home/.local/state/dot/news-seen" ]]; then pass "and none of it is marked read"; else fail "and none of it is marked read"; fi
+out="$("$standard" news --login)"
+has "at login, a line pointing at the unread notes" "^2 new notes on .*: dot news$"
+out="$(interm "$standard" help)"
+has "one or two unread notes show in full before a command" "note n1"
+has "with their text" "about n2"
+hasnt "only the profile's notes" "note a1"
+has "and the command still runs" "Help topics"
+out="$(interm "$standard" help)"
+hasnt "once read, they don't show again" "note n"
+out="$("$standard" news --login)"
+if [[ -z "$out" ]]; then pass "nor at login"; else fail "nor at login" "$out"; fi
+out="$("$standard" news)"
+if grep -q "note n2" <<<"$out" && ! grep -q "(new)" <<<"$out"; then pass "dot news shows them all, none new"; else fail "dot news shows them all, none new" "$out"; fi
+if [[ "$(grep -n 'note n2' <<<"$out" | cut -d: -f1)" -lt "$(grep -n 'note n1' <<<"$out" | cut -d: -f1)" ]]; then pass "newest first"; else fail "newest first" "$out"; fi
+notes n1:2026-01-01:admin,standard n2:2026-01-02:standard a1:2026-01-02:admin n3:2026-01-03:standard n4:2026-01-04:standard n5:2026-01-05:standard
+out="$(interm "$standard" help)"
+has "three or more unread: a count" "3 new notes on .*: dot news"
+hasnt "not the notes themselves" "note n3"
+out="$(interm "$standard" help)"
+has "which stay unread until dot news" "3 new notes"
+out="$("$standard" news)"
+has "dot news marks the unread ones" "note n5  (new)"
+out="$(interm "$standard" help)"
+hasnt "and reads them" "new notes"
+out="$(interm "$admin" help)"
+has "the admin's dot shows the admin's notes" "note a1"
 
 echo "tools and dev shells"
 out="$("$standard" tools silver 2>&1)"

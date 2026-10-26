@@ -5,7 +5,7 @@
 {
   # the machine's hardware config (the bootstrap copies it in); imported once it exists, so the host
   # still evaluates before that (its `estate` services; a system build needs it)
-  imports = builtins.filter builtins.pathExists [
+  imports = [ ./news.nix ] ++ builtins.filter builtins.pathExists [
     ./hardware-configuration.nix
   ];
 

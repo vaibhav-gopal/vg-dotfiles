@@ -47,6 +47,8 @@ facts() {
     linger = c.users.users.yaxpatel.linger;
     podman = c.virtualisation.podman.enable;
     help = builtins.attrNames c.dot.help;
+    news = builtins.fromJSON c.environment.etc.\"dot/news.json\".text;
+    newsAtLogin = sys.pkgs.lib.hasInfix \"dot news --login\" c.environment.interactiveShellInit;
     sharedGroups = builtins.mapAttrs (_: g: g.members)
       (sys.pkgs.lib.filterAttrs (n: _: sys.pkgs.lib.hasPrefix \"shared-\" n) c.users.groups);
     sharedRules = builtins.filter (sys.pkgs.lib.hasInfix \"/srv/shared\") c.systemd.tmpfiles.rules;
@@ -79,6 +81,8 @@ check "every user shares the everyone folder (the default)" "$base" '.sharedGrou
 check "jade's capstone folder: the three colleagues and the admin" "$base" '.sharedGroups["shared-capstone"] | sort == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
 check "a shared folder is members-only and setgid, with the group's default ACL" "$base" '(.sharedRules | index("d /srv/shared/capstone 2770 root shared-capstone -") != null) and (.sharedRules | any(test("^a\\+ /srv/shared/capstone .*default:group::rwx,default:mask::rwx,default:other::---")))'
 check "the shared help topic is there" "$base" '.help | index("shared") != null'
+check "jade's news reaches /etc/dot/news.json, dated, for its standard users" "$base" '(.news | keys == ["2026-10-25-help","2026-10-25-shared-folders","2026-10-25-ttnn-pin"]) and all(.news[]; .date == "2026-10-25" and .profiles == ["standard"])'
+check "and a login points at what's unread" "$base" '.newsAtLogin'
 check "no assertion fails" "$base" '.failed == []'
 
 echo "overrides"
