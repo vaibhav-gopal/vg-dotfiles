@@ -1,4 +1,7 @@
-# headless server profile: desktop and peripheral defaults off, remote access (sshd) on.
+# headless server profile: desktop and peripheral defaults off, remote access (sshd) on, and kept up
+# (core.headless.uptime): it never sleeps, whoever asks (GNOME at the console suspended jade under
+# running jobs once: it counts only console input), Wi-Fi doesn't power-save, and a panic or a hang
+# reboots it instead of leaving it stuck.
 # tend: vg-dotfiles/NixOS/Core
 { config, lib, usrlib, pkgs, username, ... }:
 let
@@ -14,10 +17,14 @@ in {
       # Other users' keys; their accounts come from profiles.users
       userKeys = usrlib.mkAttrsOption "Public keys for the other users in profiles.users, as `name = [ keys ]`" { };
     };
+    uptime = {
+      enable = usrlib.mkEnableOptionTrue "keep the server up: no sleep of any kind, no Wi-Fi power saving, reboot after a panic or a hang";
+      watchdog = usrlib.mkStringOption "Reboot through the hardware watchdog when systemd stops answering it for this long (\"off\": don't)" "60s";
+    };
   };
 
   # Everything is mkDefault, so a host can still opt back in (e.g. `core.graphics.enable = true;` for a GPU compute box)
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable (lib.mkMerge [ {
     core.login.enable = lib.mkDefault false;
     core.desktop.enable = lib.mkDefault false;
     core.graphics.enable = lib.mkDefault false;
@@ -73,5 +80,34 @@ in {
 
     # enable running foreign binaries on NixOS (allows vscode server over Remote-SSH)
     programs.nix-ld.enable = lib.mkDefault true;
-  };
+  } (lib.mkIf cfg.uptime.enable {
+    # every sleep refused at systemd, so no one can: GNOME's idle suspend, the greeter, a menu click
+    systemd.sleep.settings.Sleep = {
+      AllowSuspend = "no";
+      AllowHibernation = "no";
+      AllowHybridSleep = "no";
+      AllowSuspendThenHibernate = "no";
+    };
+    services.logind.settings.Login = {
+      HandleSuspendKey = "ignore";
+      HandleHibernateKey = "ignore";
+      HandleLidSwitch = "ignore";
+      IdleAction = "ignore";
+    };
+    # and GNOME doesn't try (nor warn that it's about to): only the screen blanks and locks
+    programs.dconf.profiles.user.databases = lib.mkIf config.services.desktopManager.gnome.enable [{
+      settings."org/gnome/settings-daemon/plugins/power" = {
+        sleep-inactive-ac-type = "nothing";
+        sleep-inactive-battery-type = "nothing";
+      };
+    }];
+    networking.networkmanager.wifi.powersave = lib.mkIf config.networking.networkmanager.enable false;
+    # a panic reboots after 10 s; a hang (systemd stops answering the hardware watchdog) too. Out of
+    # memory (a user's share, a job's) kills a process, never the machine: 0 is the kernel's
+    # default, said here because NixOS's test VMs set 2 (any OOM panics) and the VM test fills a
+    # user's share on purpose
+    boot.kernel.sysctl."kernel.panic" = 10;
+    boot.kernel.sysctl."vm.panic_on_oom" = 0;
+    systemd.settings.Manager.RuntimeWatchdogSec = lib.mkIf (cfg.uptime.watchdog != "off") cfg.uptime.watchdog;
+  }) ]);
 }
