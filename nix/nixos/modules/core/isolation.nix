@@ -2,7 +2,10 @@
 # own tailnet node, so a guest must not reach past it, nor see the owner's or each other's work.
 # - network: guests (primary group `guests`, which their Slurm jobs run under too) reach the internet
 #   and MagicDNS only, never the tailnet or the LAN; inbound, the tailnet gets sshd alone
-#   (modules.tailscale.trustTailnet off)
+#   (modules.tailscale.trustTailnet off). The same holds for the Nix daemon's build users (nixbld):
+#   a fixed-output derivation downloads as one, so a guest's build would otherwise reach the LAN for
+#   them. The pool is shared, so the admin's builds can't fetch from there either (substitution runs
+#   as root and flake inputs as the user, so neither is affected)
 # - processes: /proc is mounted hidepid=invisible, so a guest sees only their own; the owner and the
 #   services that inspect other users' processes are in `proc`
 # - /tmp, /var/tmp, /dev/shm: each guest's sessions get private ones (pam_namespace), and each Slurm
@@ -20,17 +23,21 @@ let
   # the tailnet (CGNAT range, Tailscale's ULA), the LAN (RFC 1918, ULA) and link-local
   blocked4 = [ "100.64.0.0/10" "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "169.254.0.0/16" ];
   blocked6 = [ "fd7a:115c:a1e0::/48" "fc00::/7" "fe80::/10" ];
-  match = "-m owner --gid-owner guests --suppl-groups";
+  # the guests' own processes and jobs, and every build's downloads
+  groups = [ "guests" "nixbld" ];
+  unhook = ipt: lib.concatMapStrings (g: ''
+    ${ipt} -D OUTPUT -m owner --gid-owner ${g} --suppl-groups -j guest-egress 2>/dev/null || true
+  '') groups;
   egressRules = ipt: dns: blocked: ''
     ${ipt} -N guest-egress 2>/dev/null || ${ipt} -F guest-egress
     ${ipt} -A guest-egress -d ${dns} -p udp --dport 53 -j RETURN
     ${ipt} -A guest-egress -d ${dns} -p tcp --dport 53 -j RETURN
     ${lib.concatMapStrings (net: "${ipt} -A guest-egress -d ${net} -j REJECT\n") blocked}
-    ${ipt} -D OUTPUT ${match} -j guest-egress 2>/dev/null || true
-    ${ipt} -I OUTPUT 1 ${match} -j guest-egress
+    ${unhook ipt}
+    ${lib.concatMapStrings (g: "${ipt} -I OUTPUT 1 -m owner --gid-owner ${g} --suppl-groups -j guest-egress\n") groups}
   '';
   egressStop = ipt: ''
-    ${ipt} -D OUTPUT ${match} -j guest-egress 2>/dev/null || true
+    ${unhook ipt}
     ${ipt} -F guest-egress 2>/dev/null || true
     ${ipt} -X guest-egress 2>/dev/null || true
   '';

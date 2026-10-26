@@ -42,6 +42,7 @@ facts() {
     standard = f \"yaxpatel\";
     standardGroup = c.users.users.yaxpatel.group;
     sshUsers = c.services.openssh.settings.AllowUsers;
+    egress = c.networking.firewall.extraCommands;
     help = builtins.attrNames c.dot.help;
     failed = map (a: a.message) (builtins.filter (a: !a.assertion) c.assertions);
   }" 2>"$errlog" || tail -3 "$errlog"
@@ -64,6 +65,7 @@ check "standard user has no managed git identity" "$base" '.standard.gitName == 
 check "standard user's configs are store copies" "$base" '.standard.liveNvim | not'
 check "standard users are isolated (group guests)" "$base" '.standardGroup == "guests"'
 check "sshd admits exactly the users with ssh logins" "$base" '.sshUsers == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
+check "the egress rule covers the guests and the build users (a build downloads as nixbld)" "$base" '(.egress | test("gid-owner guests")) and (.egress | test("gid-owner nixbld"))'
 check "Slurm's help topics are there (its module is on)" "$base" '.help | index("slurm") != null and index("slurm-admin") != null'
 check "no assertion fails" "$base" '.failed == []'
 
