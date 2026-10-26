@@ -139,6 +139,7 @@ hostname (`DOT_HOST=<host>` for another). `dot help` lists the commands and the 
 | `dot check [--all]` / `dot test` | Evaluate this machine (or every one) / run the test suite |
 | `dot status` | Machine, generation, checkout |
 | `dot users` / `dot features` | Who logs in here / which masked features each user has |
+| `dot usage [--disk]` | Who uses the machine now: each user's memory, CPU, logins, Slurm jobs, the card (--disk: home sizes) |
 | `dot options [--home [--user u]] [path]` | Options with type, value and default (this repo's, or under a path) |
 | `dot config [--home] <path>` / `dot pkgs` / `dot session` | A value as JSON / packages / aliases and variables |
 | `dot user reset <name>` / `dot passwd` | A standard user's one-time password / yours (at the machine) |

@@ -188,6 +188,41 @@ has "and points at dot bootstrap" "dot bootstrap clones it"
 out="$(DOT_REPO="$tmp/repo" "$admin" cd 2>&1)"
 has "DOT_REPO picks the checkout" "$tmp/repo"
 
+echo "dot usage"
+# A machine as the kernel, logind and Slurm would describe it: this test's user and an unknown uid
+# with sessions (sizes in bytes, CPU in microseconds), a system user's slice, one card held by alice
+me="$(id -un)"
+cg="$tmp/cg/user.slice"
+mkdir -p "$cg/user-$(id -u).slice" "$cg/user-99999.slice" "$cg/user-500.slice" "$tmp/tt/by-id" "$tmp/usagebin"
+echo 8589934592 >"$cg/memory.max"; echo "200000 100000" >"$cg/cpu.max"; echo 3677356032 >"$cg/memory.current"
+slice() { echo "$2" >"$cg/$1/memory.current"; echo "$3" >"$cg/$1/memory.peak"; echo "usage_usec $4" >"$cg/$1/cpu.stat"; echo "$5" >"$cg/$1/pids.current"; }
+slice "user-$(id -u).slice" 3670016000 8589934592 3330000000 716 # 3.4G, peak 8.0G, 55.5 minutes
+slice user-99999.slice 7340032 14680064 0 4                       # 7M, peak 14M
+slice user-500.slice 1048576000 1048576000 0 1                    # a system user: left out
+touch "$tmp/tt/0"
+cat >"$tmp/usagebin/loginctl" <<EOF
+#!/usr/bin/env bash
+printf '%s\n' " 2 $(id -u) $me seat0 1711 user    tty1 no -" " 3 $(id -u) $me - 1722 manager - no -"
+EOF
+cat >"$tmp/usagebin/squeue" <<EOF
+#!/usr/bin/env bash
+printf '%s\n' "99999|RUNNING|16|24G|N/A" "99999|RUNNING|8|16G|gres/tt:1" "99999|PENDING|8|16G|gres/tt:1" "$me|PENDING|4|8G|N/A"
+EOF
+printf '#!/usr/bin/env bash\necho 24/0/0/24\n' >"$tmp/usagebin/sinfo"
+printf '#!/usr/bin/env bash\nprintf "user::rw-\\nuser:alice:rw-\\ngroup::---\\n"\n' >"$tmp/usagebin/getfacl"
+chmod +x "$tmp/usagebin"/*
+out="$(PATH="$tmp/usagebin:$PATH" DOT_CGROUP="$tmp/cg" DOT_TT_DIR="$tmp/tt" "$admin" usage 2>&1)"
+has "a user's slice: memory, its peak, CPU time, tasks, real logins (not the manager), waiting jobs" "^$me  *3.4G  *8.0G  *55m  *716  *1  *0/1  -$"
+has "a user's running jobs: what they hold, the card among it" "^99999  *7M  *14M  *0m  *4  *0  *2/1  24 CPUs, 40.0G, the card$"
+if [[ "$(grep -n "^$me " <<<"$out" | cut -d: -f1)" -lt "$(grep -n '^99999 ' <<<"$out" | cut -d: -f1)" ]]; then pass "the biggest first"; else fail "the biggest first" "$out"; fi
+hasnt "system users left out" "^500 "
+has "who holds the card" "^card 0: alice$"
+hasnt "only cards, not by-id/" "by-id"
+has "the logins' share and their cap" "logins   3.4G of 8.0G memory, 2 CPUs between them"
+has "and Slurm's CPUs" "allocated/idle/other/total 24/0/0/24"
+out="$("$admin" usage --nosuch 2>&1)"; rc=$?
+fails "an unknown option fails"
+
 echo "inspecting vgsquid-jade"
 out="$(DOT_REPO="$src" DOT_HOST=vgsquid-jade "$admin" users 2>&1)"
 has "dot users lists the admin" "vaibhav  *admin  *console,ssh"
