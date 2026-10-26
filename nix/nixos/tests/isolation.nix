@@ -232,6 +232,9 @@ pkgs.testers.runNixOSTest {
 
     with subtest("Slurm: the guest has an account, runs jobs, and sees only their own"):
         machine.wait_until_succeeds("sacctmgr -n show assoc user=colleague format=account | grep -qw colleagues", timeout=180)
+        # and slurmctld's own copy: started before slurmdbd answered, it picks the association up
+        # later (in CI once, srun came first: "doesn't have a default account")
+        machine.wait_until_succeeds("scontrol show assoc_mgr users=colleague flags=assoc | grep -q 'Account=colleagues UserName=colleague('", timeout=180)
         machine.wait_until_succeeds("sinfo -h -o %t | grep -qx idle", timeout=120)
         machine.succeed(as_guest("srun --mem=100M -c1 true"))
         job = machine.succeed(as_user("vaibhav", "sbatch --parsable --mem=100M -c1 --wrap 'sleep 600'")).strip()
