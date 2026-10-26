@@ -208,7 +208,9 @@ pkgs.testers.runNixOSTest {
     with subtest("the guest logs in over ssh, to a private /tmp"):
         machine.succeed("echo admin > /tmp/admins-file")
         router.succeed("install -m600 ${keys.snakeOilPrivateKey} /root/key")
-        ssh = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/key {guest}@192.168.1.1"
+        # -n: ssh would otherwise read stdin, the driver's own channel to the VM, and now and then
+        # swallow a command's exit code ("invalid literal for int()", once in CI)
+        ssh = f"ssh -n -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/key {guest}@192.168.1.1"
         router.succeed(f"{ssh} 'test ! -e /tmp/admins-file && echo mine > /tmp/guests-file'")
         machine.fail("test -e /tmp/guests-file")
         machine.succeed("cat /var/lib/guest-tmp/tmp-*/guests-file | grep -qx mine")
