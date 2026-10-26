@@ -1,0 +1,6 @@
+gcc
+cmake
+ninja
+gdb
+pkg-config
+clang-tools

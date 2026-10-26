@@ -12,7 +12,7 @@ ${B}dot${N} - your tools and help on $(uname -n)
   dot find <word>               search every package nix has
   dot shell <pkg>...            a shell with those packages, gone when you exit
   dot run <pkg> [args]          run a package once
-  dot devshell [template]       start a dev shell for the project in this folder
+  dot devshell [layer...]       a dev shell for the project in this folder (python, tenstorrent, ...)
   dot whoami                    your account here
   dot passwd                    set or change your password
   dot help [topic]              this, or a help topic
@@ -48,24 +48,6 @@ cmd_run() {
   [[ $# -gt 0 ]] || die "dot run <pkg> [args]"
   local p="$1"; shift
   exec nix run "nixpkgs#$p" -- "$@"
-}
-
-cmd_devshell() {
-  local t="${1:-}" src
-  if [[ -z "$t" ]]; then
-    head1 "Templates (dot devshell <template>)"
-    for src in "$DOT_SHARE"/templates/*; do printf '  %s%-10s%s %s\n' "$B" "$(basename "$src")" "$N" "$(sed -n '1s/^# //p' "$src/flake.nix")"; done
-    return
-  fi
-  src="$DOT_SHARE/templates/$t"
-  [[ -d "$src" ]] || die "no template '$t' (dot devshell lists them)"
-  [[ ! -e flake.nix ]] || die "this folder already has a flake.nix"
-  cp -r --no-preserve=mode "$src"/. .
-  [[ -e .envrc ]] || echo "use flake" >.envrc
-  say "Wrote flake.nix (and .envrc) from '$t'. Next:"
-  say "  edit flake.nix (the packages your project needs), then:"
-  say "  nix develop            # or direnv allow, to enter it whenever you cd here"
-  say "  git add flake.nix      # a flake only sees files git knows about"
 }
 
 cmd_whoami() {

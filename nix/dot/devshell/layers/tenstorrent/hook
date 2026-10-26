@@ -1,0 +1,4 @@
+# ttnn from PyPI, once (pin a version with `uv pip install ttnn==<version>`; it must match the
+# card's firmware: dot help tenstorrent)
+uv pip show --quiet ttnn >/dev/null 2>&1 || { echo "installing ttnn into .venv..."; uv pip install --quiet ttnn; }
+echo "The card is only usable inside a Slurm job: srun --gres=tt:1 -c 8 --mem=16G --pty bash (dot help slurm)"

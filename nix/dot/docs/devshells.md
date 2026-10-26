@@ -6,29 +6,34 @@ project gets exactly the same versions, and nothing touches the rest of the mach
 
 ## Start one
 
+A shell is put together from **layers**: `dot devshell` lists them. Name the ones the project
+needs and you get one `flake.nix` with all of them (a layer brings what it needs: `tenstorrent`
+brings `python`):
+
 ```sh
 cd ~/projects/my-experiment
-git init                     # a flake only sees files git knows about
-dot devshell                 # lists the templates
-dot devshell base            # a plain shell: add the packages you need
-git add flake.nix .envrc
-nix develop                  # enter it (the first time downloads what it needs)
+git init                              # a flake only sees files git knows about
+dot devshell python tenstorrent       # or: cpp, rust, node, ... any mix
+git add flake.nix .envrc .gitignore
+nix develop                           # enter it (the first time downloads what it needs)
 ```
 
-Edit the `packages = [ ... ];` list in `flake.nix` with what the project needs, e.g.
-`pkgs.python3 pkgs.uv pkgs.cmake pkgs.ninja`, and run `nix develop` again. Find package names with
-`dot find <word>`.
+The flake is the project's: add packages to its `packages = with pkgs; [ ... ];` list (find names
+with `dot find <word>`) and run `nix develop` again. To add a layer later, `dot devshell --print
+<layers>` prints a fresh flake to copy the parts you need from.
 
 ## Enter it automatically
 
-`direnv` is set up for you: with the `.envrc` the template wrote (`use flake`), run `direnv allow`
+`direnv` is set up for you: with the `.envrc` dot devshell wrote (`use flake`), run `direnv allow`
 once and the shell loads whenever you `cd` into the folder.
 
 ## Python projects
 
-`dot devshell python` is a uv workspace (uv2nix). For something quicker, a `base` shell with
-`pkgs.python3 pkgs.uv`, then `uv venv && uv pip install -r requirements.txt` inside the project, works
-too: prebuilt wheels run here.
+The `python` layer gives Python 3.12 and uv, and makes a `.venv` in the project that's active
+in the shell: `uv pip install -r requirements.txt` (or `uv add <pkg>` with a `pyproject.toml`).
+Prebuilt wheels work: the shell puts the C++ runtime they expect on `LD_LIBRARY_PATH`.
+
+The `tenstorrent` layer adds TT-NN (`ttnn`) to that venv; `dot help tenstorrent` for the card.
 
 ## In a Slurm job
 

@@ -36,6 +36,7 @@ ${B}Setup${N}
   dot bootstrap [host] [opts]   bring this machine up to its configuration (clones the repo first)
   dot repos                     clone the machine repos that are missing (logs gh in if it has to)
   dot brew <bootstrap|adopt|check|file>   Homebrew on nix-darwin
+  dot devshell [layer...]       a dev shell for a project (python, tenstorrent, cpp, ...)
   dot cd | dot edit             print the checkout's path (cd "\$(dot cd)") | open it in \$EDITOR
   dot help [topic]              this, or a help topic
 EOF
@@ -246,7 +247,7 @@ cmd_brew() {
 main() {
   local cmd="${1:-help}"; shift || true
   case "$cmd" in
-    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew | repos)
+    apply | diff | update | gc | check | test | status | users | features | options | config | pkgs | session | user | passwd | bootstrap | brew | repos | devshell)
       "cmd_$cmd" "$@" ;;
     cd) repo ;;
     edit) exec "${EDITOR:-vi}" "$(repo)" ;;

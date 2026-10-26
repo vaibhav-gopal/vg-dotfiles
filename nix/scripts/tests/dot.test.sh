@@ -76,15 +76,31 @@ out="$("$standard" tools nothing-matches-this 2>&1)"
 hasnt "and leaves out what doesn't match" "ripgrep"
 mkdir -p "$tmp/proj" && cd "$tmp/proj" || exit 1
 out="$("$standard" devshell 2>&1)"
-has "dot devshell lists the templates" "python"
-out="$("$standard" devshell base 2>&1)"
-if [[ -f flake.nix && -f .envrc ]]; then pass "dot devshell base writes flake.nix and .envrc"; else fail "dot devshell base writes flake.nix and .envrc" "$out"; fi
+has "dot devshell lists the layers" "tenstorrent"
+out="$("$standard" devshell --print python tenstorrent 2>&1)"
+if [[ ! -e flake.nix ]]; then pass "--print writes no file"; else fail "--print writes no file"; fi
+order="$(grep -oE '^ +# (base|python|tenstorrent)$' <<<"$out" | awk '{print $2}' | awk '!seen[$0]++' | paste -sd' ')"
+if [[ "$order" == "base python tenstorrent" ]]; then pass "layers in order: base, then requirements, each once"; else fail "layers in order: base, then requirements, each once" "$order"; fi
+if [[ "$(grep -c '^ *python312$' <<<"$out")" -eq 1 ]]; then pass "a layer named twice (python, and through tenstorrent) lands once"; else fail "a layer named twice lands once" "$out"; fi
+has "the libraries wheels need are on LD_LIBRARY_PATH" "makeLibraryPath (with pkgs; \\[ stdenv.cc.cc.lib zlib \\])"
+out="$("$standard" devshell tenstorrent 2>&1)"
+has "tenstorrent alone pulls in python" "layers: base python tenstorrent"
+if [[ -f flake.nix && -f .envrc && -f .gitignore ]]; then pass "it writes flake.nix, .envrc and .gitignore"; else fail "it writes flake.nix, .envrc and .gitignore" "$out"; fi
 echo "# mine" >flake.nix
 out="$("$standard" devshell base 2>&1)"; rc=$?
 fails "a second dot devshell fails"
 if [[ "$(cat flake.nix)" == "# mine" ]]; then pass "and leaves the existing flake.nix alone"; else fail "and leaves the existing flake.nix alone"; fi
 out="$("$standard" devshell nosuch 2>&1)"; rc=$?
-fails "an unknown template fails"
+fails "an unknown layer fails"
+mkdir -p "$tmp/cpp" && cd "$tmp/cpp" || exit 1
+out="$("$standard" devshell cpp 2>&1)"
+if [[ -f flake.nix ]] && ! grep -q LD_LIBRARY_PATH flake.nix; then pass "a shell with no libraries (cpp) is written, without LD_LIBRARY_PATH"; else fail "a shell with no libraries (cpp) is written" "$out"; fi
+# every layer at once must still be a flake that evaluates (against the nixpkgs this repo pins)
+mkdir -p "$tmp/all" && cd "$tmp/all" || exit 1
+"$standard" devshell base python tenstorrent cpp rust node >/dev/null 2>&1
+rev="$(jq -r .nodes.nixpkgs.locked.rev "$src/nix/flake.lock")"
+out="$(nix eval --raw "path:$tmp/all#devShells.x86_64-linux.default.drvPath" --override-input nixpkgs "github:nixos/nixpkgs/$rev" 2>&1)"
+has "every layer composed together evaluates" "nix-shell.drv"
 cd "$tmp/home" || exit 1
 
 echo "refusals"
