@@ -2,7 +2,8 @@
 # (sshd lets in only the users with ssh in their logins; tty and SDDM refuse those without
 # console), and the first-login password: a standard user whose password was never set is asked
 # for one when their shell starts (vg-first-password, the one thing they may run as root, and only
-# for themselves, once). The admin's password comes from the install.
+# for themselves, once). The admin's password comes from the install. Where someone lingers, `dot
+# help background` says what lingering keeps running and how (background.md).
 # tend: vg-dotfiles/NixOS/Core
 { config, lib, pkgs, ... }:
 let
@@ -10,6 +11,7 @@ let
   standard = config.profiles.standard;
   withLogin = kind: lib.attrNames (lib.filterAttrs (_: u: lib.elem kind u.logins) users);
   noConsole = lib.subtractLists (withLogin "console") (lib.attrNames users);
+  lingering = lib.attrNames (lib.filterAttrs (_: u: u.linger) users);
 
   # pam_access for the console services: these users are refused there (ssh keeps its own list)
   consoleAccess = pkgs.writeText "access-console.conf" ''
@@ -45,6 +47,17 @@ in {
     ];
 
     services.openssh.settings.AllowUsers = lib.mkIf config.services.openssh.enable (withLogin "ssh");
+
+    # what lingering is for, on the machines where someone lingers
+    dot.help.background = lib.mkIf (lingering != [ ]) {
+      title = "Keeping things running after you log out: lingering, user services, containers";
+      text = ''
+        Lingering here: ${lib.concatStringsSep ", " lingering} (yours: loginctl show-user $USER -p Linger).
+        zellij attach --create work                 # a session to leave running and rejoin
+        systemctl --user enable --now <service>     # your own service, started at boot too
+      '';
+      file = "nix/nixos/modules/core/background.md";
+    };
 
     security.pam.services = lib.mkIf (noConsole != [ ]) ({
       login.rules.account.access = consoleRule;

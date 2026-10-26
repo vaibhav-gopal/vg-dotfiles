@@ -8,9 +8,10 @@
 let
   topic = title: file: { inherit title; text = ""; file = null; path = "${file}"; };
   devshells = topic "Dev shells: a project's tools without installing anything (dot devshell)" ./docs/devshells.md;
+  nix = topic "Nix: finding, trying and keeping packages (nix shell, nix profile, versions)" ./docs/nix.md;
   topics = {
     admin = {
-      inherit devshells;
+      inherit devshells nix;
       dotfiles = { title = "vg-dotfiles: the machines, the profiles and how they fit (README)"; text = ""; file = "README.md"; path = "${../../README.md}"; };
       bootstrap = {
         title = "Setting up a new machine";
@@ -25,7 +26,7 @@ let
       };
     };
     standard = {
-      inherit devshells;
+      inherit devshells nix;
       account = topic "Your account: password, git identity, Claude, your own shell settings" ./docs/account.md;
     };
   }.${profile};

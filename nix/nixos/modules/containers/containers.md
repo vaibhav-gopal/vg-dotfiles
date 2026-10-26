@@ -43,9 +43,8 @@ firewall leaves open). Reach it from your laptop with an SSH tunnel: `ssh -L 808
 
 ## Keeping things running after you log out
 
-Containers and user services stop when your last session ends, unless lingering is on for you
-(the admin turns it on: `profiles.users.<you>.linger`). With it, `podman run -d` containers and
-`systemctl --user` services keep running.
+Containers stop when your last session ends, unless lingering is on for you; with it they keep
+running, and can start again at boot: `dot help background`.
 
 ## In a Slurm job
 

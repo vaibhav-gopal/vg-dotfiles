@@ -88,6 +88,9 @@ check "keys for a user who isn't in profiles.users" "$strayKeys" '.failed | any(
 echo "help comes and goes with its module"
 noSlurm="$(facts '{ lib, ... }: { modules.slurm.enable = lib.mkForce false; }')"
 check "no Slurm, no Slurm topics" "$noSlurm" '.help | index("slurm") == null'
+check "someone lingers, so the background topic is there" "$base" '.help | index("background") != null'
+noLinger="$(facts '{ lib, ... }: { profiles.users = lib.genAttrs [ "yaxpatel" "sameerjuin" "siddhpatel" ] (_: { linger = lib.mkForce false; }); }')"
+check "nobody lingers, no background topic" "$noLinger" '.help | index("background") == null'
 
 (( failures == 0 )) || { echo "$failures check(s) failed"; exit 1; }
 echo "all checks passed"

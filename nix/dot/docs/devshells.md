@@ -48,5 +48,4 @@ srun -c 8 --mem=16G nix develop --command python train.py
 ## One-off tools
 
 Not worth a flake? `dot shell <pkg>...` opens a shell with them; `dot run <pkg>` runs one once.
-To keep a tool across logins, `nix profile install nixpkgs#<pkg>` installs it into your own profile
-(only you see it; `nix profile list` / `nix profile remove`).
+To keep one at every login, `nix profile add nixpkgs#<pkg>`: `dot help nix` for all of these.
