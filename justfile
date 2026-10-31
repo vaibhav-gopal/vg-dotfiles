@@ -231,6 +231,11 @@ homesession:
 check-hosts:
     bash {{justfile_directory()/scripts-dir}}/check-hosts.sh
 
+# Run every check a change must pass before it's committed (no CI here: these are the record)
+[group('eval')]
+check:
+    bash {{justfile_directory()/scripts-dir}}/check.sh
+
 # Validate the currently selected flake config from .env without switching the machine
 [group('eval')]
 validate:

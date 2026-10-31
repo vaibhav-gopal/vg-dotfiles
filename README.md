@@ -98,7 +98,7 @@ reachable only over the tailnet.
 `nix eval --json nix#configurations` (the machine table) and `nix#estate` (per host, the system services
 it runs, from `estate.services` in the modules that turn them on) are read by Tend and the layers above
 it. Their shape is a contract versioned by `nix#exports.version`: renaming or removing a field, or
-changing what one means, bumps it (adding one doesn't), and `nix/scripts/tests/exports.test.sh` (in CI)
+changing what one means, bumps it (adding one doesn't), and `nix/scripts/tests/exports.test.sh` (in `just check`)
 fails until it does.
 
 ## Day to day
@@ -107,12 +107,14 @@ fails until it does.
 
 - `just build`: rebuild and switch (`just buildboot` applies at the next boot)
 - `just update`: bump `flake.lock`; `just gc`: delete generations older than 7 days
+- `just check`: everything a change must pass before it's committed (below)
 - `just check-hosts`: evaluate every machine; `just validate`: this one
 - `just sysconfigs`, `just homeconfigs`, `just evalsysconfigs <attr>`: read the config without building
 
-`nix develop` in the repo root gives you `just` and `shellcheck`. CI (`.github/workflows/check.yml`)
-evaluates every host, builds the shared home layer, and runs shellcheck and the bootstrap tests
-(`bash nix/scripts/tests/bootstrap.test.sh`).
+`nix develop` in the repo root gives you `just` and `shellcheck`. There's no CI: `just check`
+(`bash nix/scripts/check.sh`, on Windows `wsl -d NixOS -- bash nix/scripts/check.sh`) evaluates every
+host, builds the shared home layer, checks the exports' shape, and runs shellcheck and the script tests,
+on any Linux machine with Nix, before every commit.
 
 #### Imperative package installs
 
