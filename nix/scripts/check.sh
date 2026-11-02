@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # What a change must pass before it's committed: every host evaluates, the shared home layer builds
 # (vgwsl2's home-files, ~1.1 GiB: a build failure that evaluation missed shipped once), the exports
-# keep their shape, and the scripts pass shellcheck and their tests. This repo runs no CI: these are
+# keep their shape, the scripts pass shellcheck and their tests, and every flake template starts a project
+# that passes its own checks. This repo runs no CI: these are
 # the record, run on a Linux machine with Nix before every commit (vgwsl2: wsl -d NixOS -- bash nix/scripts/check.sh).
 # tend: vg-dotfiles/Composition
 #
@@ -36,6 +37,7 @@ step "shellcheck" "${NIX[@]}" develop --command \
   shellcheck -x bootstrap.sh nix/scripts/*.sh nix/scripts/bootstrap/*.sh nix/scripts/tests/*.sh
 step "bootstrap tests" bash nix/scripts/tests/bootstrap.test.sh
 step "wallpaper tests" bash nix/scripts/tests/wallpaper.test.sh
+step "flake templates" bash nix/scripts/tests/templates.test.sh
 
 if ((${#failed[@]})); then
   printf '\n%d step(s) failed: %s\n' "${#failed[@]}" "${failed[*]}"

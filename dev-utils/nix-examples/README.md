@@ -1,6 +1,6 @@
 # Development Examples
 
-Not intended for direct copy paste
+Not intended for direct copy paste: to start a project, use a template (`nix flake init -t ~/vg-dotfiles#<name>`, see `../nix-templates` and the repo README)
 
 More of a learning exercise
 

@@ -1,0 +1,8 @@
+{"batch":"01a19994-bb2b-735d-889d-f99d68f444ed","after":"01a1991f-9105-707e-98d7-6084675a0f9a","author":"agent:claude-code","at":1793578023723,"message":"Refresh: the four stale claims' code changed only by additions (b2410a5 adds estate.services / estate.hostedOn lines; f4728f2 adds the exports output and comments), so each still holds as written. Composition's flake composes Shared and Home, as its claims already say (Shared and Home don't use Composition: it builds on them); the relations were undeclared. (proposal 01a19994-97b6-729f-b3d2-a4c12eeebe91, proposed by agent:claude-code, accepted by user)"}
+{"op":"accepted","proposal":"01a19994-97b6-729f-b3d2-a4c12eeebe91","proposed_by":"agent:claude-code","accepted_by":"user"}
+{"op":"claim.reaffirm","id":"01a15f3a-d6af-776d-a88c-a4df4600a97d","rests_on":[{"of":"code:nix/nixos/modules/core/connectivity.nix","at":"fp:8290ba7528ed","checked":"2026-11-02"}]}
+{"op":"claim.reaffirm","id":"01a15f3a-d6b0-717d-9c9f-8265b1b8d792","rests_on":[{"of":"code:nix/nixos/modules/tenstorrent/default.nix","at":"fp:9ef943611723","checked":"2026-11-02"}]}
+{"op":"claim.reaffirm","id":"01a165bb-a5b1-7250-a9ad-59257b25fdd6","rests_on":[{"of":"code:nix/nixos-wsl/vgwsl2/default.nix","at":"fp:ef5c4a0a0eea","checked":"2026-11-02"}]}
+{"op":"claim.reaffirm","id":"01a165ec-4a75-723c-9633-40e2da4b96ea","rests_on":[{"of":"code:nix/modules/estate.nix","at":"fp:841a77e76311","checked":"2026-11-02"},{"of":"code:nix/flake.nix","at":"fp:2717753f890d","checked":"2026-11-02"}]}
+{"op":"node.relate","from":"01a122ba-8745-77c6-b15d-eb4c74032ee0","kind":"uses","to":"01a12288-d789-721b-b181-a05ddb2f40a5"}
+{"op":"node.relate","from":"01a122ba-8745-77c6-b15d-eb4c74032ee0","kind":"uses","to":"01a122ba-8745-77c6-b15d-eb4d43047a58"}

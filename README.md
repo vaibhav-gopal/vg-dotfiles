@@ -113,8 +113,31 @@ fails until it does.
 
 `nix develop` in the repo root gives you `just` and `shellcheck`. There's no CI: `just check`
 (`bash nix/scripts/check.sh`, on Windows `wsl -d NixOS -- bash nix/scripts/check.sh`) evaluates every
-host, builds the shared home layer, checks the exports' shape, and runs shellcheck and the script tests,
-on any Linux machine with Nix, before every commit.
+host, builds the shared home layer, checks the exports' shape, runs shellcheck and the script tests, and
+starts a project from every flake template, on any Linux machine with Nix, before every commit.
+
+## Starting a project
+
+The root flake carries templates for new projects (`dev-utils/nix-templates`), each with a dev shell,
+a `.envrc` for direnv, and a starter program whose test is the flake's check:
+
+| Template | What it is |
+|---|---|
+| `base` (default) | an empty dev shell to fill in |
+| `rust` | a crane build: the package, clippy, fmt and `cargo test` as flake checks |
+| `cpp` | CMake and Ninja, CTest as the check; clangd and a debugger in the shell |
+| `bun` | TypeScript on Bun, `bun test` as the check |
+| `python` | a uv project built from `uv.lock` with uv2nix, pytest as the check |
+
+```sh
+mkdir myproject && cd myproject && git init
+nix flake init -t ~/vg-dotfiles#rust
+git add -A && nix flake check && nix run
+```
+
+Rename `hello` where the files say so. `bash nix/scripts/tests/templates.test.sh [name...]` checks that each
+template still starts a project whose checks pass, and that its check fails once its test is broken.
+`dev-utils/nix-examples` keeps examples to learn from (an FHS shell, a stdenv build), not to copy.
 
 #### Imperative package installs
 
