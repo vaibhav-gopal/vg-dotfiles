@@ -1,4 +1,5 @@
 {"batch":"01a12289-9a3a-730a-ad28-f024b32a9f73","after":"01a12288-ab12-734d-8c7a-b3d796f1fa73","author":"scan:adopt","at":1791580805689,"message":"The first draft of dotfiles's design, from its code: a part for each folder of code no node owns, linked to it; each still needs its intent (proposal 01a12288-d78a-77ae-b836-2a5f903889e1, proposed by scan:adopt, accepted by user)"}
+{"op":"accepted","proposal":"01a12288-d78a-77ae-b836-2a5f903889e1","proposed_by":"scan:adopt","accepted_by":"user"}
 {"op":"node.add","id":"01a12288-d789-721b-b181-a05c4f0ab3c9","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"core","kind":"component","intent":null,"status":"building"}
 {"op":"node.code.link","node":"01a12288-d789-721b-b181-a05c4f0ab3c9","link":{"kind":"path","value":"nix/nixos/modules/core/*"}}
 {"op":"node.add","id":"01a12288-d789-721b-b181-a05ddb2f40a5","parent":"01a12285-3830-73f2-b3ac-41f3fb692807","name":"modules","kind":"component","intent":null,"status":"building"}
