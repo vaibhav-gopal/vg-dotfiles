@@ -1,15 +1,16 @@
 ---
 name: code-review
-description: Review a change (a pull request, a branch, or what's uncommitted) for real bugs and for drift from the project's design, using Tend - the rules and decisions in force for the code it touches, the missteps made there before, the toolbox, the tests that reach it, and what the change leaves stale. Use when asked to review code or a PR, or before landing a change.
+description: Review a change (a pull request, a branch, or what's uncommitted) for real bugs and for drift from the project's design, using tend - the rules and decisions in force for the code it touches, the missteps made there before, the toolbox, the tests that reach it, and what the change leaves stale. Use when asked to review code or a PR, or before landing a change.
 ---
 
-# Code review, with Tend
+# Code review, with tend
 
 Adapted from Anthropic's `code-review` plugin (claude-plugins-official, Apache-2.0): the same parallel
-reviewers and confidence scoring, with the project's design (through Tend's MCP tools) in place of
+reviewers and confidence scoring, with the project's design (through tend's MCP tools) in place of
 CLAUDE.md files.
 
-Make a todo list first. Don't build, typecheck or run tests: CI does that.
+Make a todo list first. Don't build, typecheck or run tests: the project's checks do that, before every
+commit.
 
 ## 1. What to review, and whether to
 
@@ -19,7 +20,7 @@ Make a todo list first. Don't build, typecheck or run tests: CI does that.
 
 ## 2. What the design says about it (once, before any reviewer)
 
-For each changed file, from Tend:
+For each changed file, from tend:
 
 - `design_impact {file}`: the nodes that own it, what depends on them, the rules constraining a change,
   and the decisions in force.
@@ -72,7 +73,7 @@ Give it this rubric word for word:
   issue, that will happen frequently in practice. The evidence directly confirms this.
 
 For an issue flagged by the design, the scorer checks that the rule or decision really says it, by
-reading it through Tend (`design_rules`, `tend_explore journal:<id>`).
+reading it through tend (`design_rules`, `tend_explore journal:<id>`).
 
 Keep the issues scoring 80 or more. For a pull request, check it's still eligible (step 1).
 

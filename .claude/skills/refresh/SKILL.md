@@ -1,6 +1,6 @@
 ---
 name: refresh
-description: Find what no longer holds in a Tend project - document sections, decisions, readings, scores and test results resting on ground that moved, and baseline changes that affect this repo - and bring it up to date in order, cheapest first. Use when tend_basis or the session context reports stale ground, after a large change, or when asked whether the docs or decisions are still current.
+description: Find what no longer holds in a tend project - document sections, decisions, readings, scores and test results resting on ground that moved, and baseline changes that affect this repo - and bring it up to date in order, cheapest first. Use when tend_basis or the session context reports stale ground, after a large change, or when asked whether the docs or decisions are still current.
 ---
 
 # Refresh what's stale

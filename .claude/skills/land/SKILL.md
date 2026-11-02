@@ -1,9 +1,9 @@
 ---
 name: land
-description: Land a change the way a Tend project expects - find where it belongs and what binds it before writing code, then record it in the design (the node, its status, its code, decisions with what they rest on), check how far the code carries it, and catch what it left stale. Use when starting a feature or fix in a repo with a .tend/ directory, and again before saying it's done.
+description: Land a change the way a tend project expects - find where it belongs and what binds it before writing code, then record it in the design (the node, its status, its code, decisions with what they rest on), check how far the code carries it, and catch what it left stale. Use when starting a feature or fix in a repo with a .tend/ directory, and again before saying it's done.
 ---
 
-# Land a change, with Tend
+# Land a change, with tend
 
 ## Before writing code
 

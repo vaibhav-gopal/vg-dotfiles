@@ -6,7 +6,7 @@ description: Simplify recently changed code and make it consistent with how the 
 # Unify: simpler code, and one way of doing each thing
 
 Adapted from Anthropic's `code-simplifier` (claude-plugins-official, Apache-2.0). Consistency across the
-whole repo is added with Tend: the design tree says what code belongs together, the toolbox says which
+whole repo is added with tend: the design tree says what code belongs together, the toolbox says which
 way is accepted, and the code graph and history say how the code does it now and which way it's moving.
 
 ## Scope
@@ -41,7 +41,7 @@ Name the recurring concerns the code in scope touches. Common ones:
 - how modules and files are organized;
 - tests: helpers, naming, fixtures.
 
-## 3. How the repo does each, with Tend
+## 3. How the repo does each, with tend
 
 The accepted way first:
 
