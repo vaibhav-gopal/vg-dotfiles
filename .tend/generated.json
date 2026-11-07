@@ -7,7 +7,7 @@
   ".claude/skills/triage/SKILL.md": "d1d2ee4914b84dd5abddb0c2b620df2fb14dffac87af7515166d0db0c3497be8",
   ".claude/skills/unify/SKILL.md": "d4b7138dfd7abccf58a3f3e5714b59dd441df14df21ab1a57f29f4ae56a9a600",
   ".mcp.json#mcpServers.tend": "da94930fac786515805febafe208fdd0693a1083387aec4f164f76a34d1b03b0",
-  "AGENTS.md": "8587a43802d4356785d812da34a55385b0f8607f3cdcc73148b433bb3245d908",
+  "AGENTS.md": "62d7817e997e1662381fc89ac861e0c7a2ae3db1b88b6ca883df9811440f19f5",
   "CLAUDE.md": "b9992e91d5062fab11d8f887a3ffaae7f07eb7a67b7f1ab6aacf1bd9528533a4",
   "CONTACT.md": "4fde0970f0f7bb51f4d4b64e8bf201ef1d7af1bb8caf3c99acb019dc6bc69aba",
   "LICENSE.md": "d1ec05b97131c934e5bd9fac2cad95924a7b9217ed0cbaee9788ffc6a2f73716",
@@ -16,5 +16,15 @@
   "LICENSES/LicenseRef-Commercial-1.0.txt": "739b68e2039aa98521aa58e50581e7ba55c7b5528b01457c5bfc592d0c7ab531",
   "LICENSES/LicenseRef-Royalty-Free-1.0.txt": "206caca5a72c9543342fce4a201210071d3854a2ee0c7ddccac523a69569a4c7",
   "REUSE.toml": "e233b5e9f4400dd980800b899b5d64786e73f4dbe4bb154433190035d84e5287",
-  "SECURITY.md": "7b5a0d0e24ac888b58c0db982aeffc9ae31ff24c53ecbe1e273f10ae64e311a0"
+  "SECURITY.md": "7b5a0d0e24ac888b58c0db982aeffc9ae31ff24c53ecbe1e273f10ae64e311a0",
+  "dev-utils/nix-templates/python/LICENSE.md": "d1ec05b97131c934e5bd9fac2cad95924a7b9217ed0cbaee9788ffc6a2f73716",
+  "dev-utils/nix-templates/python/LICENSES/AdditionRef-Open-Project-Exception-1.0.txt": "bf50ad8eb6f868823155d54d8d18a4675624132abd937db1f7761ed41b8bbee3",
+  "dev-utils/nix-templates/python/LICENSES/GPL-3.0-only.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  "dev-utils/nix-templates/python/LICENSES/LicenseRef-Commercial-1.0.txt": "739b68e2039aa98521aa58e50581e7ba55c7b5528b01457c5bfc592d0c7ab531",
+  "dev-utils/nix-templates/python/LICENSES/LicenseRef-Royalty-Free-1.0.txt": "206caca5a72c9543342fce4a201210071d3854a2ee0c7ddccac523a69569a4c7",
+  "dev-utils/nix-templates/rust/LICENSE.md": "d1ec05b97131c934e5bd9fac2cad95924a7b9217ed0cbaee9788ffc6a2f73716",
+  "dev-utils/nix-templates/rust/LICENSES/AdditionRef-Open-Project-Exception-1.0.txt": "bf50ad8eb6f868823155d54d8d18a4675624132abd937db1f7761ed41b8bbee3",
+  "dev-utils/nix-templates/rust/LICENSES/GPL-3.0-only.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  "dev-utils/nix-templates/rust/LICENSES/LicenseRef-Commercial-1.0.txt": "739b68e2039aa98521aa58e50581e7ba55c7b5528b01457c5bfc592d0c7ab531",
+  "dev-utils/nix-templates/rust/LICENSES/LicenseRef-Royalty-Free-1.0.txt": "206caca5a72c9543342fce4a201210071d3854a2ee0c7ddccac523a69569a4c7"
 }
