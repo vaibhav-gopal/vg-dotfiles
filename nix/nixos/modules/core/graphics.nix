@@ -48,6 +48,11 @@ in {
     # ROCm OpenCL ; compute needs /dev/kfd + the render node, owned by the render / video groups
     hardware.amdgpu.opencl.enable = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) true;
     environment.systemPackages = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) [ pkgs.clinfo ];
+
+    # for the estate: Vulkan from a real GPU driver (mesa RADV, NVIDIA's), never mesa's software fallback;
+    # OpenCL only where the ROCm runtime is on. No `rocm` or `cuda`: neither toolkit (HIP, CUDA) is installed here.
+    estate.capabilities = lib.optional (cfg.amd.enable || cfg.nvidia.enable) "vulkan"
+      ++ lib.optional (cfg.amd.enable && cfg.amd.opencl.enable) "opencl";
     users.users.${username}.extraGroups = lib.mkIf (cfg.amd.enable && cfg.amd.opencl.enable) [ "render" "video" ];
 
     # enable nvidia drivers (PRIME options/service allows both nvidia + amd iGPU runtime switching for performance / efficiency)

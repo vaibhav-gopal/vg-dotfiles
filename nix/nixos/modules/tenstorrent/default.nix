@@ -31,6 +31,7 @@ in {
     boot.extraModulePackages = [ tt-kmd ];
     boot.kernelModules = [ "tenstorrent" ];
     services.udev.packages = [ tt-kmd ];
+    estate.capabilities = [ "tenstorrent" ];
     estate.services = [{
       name = "tenstorrent";
       notes = "tt-kmd ${tt-kmd.version} kernel driver (/dev/tenstorrent/*, open to every user), ${toString cfg.hugepages}x 1G hugepages at /dev/hugepages-1G; tt-smi";

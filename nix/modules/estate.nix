@@ -22,6 +22,14 @@ in {
       default = [ ];
       description = "System services this host runs; each module adds the ones it turns on";
     };
+    capabilities = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        What this host can do, in the estate's vocabulary (vg-paradigms' estate/capabilities.toml: an id not
+        there isn't used); each module adds the ones it provides where it turns them on, as with services
+      '';
+    };
     hostedOn = nullOr lib.types.str // { description = "The machine this one runs inside (a WSL distro's Windows host)"; };
     # What the flake's `estate.<host>` output holds: the above as JSON-ready data, unset fields left out
     export = lib.mkOption {
@@ -29,7 +37,11 @@ in {
       internal = true;
       default = {
         services = map (s: lib.filterAttrs (_: v: v != null) s) cfg.services;
+        capabilities = lib.sort lib.lessThan (lib.unique cfg.capabilities);
       } // lib.optionalAttrs (cfg.hostedOn != null) { hosted_on = cfg.hostedOn; };
     };
   };
+
+  # every host this module is in runs Nix
+  config.estate.capabilities = [ "nix" ];
 }

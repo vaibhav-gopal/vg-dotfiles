@@ -42,13 +42,22 @@ check "estate covers the same hosts as configurations" '
 
 check "every estate host has services, each with name and kind, and only v1 fields" '
   firstBad (lib.mapAttrsToList (h: e:
-    let extra = builtins.filter (k: !builtins.elem k [ "services" "hosted_on" ]) (builtins.attrNames e);
+    let extra = builtins.filter (k: !builtins.elem k [ "services" "capabilities" "hosted_on" ]) (builtins.attrNames e);
         badSvc = builtins.filter (s:
           !(s ? name && s ? kind && builtins.isString s.name && builtins.isString s.kind)
           || builtins.any (k: !builtins.elem k [ "name" "kind" "unit" "tailnet_only" "notes" ]) (builtins.attrNames s)) e.services;
     in if extra != [ ] then "${h} has ${toString extra}"
        else if badSvc != [ ] then "${h}: service ${builtins.toJSON (builtins.head badSvc)}"
        else "ok") f.estate)'
+
+# added in version 1 (an added field doesn't bump it): the estate's vocabulary is checked by the reader (thalam)
+check "every estate host has capabilities, a sorted list of distinct strings including nix" '
+  firstBad (lib.mapAttrsToList (h: e:
+    if !(e ? capabilities) || !builtins.isList e.capabilities then "${h}: no capabilities list"
+    else if !builtins.all builtins.isString e.capabilities then "${h}: capabilities ${builtins.toJSON e.capabilities}"
+    else if e.capabilities != lib.sort lib.lessThan (lib.unique e.capabilities) then "${h}: capabilities not sorted and distinct"
+    else if !builtins.elem "nix" e.capabilities then "${h}: capabilities lack nix"
+    else "ok") f.estate)'
 
 check "hosted_on, where set, names a string" '
   firstBad (lib.mapAttrsToList (h: e: if !(e ? hosted_on) || builtins.isString e.hosted_on then "ok" else "${h}: hosted_on") f.estate)'
