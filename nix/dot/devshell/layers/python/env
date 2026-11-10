@@ -1,0 +1,1 @@
+UV_PYTHON_DOWNLOADS = "never"; # use the shell's Python, not one uv downloads

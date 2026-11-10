@@ -1,5 +1,5 @@
 # Slurm as a one-node cluster on a shared box: it schedules the cores, memory and Tenstorrent cards
-# between the owner and the guest accounts (core.headless.guests), with fairshare priority from
+# between the owner and the standard users (profiles.users), with fairshare priority from
 # slurmdbd accounting on a local MariaDB.
 # Access is gated, not advisory: the cards are root-only until a job is given one (the prolog adds
 # the job user's ACL, the epilog takes it back, kills what still holds the card and clears the
@@ -15,7 +15,7 @@ let
   slurmConf = "${config.services.slurm.etcSlurm}/slurm.conf";
   slurm = config.services.slurm.package;
   account = "colleagues";
-  members = [ username ] ++ lib.attrNames config.core.headless.guests;
+  members = [ username ] ++ config.profiles.standard;
   cards = lib.optionals tt.enable (map toString (lib.range 0 (cfg.cards - 1)));
   # memory kept out of jobs: the login sessions, the cards' 1G hugepages and the daemons (MiB)
   reservedMemory = cfg.login.memory + (if tt.enable then tt.hugepages * 1024 else 0) + 2048;
@@ -24,7 +24,10 @@ let
   # they can't name slurm.conf (or the wrappers that carry it)
   scriptPath = "export PATH=/run/current-system/sw/bin:${lib.makeBinPath [ pkgs.coreutils pkgs.findutils ]}";
 
-  # the card indices a job holds, from its detailed record (GRES=tt:p150a:1(IDX:0) or IDX:0-1,3)
+  # the card indices a job holds, from its detailed record (GRES=tt:p150a:1(IDX:0) or IDX:0-1,3).
+  # Only a running job's record carries IDX (a finished one prints GRES=tt:p150a:1), so the prolog
+  # reads it and keeps the list in cardsDir for the epilog.
+  cardsDir = "/run/slurm-tt";
   jobCards = ''
     job_cards() {
       scontrol show job -d "$SLURM_JOB_ID" \
@@ -37,19 +40,21 @@ let
     set -eu
     ${scriptPath}
     ${jobCards}
-    for i in $(job_cards); do
+    install -d -m 0700 ${cardsDir}
+    job_cards >"${cardsDir}/$SLURM_JOB_ID"
+    for i in $(cat "${cardsDir}/$SLURM_JOB_ID"); do
       ${pkgs.acl}/bin/setfacl -m "u:$SLURM_JOB_USER:rw" "/dev/tenstorrent/$i"
     done
   '';
   epilog = pkgs.writeShellScript "slurm-epilog" ''
     set -u
     ${scriptPath}
-    ${jobCards}
-    for i in $(job_cards); do
+    for i in $(cat "${cardsDir}/$SLURM_JOB_ID" 2>/dev/null); do
       ${pkgs.acl}/bin/setfacl -x "u:$SLURM_JOB_USER" "/dev/tenstorrent/$i"
       # an fd opened during the job outlives the ACL: the card is free only once nothing holds it
       ${pkgs.psmisc}/bin/fuser -k -s "/dev/tenstorrent/$i" || true
     done
+    rm -f "${cardsDir}/$SLURM_JOB_ID"
     # their hugepage files, unless another of their jobs is still running
     if [ -z "$(squeue -h -u "$SLURM_JOB_USER" -t RUNNING -o %i)" ]; then
       find /dev/hugepages-1G -maxdepth 1 -user "$SLURM_JOB_USER" -delete 2>/dev/null || true
@@ -67,6 +72,11 @@ in {
     login = {
       cpus = usrlib.mkIntOption "CPUs' worth of time all login sessions share (user.slice CPUQuota)" 2;
       memory = usrlib.mkIntOption "MiB all login sessions share (user.slice MemoryMax)" 8192;
+      # within that, one user's sessions, services and containers (user-<uid>.slice)
+      perUser = {
+        cpus = usrlib.mkIntOption "CPUs' worth of time one user's sessions, services and containers get (user-.slice CPUQuota)" 1;
+        memory = usrlib.mkIntOption "MiB one user's sessions, services and containers get (user-.slice MemoryMax)" 4096;
+      };
     };
   };
 
@@ -92,6 +102,8 @@ in {
         SchedulerType=sched/backfill
         SelectType=select/cons_tres
         SelectTypeParameters=CR_Core_Memory
+        # a job that asks for no memory gets 2 GiB per CPU, not the whole node (which blocks everyone)
+        DefMemPerCPU=2048
         TaskPlugin=task/cgroup,task/affinity
         JobAcctGatherType=jobacct_gather/cgroup
         ${lib.optionalString tt.enable "GresTypes=tt"}
@@ -104,16 +116,24 @@ in {
         PriorityWeightFairshare=10000
         PriorityWeightAge=1000
         PriorityWeightJobSize=100
-        PrologFlags=Alloc
+        PrologFlags=Alloc,Contain
         Prolog=${prolog}
         Epilog=${epilog}
+        # each job gets its own /tmp and /dev/shm (job_container.conf), removed when it ends
+        NamespaceType=namespace/tmpfs
+        # users see only their own jobs (sinfo still shows the node busy); the owner is a Slurm admin
+        PrivateData=jobs
       '';
       extraCgroupConfig = ''
         ConstrainCores=yes
         ConstrainRAMSpace=yes
         ConstrainDevices=yes
       '';
-      extraConfigPaths = lib.optional tt.enable (pkgs.writeTextDir "gres.conf" ''
+      extraConfigPaths = [
+        (pkgs.writeTextDir "job_container.conf" ''
+          BasePath=/var/lib/slurm-tmp AutoBasePath=true Dirs=/tmp,/dev/shm
+        '')
+      ] ++ lib.optional tt.enable (pkgs.writeTextDir "gres.conf" ''
         Name=tt Type=${cfg.cardType} File=/dev/tenstorrent/[0-${toString (cfg.cards - 1)}]
       '');
       dbdserver = {
@@ -125,6 +145,8 @@ in {
     services.mysql = {
       enable = true;
       package = pkgs.mariadb;
+      # slurmdbd is its only client, on this host
+      settings.mysqld.bind-address = "127.0.0.1";
       ensureDatabases = [ "slurm_acct_db" ];
       ensureUsers = [{
         name = "slurm";
@@ -141,6 +163,16 @@ in {
     systemd.slices.user.sliceConfig = {
       CPUQuota = "${toString (cfg.login.cpus * 100)}%";
       MemoryMax = "${toString cfg.login.memory}M";
+    };
+    # and each user's share of it, so one user's service can't starve everyone's shells. Every
+    # user-<uid>.slice reads user-.slice.d/ (a drop-in by prefix); systemd ships no user-.slice unit,
+    # so NixOS's default would write one, which no user's slice reads: asDropin
+    systemd.slices."user-" = {
+      overrideStrategy = "asDropin";
+      sliceConfig = {
+        CPUQuota = "${toString (cfg.login.perUser.cpus * 100)}%";
+        MemoryMax = "${toString cfg.login.perUser.memory}M";
+      };
     };
 
     systemd.services = {
@@ -183,7 +215,7 @@ in {
         after = [ "slurmdbd.service" ];
       };
 
-      # every login account (the owner and core.headless.guests) gets an association, without
+      # every login account (the owner and the standard users) gets an association, without
       # which AccountingStorageEnforce refuses its jobs
       slurm-accounts = {
         description = "Add the host's users to Slurm accounting";
@@ -199,6 +231,32 @@ in {
           for user in ${lib.escapeShellArgs members}; do
             ${slurm}/bin/sacctmgr -i add user "$user" Account=${account} Cluster=${host} || true
           done
+          # PrivateData hides other users' jobs; the owner still sees and manages them all
+          ${slurm}/bin/sacctmgr -i modify user ${username} set AdminLevel=Admin || true
+        '';
+      };
+    };
+
+    dot.help = {
+      slurm = {
+        title = "Running jobs: the cores, memory${lib.optionalString tt.enable " and the Tenstorrent card"} through Slurm";
+        text = ''
+          srun -c 8 --mem=16G --pty bash${lib.optionalString tt.enable "              # a shell; add --gres=tt:1 for the card"}
+          sbatch job.sh                               # unattended (#SBATCH lines at its top)
+          squeue -u $USER / scancel <id> / sinfo      # yours, stop one, how busy it is
+          Jobs default to ${cfg.defaultTime} (max ${cfg.maxTime}) and 2 GiB per CPU; logins share ${toString cfg.login.cpus} CPUs and ${toString (cfg.login.memory / 1024)} GiB, at most ${toString cfg.login.perUser.cpus} CPU and ${toString (cfg.login.perUser.memory / 1024)} GiB each (with your services and containers).
+        '';
+        file = "nix/nixos/modules/slurm/slurm.md";
+      };
+      slurm-admin = {
+        title = "Slurm: accounts, the queue and the card (admin)";
+        profiles = [ "admin" ];
+        text = ''
+          Every user in profiles.users gets an association in `${account}` at boot (slurm-accounts.service).
+          sacctmgr show assoc format=account,user,adminlevel   # who's in
+          squeue / scontrol show job <id>                    # everyone's jobs (you're a Slurm admin)
+          scontrol update nodename=${host} state=resume      # after a drain
+          getfacl /dev/tenstorrent/0                         # who holds the card now (only a job's user)
         '';
       };
     };

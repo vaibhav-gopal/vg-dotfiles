@@ -10,8 +10,6 @@ let
 in {
   # PATHS (read-only)
   options.extPaths = {
-    readOnly = true;
-
     # dotfiles global directories
     dotfilesDir = usrlib.mkPathOption "Where the vg-dotfiles repo is checked out, for use with raw symlinking / files out of nix store" "${config.home.homeDirectory}/vg-dotfiles";
     dotfilesEnvDir = usrlib.mkPathOption "The location of the dotfiles env directory, for use with raw symlinking / files out of nix store" "${dir}/env";

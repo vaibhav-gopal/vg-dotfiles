@@ -97,4 +97,4 @@ step_tailscale() {
 }
 
 bs_parse_args "$@"
-bs_steps step_host step_checkout step_env step_hardware step_system step_tailscale
+bs_steps step_host step_checkout step_env step_hardware step_system step_tailscale step_repos

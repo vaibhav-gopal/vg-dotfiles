@@ -47,6 +47,10 @@ esac
 EOF
 printf '#!/usr/bin/env bash\necho "$*" >>"%s/sudo.log"\n' "$tmp" >"$tmp/bin/sudo"
 chmod +x "$tmp/bin/nix" "$tmp/bin/sudo"
+# vg-repos stand-in: records how it was run (the real one would clone into the user's home)
+printf '#!/usr/bin/env bash\necho "$*" >>"%s/repos.log"\n' "$tmp" >"$tmp/bin/vg-repos"
+chmod +x "$tmp/bin/vg-repos"
+export BS_REPOS="$tmp/bin/vg-repos"
 
 run() { # run <args...>: nixos.sh in the throwaway repo; output in $out, status in $rc
   out="$(cd "$repo" && PATH="$tmp/bin:$PATH" BS_ETC_NIXOS="$tmp/etc" bash nix/scripts/bootstrap/nixos.sh "$@" 2>&1)"
@@ -61,6 +65,7 @@ expect "dry run succeeds" test "$rc" -eq 0
 expect "dry run writes no .env" test ! -e "$repo/.env"
 expect "dry run copies no hardware config" test ! -e "$hw"
 expect "dry run applies nothing" test ! -e "$tmp/sudo.log"
+expect "dry run clones no repos" test ! -e "$tmp/repos.log"
 
 run testhost --switch
 expect "first run succeeds" test "$rc" -eq 0
@@ -71,6 +76,7 @@ expect "hardware config copied from the machine" cmp -s "$hw" "$tmp/etc/hardware
 expect "hardware config staged in git" git -C "$repo" ls-files --error-unmatch -- "$hw" >/dev/null
 expect "system applied with nixos-rebuild switch" grep -q "nixos-rebuild switch --flake $repo/nix#testhost" "$tmp/sudo.log"
 expect "tailscale skipped without --with-tailscale" grep -q 'skipped (--with-tailscale' <<<"$out"
+expect "the repos are cloned interactively at the end" grep -qx -- --interactive "$tmp/repos.log"
 
 run
 expect "second run (host from .env) succeeds" test "$rc" -eq 0

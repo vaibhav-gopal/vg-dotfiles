@@ -13,10 +13,10 @@ in {
       package = usrlib.mkPackageOption "The neovim package to use (Uses unwrapped by default in programs)" pkgs.neovim-unwrapped;
     };
     vscodevim = {
-      enable = usrlib.mkEnableOptionTrue "Enable vscode vimrc file setup";
+      enable = usrlib.mkProfileEnableOption config "editor.vscodevim" "Enable vscode vimrc file setup" [ "admin" ];
     };
     zed = {
-      enable = usrlib.mkEnableOptionTrue "Enable zed editor application";
+      enable = usrlib.mkProfileEnableOption config "editor.zed" "Enable zed editor application" [ "admin" ];
       package = usrlib.mkPackageOption "The zed editor package to use" pkgs-unstable.zed-editor;
     };
   };
@@ -27,9 +27,7 @@ in {
       enable = true;
       defaultEditor = lib.mkIf (cfg.default == "vim") true;
     };
-    home.file."${config.home.homeDirectory}/.vimrc".source =
-      lib.mkIf cfg.nvim.enable
-      (config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/editor/vim.d/vimrc");
+    home.file."${config.home.homeDirectory}/.vimrc" = lib.mkIf cfg.nvim.enable { source = config.lib.dot.source "home/modules/editor/vim.d/vimrc"; };
 
     # NEOVIM
     programs.neovim = {
@@ -44,12 +42,10 @@ in {
       withRuby = false;
       withPython3 = false;
     };
-    xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/editor/nvim.d";
+    xdg.configFile."nvim" = lib.mkIf cfg.nvim.enable { source = config.lib.dot.source "home/modules/editor/nvim.d"; };
     
     # VSCODE VIMRC
-    home.file."${config.home.homeDirectory}/.vscodevimrc".source = 
-      lib.mkIf cfg.vscodevim.enable
-      (config.lib.file.mkOutOfStoreSymlink "${config.extPaths.commonModulesDir}/editor/vim.d/vimrc");
+    home.file."${config.home.homeDirectory}/.vscodevimrc" = lib.mkIf cfg.vscodevim.enable { source = config.lib.dot.source "home/modules/editor/vim.d/vimrc"; };
 
     # ZED EDITOR
     programs.zed-editor = {

@@ -1,6 +1,6 @@
 # Template .env file : put the real .env in the same directory
-# Need the following defaults for building / switching via justfile
-# NIXTYPE : the nix type, one of the top level directories in vg-dotfiles/nix (used for validation / ensuring you don't build the wrong nix type configuration and used for getting correct justfile recipes)
+# What `dot` reads for this machine (bootstrap writes it; without one, dot uses the hostname)
+# NIXTYPE : the archetype, one of nixos, nixos-wsl, nix-darwin (a directory in vg-dotfiles/nix)
 # NIXCONFIG : the top-level configuration name in flake.nix to activate
 # NIXCONFIG_VERSION : the lts nixpkgs version in which to use, to get the approriate nixos package or update the channel
 # NIXCONFIG_USERNAME : the username for the nix config, to get home manager options using `nix eval`

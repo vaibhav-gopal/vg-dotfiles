@@ -49,13 +49,12 @@ that's only ever one of them sets `common.claude-code.profiles = [ "work" ];` (o
 Install the OS (NixOS, NixOS-WSL, or macOS with nix), then:
 
 ```bash
-nix-shell -p git        # NixOS / NixOS-WSL: git isn't there on a fresh install
-git clone https://github.com/vaibhav-gopal/vg-dotfiles.git ~/vg-dotfiles
-cd ~/vg-dotfiles
-./bootstrap.sh <host>   # e.g. ./bootstrap.sh vgsquid-jade
+nix --extra-experimental-features "nix-command flakes" \
+  run github:vaibhav-gopal/vg-dotfiles#dot -- bootstrap <host>   # e.g. vgsquid-jade
 ```
 
-`bootstrap.sh` picks the archetype and runs its script in `nix/scripts/bootstrap/`
+That clones the repo to `~/vg-dotfiles` (git comes with it). From a checkout, `nix develop` gives you
+`dot`, then `dot bootstrap <host>`. It picks the archetype and runs its script in `nix/scripts/bootstrap/`
 (`nixos.sh`, `nixos-wsl.sh`, `nix-darwin.sh`). Every step checks before it changes anything, so
 re-run it whenever; it only does what's left:
 
@@ -70,7 +69,7 @@ re-run it whenever; it only does what's left:
 7. **tailscale** (NixOS, `--with-tailscale`): `tailscale up` once tailscaled runs
 
 Flakes are switched on for the bootstrap itself, so a fresh install needs no config first.
-`--dry-run` checks and evaluates without changing anything; `./bootstrap.sh --help` lists the rest.
+`--dry-run` checks and evaluates without changing anything; `dot bootstrap --help` lists the rest.
 After the first build, commit the staged `hardware-configuration.nix`.
 
 **NixOS-WSL:** a fresh distro logs in as `nixos`. The first run builds with `boot` and prints how
@@ -82,7 +81,31 @@ to restart the distro as your user; then clone again into that user's `~/vg-dotf
    release it's installed with, `nixType`).
 2. Create `nix/<archetype>/<host>/default.nix` and `home/<archetype>/<host>/default.nix`; on NixOS the
    system one imports `./hardware-configuration.nix` (the bootstrap copies it in).
-3. Turn on what it needs (`core.*`, `modules.*`), then `./bootstrap.sh <host>` on the machine.
+3. Turn on what it needs (`core.*`, `modules.*`), then `dot bootstrap <host>` on the machine.
+
+### Users and profiles
+
+`profiles.users` in a host's `nix/<platform>/<host>/default.nix` is the one list of who logs in there.
+The configuration's user is the **admin**: sudo, the full home layer linked live into this checkout,
+and the host's own home folder (`home/<platform>/<host>`). Everyone else is **standard**: their own
+account and home layer, no sudo, config files copied into the store (they can't read the checkout).
+
+```nix
+profiles.users.alex.logins = [ "ssh" ];           # or [ "console" "ssh" ]
+core.headless.sshd.userKeys.alex = [ "ssh-ed25519 AAAA..." ];
+```
+
+- **Logins:** sshd admits only users with `ssh`; the tty and SDDM refuse those without `console`.
+- **Passwords:** the admin's comes from the install. A standard user's first shell asks them to set
+  one (`vg-first-password`, the one thing they may run as root, once).
+- **What each profile gets:** each home feature has a mask, the profiles it's on for
+  (`usrlib.mkProfileEnableOption`). Opinionated or personal features (folders and repo clones, zellij
+  auto-start, kitty, Zed, the desktop apps, your git identity and Claude accounts) are admin-only;
+  toolchains, Claude Code and `gh` are for everyone. A host changes a mask with
+  `profiles.masks."term.zellij.auto_start" = [ "admin" "standard" ];`, and one user's own settings go in
+  `profiles.users.<name>.home`.
+- **Help:** a module sets `dot.help.<topic>` (inline `text`, a `.md` `file` in the repo, or both) inside
+  its `mkIf enable`, so the topic comes and goes with it; system topics say whose `dot` shows them.
 
 ### Servers, and giving colleagues access
 
@@ -90,31 +113,56 @@ Headless hosts (`core.headless.enable`) run OpenSSH; with `core.headless.sshd.ta
 reachable only over the tailnet.
 
 - **Your key:** add it to `core.headless.sshd.authorizedKeys`; password login stays on until one is listed.
-- **A colleague:** add `name = [ "ssh-ed25519 ..." ];` to `core.headless.guests` (key-only, no sudo),
-  rebuild, then share the node with them from the Tailscale admin console.
+- **A colleague:** list them in `profiles.users` with their keys in `core.headless.sshd.userKeys`,
+  rebuild, then share the node with them from the Tailscale admin console. With
+  `core.headless.isolation.enable` they can't reach the tailnet or LAN from the host, see only their
+  own processes and get a private `/tmp` (`nix/nixos/modules/core/isolation.nix`).
 
 ## Exports others read
 
 `nix eval --json nix#configurations` (the machine table) and `nix#estate` (per host, the system services
 it runs, from `estate.services` in the modules that turn them on) are read by Tend and the layers above
 it. Their shape is a contract versioned by `nix#exports.version`: renaming or removing a field, or
-changing what one means, bumps it (adding one doesn't), and `nix/scripts/tests/exports.test.sh` (in `just check`)
-fails until it does.
+changing what one means, bumps it (adding one doesn't), and `nix/scripts/tests/exports.test.sh`
+fails until it does (it runs in `nix/scripts/check.sh`).
 
-## Day to day
+## Day to day: `dot`
 
-`just` runs everything once `.env` exists (`just` alone lists the recipes):
+`dot` (in every user's home, and in `nix develop` here) works on this machine: `.env`'s host, else the
+hostname (`DOT_HOST=<host>` for another). `dot help` lists the commands and the help topics.
 
-- `just build`: rebuild and switch (`just buildboot` applies at the next boot)
-- `just update`: bump `flake.lock`; `just gc`: delete generations older than 7 days
-- `just check`: everything a change must pass before it's committed (below)
-- `just check-hosts`: evaluate every machine; `just validate`: this one
-- `just sysconfigs`, `just homeconfigs`, `just evalsysconfigs <attr>`: read the config without building
+| | |
+|---|---|
+| `dot apply [--boot]` | Rebuild and switch (`--boot`: from the next boot) |
+| `dot diff` | Build, and show what changes against the running system |
+| `dot update` | Bump `flake.lock` |
+| `dot check [--all]` / `dot test` | Evaluate this machine (or every one) / run the test suite |
+| `dot status` | Machine, generation, checkout |
+| `dot users` / `dot features` | Who logs in here / which masked features each user has |
+| `dot usage [--services] [--disk]` | Who uses the machine now: each user's memory, CPU, logins, Slurm jobs, the card, and the caps (--services: what each user's manager runs; --disk: home sizes) |
+| `dot options [--home [--user u]] [path]` | Options with type, value and default (this repo's, or under a path) |
+| `dot config [--home] <path>` / `dot pkgs` / `dot session` | A value as JSON / packages / aliases and variables |
+| `dot user reset <name>` / `dot passwd` | A standard user's one-time password / yours (at the machine) |
+| `dot gc [--all]`, `dot brew ...`, `dot cd`, `dot edit` | Housekeeping, Homebrew, the checkout |
 
-`nix develop` in the repo root gives you `just` and `shellcheck`. There's no CI: `just check`
-(`bash nix/scripts/check.sh`, on Windows `wsl -d NixOS -- bash nix/scripts/check.sh`) evaluates every
-host, builds the shared home layer, checks the exports' shape, runs shellcheck and the script tests, and
-starts a project from every flake template, on any Linux machine with Nix, before every commit.
+Standard users get their own `dot`: `dot tools`, `dot find`, `dot shell <pkg>`, `dot devshell [template]`,
+`dot whoami`, `dot passwd`, and the help topics of the features on the machine. Both are
+`nix/dot/package.nix`; topics come from `dot.help` (see Users and profiles).
+
+**News for a machine's users** goes in its host folder (`dot.news`, e.g. `nix/nixos/vgsquid-jade/news.nix`):
+a note per change that reaches them, with a date and the profiles it's for. Each user's `dot` shows
+an unread note once before any command (one or two in full, more as a count), a login says when
+some are unread, and `dot news` shows them all. A note's name is its id: never reuse one.
+
+`nix develop` in the repo root gives you `dot` and `shellcheck`. There's no CI: `bash nix/scripts/check.sh`
+(on Windows `wsl -d NixOS -- bash nix/scripts/check.sh`), on any Linux machine with Nix, before every
+commit, evaluates every host, builds the shared home layer, runs the profiles and exports tests,
+shellcheck and the bootstrap, wallpaper and `dot` tests (`bash nix/scripts/tests/<name>.test.sh`, or
+`dot test` for all of them), and starts a project from every flake template. Where the machine has KVM it
+also runs the NixOS VM tests in `nix/nixos/tests`, the master flake's `checks` (`nix build -L
+./nix#checks.x86_64-linux.isolation`: a standard user on a shared host reaches the internet but not the
+LAN or the tailnet, from a shell, a build or a container, and sees only their own processes and /tmp);
+without KVM it says it skipped them. They boot VMs, so `dot test` leaves them out.
 
 ## Starting a project
 
@@ -156,15 +204,15 @@ Managed by `modules.homebrew` in `nix/nix-darwin/modules/homebrew/default.nix`.
 ### One-time setup
 
 nix-darwin manages Homebrew's *contents*, but does not install Homebrew itself.
-Bootstrap it once (`./bootstrap.sh vgmacbook --with-homebrew` does the same before the first build):
+Bootstrap it once (`dot bootstrap vgmacbook --with-homebrew` does the same before the first build):
 
 ```bash
-just brew-bootstrap
+dot brew bootstrap
 ```
 
 That installs Homebrew if missing, then adopts any declared cask whose app is
 already installed by hand (see *Migrating* below). It is idempotent - safe to
-re-run. Then `just build`.
+re-run. Then `dot apply`.
 
 Until Homebrew exists, activation prints a red
 `error: Homebrew is not installed, skipping...` and carries on harmlessly.
@@ -173,16 +221,16 @@ Related recipes:
 
 | Recipe | Does |
 |---|---|
-| `just brew-bootstrap` | Install Homebrew, then adopt already-installed casks |
-| `just brew-adopt` | Adoption pass on its own, without reinstalling anything |
-| `just brew-check` | Report drift read-only, without changing anything |
-| `just brewfile` | Print the declared Brewfile (works before any build) |
+| `dot brew bootstrap` | Install Homebrew, then adopt already-installed casks |
+| `dot brew adopt` | Adoption pass on its own, without reinstalling anything |
+| `dot brew check` | Report drift read-only, without changing anything |
+| `dot brew file` | Print the declared Brewfile (works before any build) |
 
-`brew-check` is worth an occasional run because `just build` cannot fix either
+`dot brew check` is worth an occasional run because `dot apply` cannot fix either
 kind of drift it reports. `brew bundle` trusts Homebrew's receipts: a cask whose
 app you deleted still has a receipt, so the rebuild skips it rather than putting
 it back, and an app installed by hand has no receipt to skip on. Anything marked
-`DRIFT` is fixed by `just brew-adopt`.
+`DRIFT` is fixed by `dot brew adopt`.
 
 The logic lives in `nix/scripts/homebrew.sh`. It evaluates the Brewfile from the
 config rather than reading it out of the nix store, so it works before the first
@@ -201,7 +249,7 @@ modules.homebrew = {
 };
 ```
 
-Then `just build`. Never `brew install` directly — see the guardrail below.
+Then `dot apply`. Never `brew install` directly — see the guardrail below.
 
 Find cask tokens with `brew search <name>`, and confirm what a token actually
 installs with `brew info --cask <token>`.
@@ -252,7 +300,7 @@ Homebrew refuses to install a cask over an existing `.app` it did not install
 brew install --cask --adopt <token>
 ```
 
-Do this once per already-installed app, before the first `just build` that
+Do this once per already-installed app, before the first `dot apply` that
 declares it. Adoption expects the installed version to match the cask's; on a
 mismatch, update the app first or fall back to replacing it.
 
@@ -281,7 +329,7 @@ home-manager `home.shellAliases` like every other alias in the repo, toggled
 with `nixtype.homebrew.enable`. Inspect the merged set with:
 
 ```bash
-just evalhomeconfigs home.shellAliases
+dot session
 ```
 
 ### Background agents

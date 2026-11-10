@@ -1,0 +1,3 @@
+# a project venv, made once; `uv pip install ...` (or `uv add` with a pyproject.toml) fills it
+[ -d .venv ] || uv venv --quiet --python "$(command -v python3.12)" .venv
+. .venv/bin/activate

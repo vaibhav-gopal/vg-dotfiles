@@ -7,8 +7,9 @@ let
 in {
   options.common.git = {
     enable = usrlib.mkEnableOptionTrue "Enable git configuration management";
-    name = usrlib.mkStringOption "Name for git config" "Vaibhav Gopal";
-    email = usrlib.mkStringOption "Email for git config" "vaibhav@gmail.com";
+    # the admin's identity; other users set their own (`git config --global user.name ...`, ~/.gitconfig)
+    name = usrlib.mkNullOrStringOption "Name for git config (null: not managed)" (if config.profile.isAdmin then "Vaibhav Gopal" else null);
+    email = usrlib.mkNullOrStringOption "Email for git config (null: not managed)" (if config.profile.isAdmin then "vaibhav@gmail.com" else null);
     package = usrlib.mkPackageOption "The git package to use" pkgs.git;
     gh = {
       enable = usrlib.mkEnableOptionTrue "Enable the GH CLI";
@@ -31,10 +32,16 @@ in {
 
         init.defaultBranch = "main";
 
-        user.email = cfg.email;
-        user.name = cfg.name;
+        user = lib.filterAttrs (_: v: v != null) { inherit (cfg) email name; };
       };
     };
+
+    # Without ~/.gitconfig, `git config --global` writes to the managed (read-only) ~/.config/git/config;
+    # a user whose identity isn't managed gets an empty one of their own to write to
+    home.activation.gitconfig = lib.mkIf (cfg.name == null || cfg.email == null)
+      (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        [ -e "$HOME/.gitconfig" ] || run touch "$HOME/.gitconfig"
+      '');
 
     # Use delta formatter for diffs
     programs.delta = {

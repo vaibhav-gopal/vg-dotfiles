@@ -9,7 +9,7 @@ let
   layoutsDirPath = "${config.home.homeDirectory}/Library/Keyboard Layouts";
 in {
   options.nixtype.keyboard = {
-    enable = usrlib.mkEnableOptionTrue "Enable darwin keyboard";
+    enable = usrlib.mkProfileEnableOption config "keyboard" "Enable darwin keyboard" [ "admin" ];
     bundlePath = usrlib.mkPathOption "The location for the macos keyboard bundle or keylayout to install to the system (by copying the file, replacing any file with the same name)" bundlePath;
   };
 

@@ -11,7 +11,7 @@ let
   cfg = config.nixtype.homebrew;
 in {
   options.nixtype.homebrew = {
-    enable = usrlib.mkEnableOptionTrue "Enable the brew helper shell aliases";
+    enable = usrlib.mkProfileEnableOption config "homebrew" "Enable the brew helper shell aliases" [ "admin" ];
   };
 
   config = lib.mkIf cfg.enable {

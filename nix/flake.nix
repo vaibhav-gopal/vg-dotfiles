@@ -96,8 +96,11 @@
       nixosConfigurations = (nixos-src.outputs.mkNixos baseArgs) // (wsl-src.outputs.mkNixos baseArgs);
       darwinConfigurations = (darwin-src.outputs.mkNixos baseArgs);
 
+      # the NixOS VM tests (nix/nixos/tests): `nix build -L ./nix#checks.x86_64-linux.<name>`
+      checks = nixos-src.outputs.mkChecks baseArgs;
+
       # make all home-manager configurations 
-      # -- NOTE: This should NOT be used for home-manager use! I know, why the fuck does it exist then? Purely for nix-eval so I can debug home-manager options! (see justfile)
+      # -- NOTE: This should NOT be used for home-manager use! I know, why the fuck does it exist then? Purely for nix-eval so I can debug home-manager options!
       # -- It is MUCH more convenient to use home-manager as a nixos module instead, which is how its configured currently. (See the sub-flakes)
       # -- Hence, we do both!
       homeConfigurations = (nixos-src.outputs.mkHome baseArgs) // (wsl-src.outputs.mkHome baseArgs) // (darwin-src.outputs.mkHome baseArgs);
@@ -105,6 +108,9 @@
       # per host: the system services it runs (and where it's hosted), for Tend's estate:
       # `nix eval --json nix#estate` (modules/estate.nix ; a host without its hardware config yet still answers)
       # Export (exports.version): host = { services = [ { name, kind, unit?, tailnet_only?, notes? } ], hosted_on? }
+      # what the admin `dot` evaluates per machine (nix/dot/eval.nix)
+      dot = nixpkgs.lib.mapAttrs (_: import ./dot/eval.nix) (self.nixosConfigurations // self.darwinConfigurations);
+
       estate = nixpkgs.lib.mapAttrs (_: sys: sys.config.estate.export)
         (self.nixosConfigurations // self.darwinConfigurations);
 
@@ -112,6 +118,7 @@
       nixosModules = {
         usrlib = import ./modules/usrlib.nix;
         home = import ./modules/home.nix;
+        profiles = import ./modules/profiles.nix;
         nix = import ./modules/nix.nix;
         estate = import ./modules/estate.nix;
       };

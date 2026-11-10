@@ -5,7 +5,7 @@
 {
   # the machine's hardware config (the bootstrap copies it in); imported once it exists, so the host
   # still evaluates before that (its `estate` services; a system build needs it)
-  imports = builtins.filter builtins.pathExists [
+  imports = [ ./news.nix ] ++ builtins.filter builtins.pathExists [
     ./hardware-configuration.nix
   ];
 
@@ -26,17 +26,38 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ8q3ar8jmEBCUxLGgXU2CgTlivUv9nIkbNbbk8Y0BGA vaibhav@iphone-14-pro-max"
   ];
 
-  # Colleagues: name = [ "ssh-ed25519 AAAA... them@laptop" ]. Key login only, no sudo; each also
-  # gets a Slurm association (modules.slurm).
+  # Who logs in here (I'm the admin, from the configuration): colleagues over ssh only, as standard
+  # users; each also gets a Slurm association (modules.slurm) and the isolation below
+  # (linger: their containers and user services keep running after they log out)
+  profiles.users = {
+    yaxpatel = { logins = [ "ssh" ]; linger = true; };
+    sameerjuin = { logins = [ "ssh" ]; linger = true; };
+    siddhpatel = { logins = [ "ssh" ]; linger = true; };
+  };
+
+  # Shared folders (/srv/shared/<name>): `everyone` comes by default; the capstone project's own
+  profiles.shared.capstone = [ "yaxpatel" "sameerjuin" "siddhpatel" "vaibhav" ];
+
+  # Rootless Podman and distrobox for everyone (an Ubuntu userland, or an app's image)
+  modules.containers.enable = true;
+
+  # Their keys: name = [ "ssh-ed25519 AAAA..." ]. Key login only, no sudo
   # (the repo is public: keys go in without their email comments)
-  core.headless.guests = {
+  core.headless.sshd.userKeys = {
     yaxpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC+9kv47Xz056iKwY72jNH3VS3VlwmgVpa+gZy4LOp6T" ];
     sameerjuin = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHvW68NIUNs1iZpFVqa8krdwWhOI99DcTYfyUmD4MyVW" ];
     siddhpatel = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOqv/C//S5qW07M7/Mj7B2BnotUfcgOkvrvMmogum5QE" ];
   };
 
+  # jade is my own tailnet node: guests can't reach the tailnet or LAN from it, see only their own
+  # processes, and get private /tmp (core/isolation.nix); the tailnet reaches only sshd here
+  core.headless.isolation.enable = true;
+
   # Tenstorrent Blackhole p150a: tt-kmd (2.11.0, builds on the latest kernel), tt-smi, 4x 1G hugepages
   modules.tenstorrent.enable = true;
+  # flashed 2026-10-25 (from 18.8.0) for ttnn 0.81.1, which new dev shells here install
+  modules.tenstorrent.firmware = "19.8.1";
+  modules.tenstorrent.ttnn = "0.81.1";
 
   # Slurm schedules the cores and the card: the card is root-only outside a job, logins get 2 CPUs
   # and 8 GiB between them, fairshare from slurmdbd. Node line from `slurmd -C` on jade (Ryzen, 12 cores).

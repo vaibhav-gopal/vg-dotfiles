@@ -24,6 +24,9 @@ in {
     enable = usrlib.mkEnableOptionFalse "Tenstorrent driver, tools and hugepages";
     # upstream's hugepages-setup (tt-system-tools) wants 4 per Blackhole or Wormhole card, 1 per Grayskull
     hugepages = usrlib.mkIntOption "1G hugepages reserved at boot for the cards (4 per Blackhole card)" 4;
+    # the host's own pair, moved together: flash the firmware, then set both (dot help tenstorrent-firmware)
+    firmware = usrlib.mkStringOption "The firmware bundle flashed on the cards (tt-smi: fw_bundle_version); empty if unknown" "";
+    ttnn = usrlib.mkStringOption "The ttnn release built for that firmware (tt-metal's INSTALLING.md, per release): what new dev shells install; empty, the newest" "";
   };
 
   config = lib.mkIf cfg.enable {
@@ -32,6 +35,34 @@ in {
     boot.kernelModules = [ "tenstorrent" ];
     services.udev.packages = [ tt-kmd ];
     estate.capabilities = [ "tenstorrent" ];
+    # read by the dev shells' tenstorrent layer (nix/dot/devshell), which installs this ttnn
+    environment.etc."tenstorrent/ttnn-version" = lib.mkIf (cfg.ttnn != "") { text = cfg.ttnn; };
+    dot.help = {
+      tenstorrent = {
+        title = "The Tenstorrent card: what's installed, getting it, and the SDK (TT-NN)";
+        text = ''
+          Driver tt-kmd ${tt-kmd.version}, ${toString cfg.hugepages}x 1G hugepages, tt-smi and tt-burnin; the SDK goes in your project:
+            dot devshell python tenstorrent      # a flake with ttnn in .venv
+          ${lib.optionalString config.modules.slurm.enable "The card is open only inside a job: srun --gres=tt:1 -c 8 --mem=16G --pty bash"}
+        '';
+        file = "nix/nixos/modules/tenstorrent/tenstorrent.md";
+      };
+      tenstorrent-firmware = {
+        title = "Updating the card's firmware (admin)";
+        profiles = [ "admin" ];
+        text = ''
+          ttnn needs the firmware its release was built for (tt-metal's INSTALLING.md, per release). Here:
+          firmware ${if cfg.firmware == "" then "(not set)" else cfg.firmware}, ttnn ${if cfg.ttnn == "" then "(not set: new dev shells take the newest)" else "${cfg.ttnn} (what new dev shells install)"}: modules.tenstorrent.firmware and .ttnn.
+          Bundles: https://github.com/tenstorrent/tt-system-firmware/releases (fw_pack-<version>.fwbundle).
+            curl -LO https://github.com/tenstorrent/tt-system-firmware/releases/download/v<version>/fw_pack-<version>.fwbundle
+            # in your home (a job's /tmp is its own); tt-flash 4.1.0's `verify` is broken, `flash` works
+            ${if config.modules.slurm.enable then "sbatch --gres=tt:1 -c 2 --mem=4G --wrap " else "sudo sh -c "}'nix shell nixpkgs#uv -c uvx --from tt-flash==4.1.0 tt-flash --no-tty flash fw_pack-<version>.fwbundle'
+            ${lib.optionalString config.modules.slurm.enable "srun --gres=tt:1 "}tt-smi -s | grep fw_bundle_version   # then reboot, and check it again
+          Nothing else may hold the card while it flashes; don't interrupt it. Then set both options and apply.
+        '';
+      };
+    };
+
     estate.services = [{
       name = "tenstorrent";
       notes = "tt-kmd ${tt-kmd.version} kernel driver (/dev/tenstorrent/*, open to every user), ${toString cfg.hugepages}x 1G hugepages at /dev/hugepages-1G; tt-smi";
@@ -65,7 +96,7 @@ in {
     }];
 
     # No tt-flash: nixpkgs 26.05's needs pyluwen 0.8 but has 0.7.11 (a real API gap, not a pin), so
-    # firmware updates go through `uvx tt-flash` (uv is in the home tools) when needed.
+    # firmware updates go through PyPI's tt-flash, run with uvx (dot help tenstorrent-firmware).
     environment.systemPackages = [
       pkgs.tt-smi
       pkgs.tt-system-tools

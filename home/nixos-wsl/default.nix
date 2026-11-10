@@ -1,9 +1,9 @@
-# entry of the NixOS-WSL home layer: its modules, then the host's own overrides.
+# entry of the NixOS-WSL home layer: its modules, then the host's own overrides (the admin's only).
 # tend: vg-dotfiles/NixOS-WSL
-{ hostname, ...}:
+{ lib, hostname, ...}:
 {
   imports = [
     ./modules
-    ./${hostname}
+    (import ../admin-only.nix lib ./${hostname}) # the admin's own flips
   ];
 }

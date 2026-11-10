@@ -1,5 +1,6 @@
-# root dev shell for working on this repo (just, and shellcheck for the scripts), built on flake-utils,
-# and the flake templates new projects start from.
+# root flake: `dot` (nix/dot), the dev shell for working on this repo (dot, and shellcheck for the
+# scripts), and the flake templates new projects start from. A fresh machine starts here:
+# `nix run github:vaibhav-gopal/vg-dotfiles#dot -- bootstrap <host>`.
 # tend: vg-dotfiles/Composition
 {
   description = "Starter environment for vg-dotfiles";
@@ -11,15 +12,20 @@
   outputs = { self, nixpkgs, flake-utils, ... }: (flake-utils.lib.eachDefaultSystem (system:
     let
         pkgs = import nixpkgs { inherit system; };
+        dot = profile: pkgs.callPackage ./nix/dot/package.nix { inherit profile; };
+    in {
+        packages = {
+            dot = dot "admin"; # the checkout is found from where it runs (or ~/vg-dotfiles)
+            dot-standard = dot "standard";
+            default = self.packages.${system}.dot;
+        };
 
-        baseShell = pkgs.mkShellNoCC {
+        devShells.default = pkgs.mkShellNoCC {
             packages = [
-                pkgs.just
+                self.packages.${system}.dot
                 pkgs.shellcheck
             ];
         };
-    in {
-        devShells.default = baseShell;
     }
   )) // {
     # starters for new projects: `nix flake init -t ~/vg-dotfiles#<name>` in an empty git repo

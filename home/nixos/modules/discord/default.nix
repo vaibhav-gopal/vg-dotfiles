@@ -6,7 +6,7 @@ let
 in {
   # MODULE OPTIONS DECLARATION
   options.nixtype.discord = {
-    enable = usrlib.mkEnableOptionTrue "Enable discord client";
+    enable = usrlib.mkProfileEnableOption config "discord" "Enable discord client" [ "admin" ];
     package = usrlib.mkPackageOption "Discord client package to use" pkgs.discord;
   };
 

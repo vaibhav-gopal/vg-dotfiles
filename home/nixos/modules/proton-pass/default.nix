@@ -17,7 +17,7 @@ let
 in {
   # MODULE OPTIONS DECLARATION
   options.nixtype.proton-pass = {
-    enable = usrlib.mkEnableOptionTrue "Enable the Proton Pass desktop app";
+    enable = usrlib.mkProfileEnableOption config "proton-pass" "Enable the Proton Pass desktop app" [ "admin" ];
     package = usrlib.mkPackageOption "The Proton Pass package to use" pkgs.proton-pass;
     passwordStore = usrlib.mkNullOrStringOption "Force Electron's secret store (`gnome-libsecret`, `kwallet6`, ...) ; null lets Electron detect it from the desktop" null;
   };
