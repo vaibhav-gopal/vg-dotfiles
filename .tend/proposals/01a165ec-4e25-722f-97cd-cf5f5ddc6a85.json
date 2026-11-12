@@ -1,0 +1,56 @@
+{
+  "id": "01a165ec-4e25-722f-97cd-cf5f5ddc6a85",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "Tend's graft 01a16034: a per-host flake output of the system services each host runs, for the estate's Machine sources",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "node.code.link",
+      "node": "01a12288-d789-721b-b181-a05ddb2f40a5",
+      "link": {
+        "kind": "path",
+        "value": "nix/modules/estate.nix"
+      }
+    },
+    {
+      "op": "claim.add",
+      "id": "01a165ec-4a75-723c-9633-40e2da4b96ea",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "text": "The flake exposes `estate`: per host, the system services it runs and where it's hosted, read without building",
+      "why": "Tend's estate (Machine sources) reads machines and their services from the repos that declare them; the user chose a small output over Tend walking each host's option tree. Each module that turns on a system service lists it in estate.services where it turns it on (openssh with tailnet_only and guests, tailscale, lact, tenstorrent, sddm with its sessions, networkmanager / wpa_supplicant, bluetooth, cups, yabai), so what counts as a service stays with the modules; vgwsl2 sets estate.hostedOn = vghydra. `nix eval --json nix#estate` answers all 7 hosts in ~10 s (checked).",
+      "rests_on": [
+        {
+          "of": "code:nix/modules/estate.nix",
+          "at": "fp:841a77e76311",
+          "checked": "2026-10-22"
+        },
+        {
+          "of": "code:nix/flake.nix",
+          "at": "fp:169bf5f569b1",
+          "checked": "2026-10-22"
+        }
+      ]
+    },
+    {
+      "op": "claim.add",
+      "id": "01a165ec-4a77-71a9-a93c-ce5d720a9a82",
+      "node": "01a122ba-8745-77c6-b15d-eb57fed82dc6",
+      "text": "A host imports hardware-configuration.nix only once it exists",
+      "why": "Hosts not installed yet (vgnixmini, vgsquid-azul/onyx/jade) must still evaluate for the estate output; with the import filtered by builtins.pathExists they do, and a system build of one still fails clearly (the fileSystems assertion) instead of on a missing file. check-hosts.sh still reports them PENDING from git. vgkraken keeps the plain import: it has its file, so a lost one fails loudly."
+    }
+  ],
+  "at": 1792711347749,
+  "from_draft": "01a165ac-a83f-733b-8a62-175777a4eb45",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.308",
+    "session": "d8f494b9-b993-440d-ba30-1c08ec1a1ec7",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-workspace/vg-dotfiles",
+    "branch": "main",
+    "commit": "b2410a5",
+    "tend": "tend 0.1.0"
+  }
+}

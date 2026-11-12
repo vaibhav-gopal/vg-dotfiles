@@ -1,0 +1,83 @@
+{
+  "id": "01a19994-97b6-729f-b3d2-a4c12eeebe91",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "Refresh: the four stale claims' code changed only by additions (b2410a5 adds estate.services / estate.hostedOn lines; f4728f2 adds the exports output and comments), so each still holds as written. Composition's flake composes Shared and Home, as its claims already say (Shared and Home don't use Composition: it builds on them); the relations were undeclared.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "claim.reaffirm",
+      "id": "01a15f3a-d6af-776d-a88c-a4df4600a97d",
+      "rests_on": [
+        {
+          "of": "code:nix/nixos/modules/core/connectivity.nix",
+          "at": "fp:8290ba7528ed",
+          "checked": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "op": "claim.reaffirm",
+      "id": "01a15f3a-d6b0-717d-9c9f-8265b1b8d792",
+      "rests_on": [
+        {
+          "of": "code:nix/nixos/modules/tenstorrent/default.nix",
+          "at": "fp:9ef943611723",
+          "checked": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "op": "claim.reaffirm",
+      "id": "01a165bb-a5b1-7250-a9ad-59257b25fdd6",
+      "rests_on": [
+        {
+          "of": "code:nix/nixos-wsl/vgwsl2/default.nix",
+          "at": "fp:ef5c4a0a0eea",
+          "checked": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "op": "claim.reaffirm",
+      "id": "01a165ec-4a75-723c-9633-40e2da4b96ea",
+      "rests_on": [
+        {
+          "of": "code:nix/modules/estate.nix",
+          "at": "fp:841a77e76311",
+          "checked": "2026-11-02"
+        },
+        {
+          "of": "code:nix/flake.nix",
+          "at": "fp:2717753f890d",
+          "checked": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "op": "node.relate",
+      "from": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "kind": "uses",
+      "to": "01a12288-d789-721b-b181-a05ddb2f40a5"
+    },
+    {
+      "op": "node.relate",
+      "from": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "kind": "uses",
+      "to": "01a122ba-8745-77c6-b15d-eb4d43047a58"
+    }
+  ],
+  "at": 1793578014645,
+  "from_draft": "01a1940a-3f6b-7413-a24e-5665b36f792d",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.316",
+    "session": "180b0162-46d9-44b3-a89d-8affe9d38c2c",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "373e58b",
+    "tend": "tend 0.1.0"
+  }
+}

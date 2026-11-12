@@ -1,0 +1,73 @@
+{
+  "id": "01a1c1db-a356-7352-ae2f-bde2327ae854",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "thalam's graft 01a19b0c: each host's capabilities in the flake's `estate` output; and the session's housecleaning (a stale claim reaffirmed: check.sh changed only by adding the templates step).",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "credit",
+      "ideated_by": "agent"
+    },
+    {
+      "op": "claim.add",
+      "id": "01a1c1db-9ff0-70e1-9900-3c5b6b186eec",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "text": "The flake exposes `estate`: per host, the system services it runs, its capabilities and where it's hosted, read without building",
+      "why": "Tend's estate and thalam (L2 Machine) read machines only from this export (repo-model; thalam's graft 01a19b0c). Capabilities are set like services: by the module that provides one where it turns it on (estate.nix adds `nix` to every host, Tenstorrent `tenstorrent`, an AMD or NVIDIA GPU driver `vulkan`, ROCm OpenCL `opencl`), using only ids in vg-paradigms' estate/capabilities.toml; no `rocm` or `cuda` since neither toolkit is installed, and no `kvm` until the vocabulary has it (graft 01a1c1db-427e to vg-paradigms). Exported sorted and distinct; an added field keeps exports.version at 1.",
+      "rests_on": [
+        {
+          "of": "code:nix/modules/estate.nix",
+          "at": "fp:e1626915991a",
+          "checked": "2026-11-09"
+        },
+        {
+          "of": "code:nix/scripts/tests/exports.test.sh",
+          "at": "fp:d3a9c7739804",
+          "checked": "2026-11-09"
+        }
+      ],
+      "replaces": "01a165ec-4a75-723c-9633-40e2da4b96ea"
+    },
+    {
+      "op": "todo.add",
+      "id": "01a1c1db-9ff0-70e1-9900-3c5cf48a485a",
+      "title": "Add `kvm` to the hosts' estate capabilities once the vocabulary has it",
+      "body": "Where KVM is usable: bare-metal x86 NixOS hosts with virtualization on, and vgwsl2 once Windows exposes AMD-V (its own todo). Set it in a module where KVM is turned on, not per host by hand.",
+      "by": "agent",
+      "refs": [
+        "tend/node/01a122ba-8745-77c6-b15d-eb4c74032ee0",
+        "code:vg-dotfiles/nix/modules/estate.nix"
+      ],
+      "waits_on": [
+        {
+          "on": "graft:01a1c1db-427e"
+        }
+      ],
+      "milestone": null
+    },
+    {
+      "op": "claim.reaffirm",
+      "id": "01a19411-2103-762f-8518-3ef016f2c836",
+      "rests_on": [
+        {
+          "of": "code:nix/scripts/check.sh",
+          "at": "fp:6d240210cf45",
+          "checked": "2026-11-09"
+        }
+      ]
+    }
+  ],
+  "at": 1794253759318,
+  "from_draft": "01a1c1d6-6fd5-72bc-9e00-23418be040f5",
+  "origin": {
+    "harness": "claude-code 2.1.321",
+    "session": "b2730ae8-88b3-40f2-9287-fbb902a370f9",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "fbec6fe",
+    "tend": "tend 0.1.0"
+  }
+}

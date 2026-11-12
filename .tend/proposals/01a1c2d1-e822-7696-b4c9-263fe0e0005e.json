@@ -1,0 +1,106 @@
+{
+  "id": "01a1c2d1-e822-7696-b4c9-263fe0e0005e",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The user asked (2026-11-09) for the merge of origin/main (24 commits from 2026-10-25/26, made on vgmacbook) with this checkout's 9 to be resolved. Upstream replaced just, the justfiles and bootstrap.sh with `dot`, and tagged code to nodes it never added (Composition/dot, NixOS/Containers); this side turned CI off. The merge keeps both: the workflow stays deleted and nix/scripts/check.sh carries its new steps. This brings the design level with the merged code.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "node.add",
+      "id": "01a1c2d1-e3da-77e5-b6e9-e80e7b453406",
+      "parent": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "name": "dot",
+      "kind": "feature",
+      "intent": "One command per profile for a machine, from the vg-dotfiles checkout: the admin's dot applies, diffs, updates, checks, tests and inspects the machine and bootstraps a new one (nix/scripts/bootstrap/<archetype>.sh), a standard user's dot finds and tries packages, composes dev shells from layers, and shows the help topics (dot.help) and news (dot.news) of the features on the machine. It replaced just, the justfiles and bootstrap.sh.",
+      "status": "done"
+    },
+    {
+      "op": "node.add",
+      "id": "01a1c2d1-e3da-77e5-b6e9-e80ff5d6728c",
+      "parent": "01a122ba-8745-77c6-b15d-eb57fed82dc6",
+      "name": "Containers",
+      "kind": "feature",
+      "intent": "Rootless Podman and distrobox for every user, each lingering so their containers and services outlive a login.",
+      "status": "done"
+    },
+    {
+      "op": "node.intent",
+      "id": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "text": "The master flake: the table of every machine (hostname, system, nixType, user, state version) and the entry points that turn it into nixosConfigurations, darwinConfigurations and homeConfigurations through each platform's sub-flake, plus `dot` and the scripts that build, switch, check and inspect them."
+    },
+    {
+      "op": "node.intent",
+      "id": "01a15faf-4482-77ea-8f63-716fce5481ec",
+      "text": "Bring a machine up to its configuration with one idempotent command: `dot bootstrap <host>` (from a fresh machine, `nix run github:vaibhav-gopal/vg-dotfiles#dot -- bootstrap <host>`, which clones the repo first) picks the archetype (NixOS, NixOS-WSL, nix-darwin) and runs its ordered steps in nix/scripts/bootstrap/, each checking before it changes anything, with opt-ins for Homebrew and the tailnet login."
+    },
+    {
+      "op": "node.code.unlink",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "link": {
+        "kind": "path",
+        "value": "justfile"
+      }
+    },
+    {
+      "op": "node.code.unlink",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "link": {
+        "kind": "path",
+        "value": "nix/justfile"
+      }
+    },
+    {
+      "op": "node.code.unlink",
+      "node": "01a15faf-4482-77ea-8f63-716fce5481ec",
+      "link": {
+        "kind": "path",
+        "value": "bootstrap.sh"
+      }
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a15db6-60b8-74ad-95bb-467109159860",
+      "link": {
+        "kind": "path",
+        "value": "nix/nixos/vgsquid-jade/hardware-configuration.nix"
+      }
+    },
+    {
+      "op": "claim.add",
+      "id": "01a1c2d1-e3da-77e5-b6e9-e81059327b57",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "text": "No CI: nix/scripts/check.sh runs every check before each commit (the hosts, the home layer, the profiles and exports tests, shellcheck and the script tests, the flake templates, and the guest isolation VM test where the machine has KVM, said to be skipped where it hasn't); still not `nix flake check`",
+      "why": "The repo is closed to contributions, so its checks are the record (ci.closed). The merge of 2026-11-09 brought the steps the workflow had gained on vgmacbook (profiles, dot tests, the isolation VM test) into check.sh, and took out `just`, which dot replaced.",
+      "replaces": "01a19411-2103-762f-8518-3ef016f2c836"
+    },
+    {
+      "op": "claim.add",
+      "id": "01a1c2d1-e3da-77e5-b6e9-e811ecea96de",
+      "node": "01a15faf-4482-77ea-8f63-716fce5481ec",
+      "text": "First-time setup is plain shell scripts, one per archetype, started by `dot bootstrap`, which needs nothing but Nix",
+      "why": "just needed .env, which the bootstrap writes, and a fresh install has neither; `dot` runs from the flake with nothing installed (nix run …#dot -- bootstrap), and it runs the same per-archetype scripts.",
+      "replaces": "01a15faf-4482-77ea-8f63-71702e529b20"
+    },
+    {
+      "op": "journal.add",
+      "id": "01a1c2d1-e3da-77e5-b6e9-e8124b4b7efa",
+      "kind": "note",
+      "node": "01a122ba-8745-77c6-b15d-eb4c74032ee0",
+      "title": "Merged vgmacbook's dot work with the CI-off side (2026-11-09)",
+      "body": "origin/main carried 24 commits made on vgmacbook on 2026-10-25/26 and pushed later: dot replacing just and bootstrap.sh, profiles, containers, shared folders, user news, a guest-isolation VM test run in CI. This checkout had 9 since: CI off (check.sh), the flake templates, estate capabilities, tend state. Conflicts were resolved keeping both: the justfile and .github/workflows/check.yml stay deleted, check.sh gained the workflow's new steps (profiles.test.sh, dot.test.sh, shellcheck without bootstrap.sh, the isolation VM test where /dev/kvm exists), the tenstorrent module keeps estate.capabilities beside dot.help, and README documents dot and check.sh. Upstream's code had been tagged to nodes it never added (Composition/dot, NixOS/Containers): added here.",
+      "supersedes": null
+    }
+  ],
+  "at": 1794269898786,
+  "from_draft": "01a1c2d1-de6e-707a-87ca-675a13744865",
+  "origin": {
+    "harness": "projcall 1",
+    "session": "b2730ae8-88b3-40f2-9287-fbb902a370f9",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "19b1748",
+    "tend": "tend 0.1.0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "01a199b2-2a43-73c0-bbc3-ccb58f0e31c3",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The stop guard flagged license.manifest on the Rust template's Cargo.toml; a template's manifest is the future project's, not this repo's.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "claim.add",
+      "id": "01a199b2-2096-76ae-9e76-07e31b3e5732",
+      "node": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "text": "Template manifests name no license: the project made from one takes its own",
+      "why": "dev-utils/nix-templates/* are copied verbatim into new projects by `nix flake init`, so a license in a template's manifest (Cargo.toml, pyproject.toml, package.json) would hand vg-dotfiles' license choice to every project started from it. Each new project gets its license from its own baseline (`tend baseline render`, its [license] in .tend/extends.toml), and license.manifest is checked there. Here it is waived for the templates only.",
+      "waives": [
+        "license.manifest"
+      ]
+    }
+  ],
+  "at": 1793579952707,
+  "from_draft": "01a1940a-3f6b-7413-a24e-5665b36f792d",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.316",
+    "session": "180b0162-46d9-44b3-a89d-8affe9d38c2c",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "520c565",
+    "tend": "tend 0.1.0"
+  }
+}

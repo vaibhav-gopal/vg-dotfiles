@@ -1,0 +1,41 @@
+{
+  "id": "01a199a2-d6c3-7678-9d2b-6c178c6afa5c",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The user's request: clean up all TODOs, drop the osConfig and QMK items.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "todo.status",
+      "id": "01a122be-9fcc-70b4-b49d-ee09a613db4c",
+      "status": "dropped",
+      "reason": "The user dropped it (2026-11-01): no QMK keyboard setup in vg-dotfiles."
+    },
+    {
+      "op": "todo.status",
+      "id": "01a122be-9fcc-70b4-b49d-ee0afa60f0c7",
+      "status": "dropped",
+      "reason": "The user dropped it (2026-11-01): the wiring that allows it stays, nothing will be built on it."
+    },
+    {
+      "op": "claim.add",
+      "id": "01a1999e-d3a2-735f-80d6-b2660f52ebad",
+      "node": null,
+      "text": "The plan lives in tend only: TODO.md retired; QMK and osConfig checking dropped",
+      "why": "The user asked (2026-11-01) to clean up the TODOs, drop the osConfig dependency-checking and QMK items, and finish the language templates. TODO.md was a second copy of the plan that had drifted (Hyprland still listed as not started while its node is building); every open item in it is already a todo or a node in tend's plan (language templates, editor setup, the first Hyprland session, lanzaboote, ZFS), so the file is deleted and tend's plan is its one owner. Its DONE list is history, kept by git. The code has no TODO comments."
+    }
+  ],
+  "at": 1793578948291,
+  "from_draft": "01a1940a-3f6b-7413-a24e-5665b36f792d",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.316",
+    "session": "180b0162-46d9-44b3-a89d-8affe9d38c2c",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "373e58b",
+    "tend": "tend 0.1.0"
+  }
+}

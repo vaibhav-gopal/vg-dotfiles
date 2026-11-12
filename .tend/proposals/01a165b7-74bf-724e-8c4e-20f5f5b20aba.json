@@ -1,0 +1,90 @@
+{
+  "id": "01a165b7-74bf-724e-8c4e-20f5f5b20aba",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The user asked for the Windows folder layout (vg-workspace/studio/documents/library/tools, school/work/projects, vg-wallpapers) on every Nix archetype, in the home folder; vgwsl2 KVM for NixOS VM tests (user in kvm, Windows side asked by graft)",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "node.add",
+      "id": "01a165b7-7143-7061-ac95-b85190358e7f",
+      "parent": "01a122ba-8745-77c6-b15d-eb4d43047a58",
+      "name": "folders",
+      "kind": "feature",
+      "intent": "The user-data folders every machine shares with vg-dotfiles-windows, in the home directory (~/vg-workspace with projects, school and work; ~/vg-studio; ~/vg-documents; ~/vg-library; ~/vg-tools), and the private vg-wallpapers repo cloned into ~/Pictures on machines with a desktop.",
+      "status": "done"
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a165b7-7143-7061-ac95-b85190358e7f",
+      "link": {
+        "kind": "path",
+        "value": "home/modules/folders/default.nix"
+      }
+    },
+    {
+      "op": "claim.add",
+      "id": "01a165b7-7143-7061-ac95-b8527e94fbbe",
+      "node": "01a165b7-7143-7061-ac95-b85190358e7f",
+      "text": "The ~/vg-* tree mirrors vg-dotfiles-windows' C:\\vg-* folders, in the home directory on every Nix archetype",
+      "why": "The user wants one layout across Windows, NixOS, NixOS-WSL and macOS, kept in the home folder here rather than at the root. The list matches home.psd1's `folders` (vg-dotfiles-windows), relative to the home directory, and is created by a home-manager activation step (mkdir -p, so idempotent and the same on macOS, where tmpfiles doesn't exist). Applied on vgwsl2: all 13 folders created.",
+      "rests_on": [
+        {
+          "of": "code:home/modules/folders/default.nix",
+          "at": "fp:e6b2b7be6b4d",
+          "checked": "2026-10-22"
+        }
+      ]
+    },
+    {
+      "op": "claim.add",
+      "id": "01a165b7-7145-76da-9d68-ae4eddeaddf1",
+      "node": "01a165b7-7143-7061-ac95-b85190358e7f",
+      "text": "vg-wallpapers is cloned once over HTTPS and never pulled by a rebuild; a clone that can't happen warns",
+      "why": "Same contract as Windows: the repo is private, so HTTPS through gh's git credential helper clones it before a machine has an SSH key; GIT_TERMINAL_PROMPT=0 makes a missing login fail in about a second instead of hanging activation, and the rebuild warns and carries on (checked on vgwsl2 without gh login). New images come from `git pull` there. Off by default on headless hosts (nixtype.headless) and NixOS-WSL, which have no desktop. The successful clone isn't tested yet (no gh login on vgwsl2); the slideshow itself is graft 01a165aa from vg-dotfiles-windows, still open."
+    },
+    {
+      "op": "claim.add",
+      "id": "01a165b7-7145-76da-9d68-ae4f67ea4fd1",
+      "node": "01a122ba-8746-75b3-b196-9ba427d23b32",
+      "text": "vgwsl2 runs NixOS VM tests on KVM once Windows exposes AMD-V",
+      "why": "Other projects' `nix flake check` (Jacquard's VM tests) should run locally. The user is in the kvm group; Nix's system-features already include kvm and nixos-test (the NixOS default). WSL ships kvm-amd as a module (CONFIG_KVM_AMD=m, in /lib/modules), but after a WSL restart with nestedVirtualization=true the guest still had no svm flag and `Hyper-V: Nested features: 0x0` (VBS running), so the Windows side is asked by graft 01a165ae-63a0 (vg-dotfiles-windows).",
+      "rests_on": [
+        {
+          "of": "code:nix/nixos-wsl/vgwsl2/default.nix",
+          "at": "fp:743ea4b7a2c2",
+          "checked": "2026-10-22"
+        }
+      ]
+    },
+    {
+      "op": "todo.add",
+      "id": "01a165b7-7145-76da-9d68-ae50a42beb1a",
+      "title": "vgwsl2: check /dev/kvm once Windows exposes AMD-V; load kvm-amd only if it's still missing",
+      "body": "After the Windows fix and a WSL restart: grep -c svm /proc/cpuinfo > 0; ls -l /dev/kvm (group kvm, 0660); if missing, try `modprobe kvm_amd` first, then declare boot.kernelModules = [ \"kvm-amd\" ] only if that's what makes it appear (WSL uses Microsoft's kernel). Then run a NixOS VM test to confirm.",
+      "by": "agent",
+      "refs": [
+        "tend/node/01a122ba-8746-75b3-b196-9ba427d23b32"
+      ],
+      "waits_on": [
+        {
+          "on": "graft:01a165ae-63a0-7d6f-8a4e-5f40f1b16114"
+        }
+      ],
+      "milestone": null
+    }
+  ],
+  "at": 1792707884223,
+  "from_draft": "01a165ac-a83f-733b-8a62-175777a4eb45",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.308",
+    "session": "d8f494b9-b993-440d-ba30-1c08ec1a1ec7",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-workspace/vg-dotfiles",
+    "branch": "main",
+    "commit": "fe29c5c",
+    "tend": "tend 0.1.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "01a165f0-fd94-7000-9a52-2296d5aab0c7",
+  "proposal": "01a165cf-7cfb-7614-9994-80be73517566",
+  "event": {
+    "kind": "accepted",
+    "batch": "01a165f0-fd94-732a-b0a0-7843e0dc118e",
+    "by": "user",
+    "at": 1792711654804
+  }
+}

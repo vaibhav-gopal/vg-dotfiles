@@ -1,0 +1,10 @@
+{
+  "id": "01a1471e-76a9-7000-aa9f-7dcf3cb2fb7c",
+  "proposal": "01a1471d-ab9e-72f9-904a-8fc45b2f7eaa",
+  "event": {
+    "kind": "accepted",
+    "batch": "01a1471e-76a9-7115-8f1c-e0a0b6910fd4",
+    "by": "user",
+    "at": 1792194541225
+  }
+}

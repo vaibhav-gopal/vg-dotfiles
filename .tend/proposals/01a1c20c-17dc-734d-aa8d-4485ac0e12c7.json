@@ -1,0 +1,33 @@
+{
+  "id": "01a1c20c-17dc-734d-aa8d-4485ac0e12c7",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "News reviewed: 1 item(s)",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "todo.add",
+      "id": "01a1c20c-17db-770b-b0a6-cb0edc865253",
+      "title": "Set kvm in the nix#estate capabilities where the modules turn KVM on, once vg-paradigms adds it to the vocabulary (todo 01a1c20b-18a4)",
+      "body": "vg-paradigms planned the kvm id (todo 01a1c20b-18a4); vg-dotfiles then states it per host in nix/modules/estate.nix, which no todo here carries yet.",
+      "by": "agent",
+      "refs": [
+        "graft:01a1c1db-427e-766e-ab8a-3f68c98a7094"
+      ],
+      "waits_on": [],
+      "milestone": null
+    }
+  ],
+  "at": 1794256934876,
+  "origin": {
+    "harness": "hubcall 1",
+    "session": "b2730ae8-88b3-40f2-9287-fbb902a370f9",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "a5ac0eb",
+    "tend": "tend 0.1.0",
+    "via": "hub"
+  }
+}

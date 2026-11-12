@@ -1,0 +1,171 @@
+{
+  "id": "01a199b1-7064-7316-a231-4c9d9ddf8f11",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The user asked to finish the language flake templates.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "node.intent",
+      "id": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "text": "Flake templates new projects start from (the root flake's `templates`: `nix flake init -t ~/vg-dotfiles#<name>`), each a dev shell, a .envrc for direnv and a starter program whose test is the flake's check; and Nix examples to learn from (dev-utils/nix-examples). Not part of any machine."
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "link": {
+        "kind": "path",
+        "value": "nix/scripts/tests/templates.test.sh"
+      }
+    },
+    {
+      "op": "node.check.set",
+      "node": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "check": {
+        "kind": "test",
+        "name": "templates",
+        "run": "wsl -d NixOS -- bash nix/scripts/tests/templates.test.sh",
+        "code": "nix/scripts/tests/templates.test.sh",
+        "notes": "Per template, in a throwaway git repo: nix flake init, lock, `nix flake check -L` passes, the dev shell has its tool, the built program prints Hello, world!; control: with its test's expected greeting changed, the check fails and its log shows that expectation. Also a step of nix/scripts/check.sh. On Linux or macOS drop the `wsl -d NixOS --`."
+      }
+    },
+    {
+      "op": "claim.add",
+      "id": "01a199b1-4bf3-708c-825f-e0f83726521a",
+      "node": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "text": "Every template starts a project whose own `nix flake check` passes, checked by starting one",
+      "why": "A template that only evaluates can still hand out a project that doesn't build (a missing Cargo.lock, a uv workspace with no uv.lock: the Python template was exactly that, a flake.nix alone). templates.test.sh inits each into a fresh git repo and runs its check, its program and its dev shell, and breaks each language template's test to show the check catches it. Verified 2026-11-01 on vgwsl2: all five pass, all four controls fail on their test's assertion.",
+      "rests_on": [
+        {
+          "of": "code:nix/scripts/tests/templates.test.sh",
+          "at": "fp:a386a17c202e",
+          "checked": "2026-11-02"
+        },
+        {
+          "of": "code:flake.nix",
+          "at": "fp:3ebea2680160",
+          "checked": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "op": "claim.add",
+      "id": "01a199b1-4bf8-7064-be4e-2fa13a219e41",
+      "node": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "text": "Templates follow nixos-26.05 and the toolbox: crane for Rust, bun for TypeScript, uv with uv2nix for Python, CMake and Ninja for C/C++",
+      "why": "The user asked to finish the language templates (2026-11-01) without naming languages; these are the ones the user's projects build with (toolbox: crane approved, bun instead of npm/yarn/pnpm, uv; C++ with CMake in oriens-cam), and nixpkgs follows the release branch (baseline rule nix.nixpkgs-release; crane needs 26.05). Each starts with no third-party dependencies (Python's only is pytest, from uv.lock) so its check runs in the sandbox; the Bun template says how to add a locked node_modules once it has dependencies."
+    },
+    {
+      "op": "node.code.unlink",
+      "node": "01a12288-d789-721b-b181-a0626362312b",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-examples/base/*"
+      }
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a12288-d789-721b-b181-a0626362312b",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/base/**"
+      }
+    },
+    {
+      "op": "node.intent",
+      "id": "01a12288-d789-721b-b181-a0626362312b",
+      "text": "The default template: an empty dev shell (and a debug one on top) with places for packages and checks, loaded by direnv. Moved from the examples so it's a template like the others."
+    },
+    {
+      "op": "node.code.unlink",
+      "node": "01a12288-d789-721b-b181-a0659b9316dc",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/python/*"
+      }
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a12288-d789-721b-b181-a0659b9316dc",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/python/**"
+      }
+    },
+    {
+      "op": "node.intent",
+      "id": "01a12288-d789-721b-b181-a0659b9316dc",
+      "text": "The Python template: a uv project (pyproject.toml, uv.lock, src layout) built with uv2nix, its virtualenv as the package, pytest against the installed package as the flake check, and a dev shell with the project installed editable."
+    },
+    {
+      "op": "node.add",
+      "id": "01a199b1-4bf8-7064-be4e-2fa2bfdbf491",
+      "parent": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "name": "rust",
+      "kind": "component",
+      "intent": "The Rust template: built with crane (dependencies once, then the package, clippy with warnings denied, rustfmt and cargo test as flake checks over the same artifacts), and a dev shell with the same toolchain plus rust-analyzer.",
+      "status": "done"
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a199b1-4bf8-7064-be4e-2fa2bfdbf491",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/rust/**"
+      }
+    },
+    {
+      "op": "node.add",
+      "id": "01a199b1-4bf8-7064-be4e-2fa30db1b6f6",
+      "parent": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "name": "cpp",
+      "kind": "component",
+      "intent": "The C/C++ template: CMake and Ninja, a library the program and its CTest tests share, the build with its tests as the flake check, compile_commands.json for clangd, and a dev shell with clang-tools and a debugger.",
+      "status": "done"
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a199b1-4bf8-7064-be4e-2fa30db1b6f6",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/cpp/**"
+      }
+    },
+    {
+      "op": "node.add",
+      "id": "01a199b1-4bf8-7064-be4e-2fa467d714dc",
+      "parent": "01a122ba-8746-75b3-b196-9ba87372d4b7",
+      "name": "bun",
+      "kind": "component",
+      "intent": "The TypeScript template on Bun: bun test as the flake check, the program packaged as bun running its sources, and a dev shell with bun and the TypeScript language server.",
+      "status": "done"
+    },
+    {
+      "op": "node.code.link",
+      "node": "01a199b1-4bf8-7064-be4e-2fa467d714dc",
+      "link": {
+        "kind": "path",
+        "value": "dev-utils/nix-templates/bun/**"
+      }
+    },
+    {
+      "op": "todo.status",
+      "id": "01a122be-9fcc-70b4-b49d-ee07c1e4f908",
+      "status": "done",
+      "reason": "rust, cpp, bun and a working python beside base, as the root flake's `templates`, each checked by templates.test.sh (in check.sh)."
+    }
+  ],
+  "at": 1793579905124,
+  "from_draft": "01a1940a-3f6b-7413-a24e-5665b36f792d",
+  "origin": {
+    "model": "claude-opus-5-5",
+    "harness": "claude-code 2.1.316",
+    "session": "180b0162-46d9-44b3-a89d-8affe9d38c2c",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-dotfiles",
+    "branch": "main",
+    "commit": "373e58b",
+    "tend": "tend 0.1.0"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "01a15afe-ba4c-733c-ab3e-99c3715b950f",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "A stale decision re-read against its ground: the project's Home and Composition, renamed with the project; the rename still holds.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "journal.reaffirm",
+      "id": "01a146e0-0010-72e7-aae5-23223966d14f",
+      "rests_on": [
+        {
+          "of": "design:vg-dotfiles / Home",
+          "at": "fp:34b5faf7c864",
+          "checked": "2026-10-20"
+        },
+        {
+          "of": "design:vg-dotfiles / Composition",
+          "at": "fp:6b9219a60f2f",
+          "checked": "2026-10-20"
+        }
+      ],
+      "note": "Home and Composition are vg-dotfiles' now; the rename stands"
+    }
+  ],
+  "at": 1792528005708,
+  "from_draft": "01a15afe-9cb7-71a3-8921-e7dac165f820",
+  "origin": {
+    "harness": "mcp-call 1",
+    "session": "4179cb01-ed3d-479c-a994-a3cbd5626abd",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-workspace/dotfiles",
+    "branch": "main",
+    "commit": "b310582",
+    "tend": "tend 0.1.0"
+  }
+}

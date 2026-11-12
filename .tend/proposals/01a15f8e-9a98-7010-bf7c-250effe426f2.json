@@ -1,0 +1,36 @@
+{
+  "id": "01a15f8e-9a98-7010-bf7c-250effe426f2",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "The user wants GNOME on vgsquid-jade's console",
+  "why": "it builds on 1 change(s) still waiting, so it waits with them",
+  "ops": [
+    {
+      "op": "claim.add",
+      "id": "01a15f8e-97d0-70df-a31f-0bd46c8ce509",
+      "node": "01a15db6-60b8-74ad-95bb-467109159860",
+      "text": "vgsquid-jade keeps the server profile and adds a GNOME session at its console on the CPU's iGPU",
+      "why": "The user asked for GNOME only on jade. core.headless stays on (sshd over the tailnet, guest accounts); login, desktop (sessions = gnome) and core.graphics.amd come back on for the Ryzen iGPU, since there is no discrete GPU. The full system builds with GNOME, kernel 7.3 and tt-kmd 2.11.0."
+    },
+    {
+      "op": "node.intent",
+      "id": "01a15db6-60b8-74ad-95bb-467109159860",
+      "text": "Server with a Tenstorrent Blackhole p150a (no discrete GPU) on an X870 board (MediaTek MT7927 wifi), with a GNOME console session, that colleagues log into over the tailnet with their own accounts."
+    }
+  ],
+  "at": 1792604543640,
+  "after": [
+    "01a15f3a-d983-769d-859f-c1e84b748cce"
+  ],
+  "from_draft": "01a15c24-02d8-75e7-acca-87938f993d3a",
+  "origin": {
+    "harness": "claude-code 2.1.305",
+    "session": "01a15c24-02d8-75e7-acca-87938f993d3a",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-workspace/vg-dotfiles",
+    "branch": "main",
+    "commit": "c524ffd",
+    "tend": "tend 0.1.0"
+  }
+}

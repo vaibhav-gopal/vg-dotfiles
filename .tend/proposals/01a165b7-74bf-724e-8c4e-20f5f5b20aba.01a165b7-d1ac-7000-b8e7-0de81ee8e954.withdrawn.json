@@ -1,0 +1,10 @@
+{
+  "id": "01a165b7-d1ac-7000-b8e7-0de81ee8e954",
+  "proposal": "01a165b7-74bf-724e-8c4e-20f5f5b20aba",
+  "event": {
+    "kind": "withdrawn",
+    "reason": "Its todo's waits_on names a wrong graft id (I expanded a shortened id by hand); and vg-dotfiles-windows' new graft 01a165b4 changes where vg-wallpapers is cloned. Refiled after the module follows it.",
+    "by": "agent:claude-code",
+    "at": 1792707908012
+  }
+}

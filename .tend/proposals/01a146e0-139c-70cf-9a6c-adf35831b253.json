@@ -1,0 +1,63 @@
+{
+  "id": "01a146e0-139c-70cf-9a6c-adf35831b253",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "author": "agent:claude-code",
+  "agent": "01a0f61b-3e85-75a4-852f-0db7d9173b98",
+  "rationale": "Rename the project to vg-dotfiles (sibling of vg-dotfiles-windows, matching the folder layout), and record the review fixes: Tailscale SSH via extraSetFlags, the missing Adwaita-dark theme.",
+  "why": "this agent's trust level is `propose`",
+  "ops": [
+    {
+      "op": "node.rename",
+      "id": "01a12285-3830-73f2-b3ac-41f3fb692807",
+      "name": "vg-dotfiles"
+    },
+    {
+      "op": "claim.add",
+      "id": "01a146e0-0010-72e7-aae5-23223966d14f",
+      "node": "01a12285-3830-73f2-b3ac-41f3fb692807",
+      "text": "Renamed dotfiles to vg-dotfiles; the checkout lives at ~/vg-dotfiles",
+      "why": "Matches the sibling repo vg-dotfiles-windows and the C:\\vg-workspace layout. The GitHub repo, the local folder and this design are renamed together. The checkout path on every Linux/macOS machine is one option, extPaths.dotfilesDir (default ~/vg-dotfiles), that every other extPaths entry and the dot/cdot/zdot/ndot aliases derive from; each machine moves its clone (mv ~/dotfiles ~/vg-dotfiles) before its next rebuild, or its out-of-store config links dangle.",
+      "rests_on": [
+        {
+          "of": "design:dotfiles / Home",
+          "at": "fp:34b5faf7c864",
+          "checked": "2026-10-16"
+        },
+        {
+          "of": "design:dotfiles / Composition",
+          "at": "fp:6b9219a60f2f",
+          "checked": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "op": "journal.add",
+      "id": "01a146e0-0011-77e7-af89-9af341df3523",
+      "kind": "misstep",
+      "node": "01a122ba-8745-77c6-b15d-eb5a75c6d3a4",
+      "title": "Tailscale SSH was set through extraUpFlags, which nixpkgs ignores without an auth key",
+      "body": "Both the NixOS and the NixOS-WSL tailscale modules put --ssh in services.tailscale.extraUpFlags. nixpkgs passes those only from tailscaled-autoconnect, which exists only when authKeyFile is set, so the ssh option did nothing on vgwsl2, vgsquid-azul and vgsquid-onyx. Found by code review (two reviewers independently); confirmed in nixpkgs' tailscale.nix (\"Only applied if services.tailscale.authKeyFile is specified\"). Now extraSetFlags, which the tailscaled-set service applies at every boot. Lesson: check where nixpkgs actually consumes an option before relying on it, not just that it evaluates.",
+      "supersedes": null
+    },
+    {
+      "op": "journal.add",
+      "id": "01a146e0-0011-77e7-af89-9af46e7f6e0e",
+      "kind": "misstep",
+      "node": "01a122ba-8745-77c6-b15d-eb584832f859",
+      "title": "GTK3 dark theme named Adwaita-dark with nothing installing it",
+      "body": "autostart.conf set gtk-theme to Adwaita-dark, but gtk3 ships only Default and Emacs theme directories; Adwaita-dark comes from gnome-themes-extra, which vgkraken didn't have, so GTK3 apps (Thunar, pavucontrol) stayed light. Found by code review; confirmed by listing both packages' share/themes. gnome-themes-extra is now in the Hyprland module. Lesson: a theme or icon name in config needs the package that provides it beside it.",
+      "supersedes": null
+    }
+  ],
+  "at": 1792190452636,
+  "from_draft": "01a146d1-0a19-70e6-a534-448fc718cd14",
+  "origin": {
+    "harness": "claude-code 2.1.302",
+    "session": "4179cb01-ed3d-479c-a994-a3cbd5626abd",
+    "machine": "VGHYDRA",
+    "repo": "C:/vg-workspace/dotfiles",
+    "branch": "main",
+    "commit": "48709ac",
+    "tend": "tend 0.1.0"
+  }
+}
