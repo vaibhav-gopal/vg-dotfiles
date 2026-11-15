@@ -1,0 +1,47 @@
+{
+  "id": "01a1c210-6397-7000-bb9b-300ec8c057b2",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a1c1db-6833-72f8-8e88-21c7fb67a14e",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "baseline render writes the repo's LICENSE.md and LICENSES/ into flake template folders",
+        "need": "In vg-dotfiles, `tend baseline render` writes LICENSE.md and LICENSES/*.txt (four texts) into dev-utils/nix-templates/rust/ and dev-utils/nix-templates/python/ (beside their Cargo.toml and pyproject.toml), saying \"vg-dotfiles is copyright ...\". Those folders are `nix flake init` templates, copied verbatim into new projects, so every new project would carry vg-dotfiles' license. vg-dotfiles decided (claim 01a199b2-2096, accepted) that template manifests name no license and waived license.manifest there; render ignores that. Needed: a way to keep render out of a subtree (a template folder, or anything a decision waiving license.manifest covers), and render then reporting those files as leftovers rather than Current.",
+        "use_case": "Today those 10 files sit untracked in vg-dotfiles and render calls them Current; committing them puts the wrong license into every project started from a template, and deleting them by hand is undone by the next render.",
+        "refs": [
+          "design:vg-dotfiles / Dev utils",
+          "code:dev-utils/nix-templates/rust/Cargo.toml",
+          "code:dev-utils/nix-templates/python/pyproject.toml"
+        ],
+        "at": 1794253744179,
+        "status": "planned",
+        "answer": {
+          "text": "A real gap: render ignores a decision that waives license.manifest for a subtree. Planned: render keeps out of the subtrees such a waiver covers and reports what it wrote there before as leftovers, not Current. Until it lands, leave those files uncommitted (or delete them); render will stop putting them back.",
+          "node": "tend / Core / Baselines / Rendered files and contact",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-904c-72df-bba3-5012964f3c60"
+          },
+          "at": 1794257216407
+        },
+        "origin": {
+          "harness": "claude-code 2.1.321",
+          "session": "b2730ae8-88b3-40f2-9287-fbb902a370f9",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-dotfiles",
+          "branch": "main",
+          "commit": "fbec6fe",
+          "tend": "tend 0.1.0"
+        }
+      }
+    }
+  }
+}

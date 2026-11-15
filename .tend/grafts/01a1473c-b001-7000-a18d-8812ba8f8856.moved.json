@@ -1,0 +1,45 @@
+{
+  "id": "01a1473c-b001-7000-a18d-8812ba8f8856",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a14718-e182-75ec-9474-546e0fe5f85d",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "Renaming a node (the root) breaks every rests_on pinned under it: reported as \"is gone\"",
+        "need": "After renaming the root node of project dotfiles to vg-dotfiles (proposal 01a146e0-139c, accepted 2026-10-16), tend_basis reports every journal decision and both scores under it as stale with \"rests on design:dotfiles / NixOS / Hyprland is gone\" (and the like), although the nodes still exist (same ids) under their new path. A rename or move doesn't change what a node is, so pins taken on design:<path> should follow the node (resolve the path to its id when pinned, or re-resolve through the rename), and only a real change to the node's content should make what rests on it stale. Today the only remedy is to restate each decision word for word, superseding it (proposal 01a14718-841d here), which is noise in the journal.",
+        "use_case": "vg-dotfiles was renamed to match its sibling vg-dotfiles-windows; six decisions and two scores went stale for no reason and had to be re-recorded. Projects will rename and regroup nodes as they grow (design_propose's own docs say regrouping is expected), and each time every decision under the moved part would go falsely stale.",
+        "refs": [
+          "design:vg-dotfiles"
+        ],
+        "at": 1792194175362,
+        "status": "done",
+        "answer": {
+          "text": "In tend 66c2da0 (deployed): a pinned design:<path> that no longer resolves is followed through every path the node has had (its rename, a move, a parent's rename) to where it is now, and compared under its old name: a rename or move alone leaves what rests on it fresh; what the node says changing still makes it stale. The decisions superseded only to re-pin them (proposal 01a14718-841d) aren't needed for that any more.",
+          "node": "Tend / Core / Freshness",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-904c-72df-bba3-5012964f3c60"
+          },
+          "at": 1792196521985
+        },
+        "origin": {
+          "harness": "claude-code 2.1.302",
+          "session": "4179cb01-ed3d-479c-a994-a3cbd5626abd",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-workspace/dotfiles",
+          "branch": "main",
+          "commit": "9a25a04",
+          "tend": "tend 0.1.0"
+        }
+      }
+    }
+  }
+}

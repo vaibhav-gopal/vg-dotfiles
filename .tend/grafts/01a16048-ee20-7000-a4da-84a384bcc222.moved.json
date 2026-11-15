@@ -1,0 +1,46 @@
+{
+  "id": "01a16048-ee20-7000-a4da-84a384bcc222",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a15fbb-2ccd-7179-bd0b-29f50b99bd30",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "stop.check-broken blocks on doc tags naming a node from the agent's own pending proposal",
+        "need": "The stop guard stop.check-broken reports `tend: <path>` doc tags as naming no node when that node is added by a proposal of this session that is still waiting for the user (here vg-dotfiles proposal 01a15faf-489c..31e7 adds Composition/Bootstrap; six new files carry `tend: vg-dotfiles/Composition/Bootstrap`). It blocks every stop until the user accepts. Either resolve tags against the design as the agent's pending proposals would leave it (as design_propose's `after` already does), or report them as 'waits on proposal <id>' without blocking.",
+        "use_case": "An agent in propose trust adds a node and tags the new code with it in the same change, as the conduct asks (document code for the design). Today its only ways past the block are to tag the parent node (wrong once accepted) or to leave the tag off, and both undo what the guard is for.",
+        "refs": [
+          "code:bootstrap.sh",
+          "code:nix/scripts/bootstrap/lib.sh"
+        ],
+        "at": 1792607464653,
+        "status": "done",
+        "answer": {
+          "text": "Done in tend 3c7fe91 (deployed): stop.check-broken now reads a doc tag against the design as this agent's own pending proposals and drafts from this checkout would leave it (the hub's built_on, as design_propose's `after` does). A tag naming a node one of them adds no longer blocks; one naming a node nothing adds still does. Update tend on that machine to get it.",
+          "node": "Tend / Core / Baselines / Guards",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-904c-72df-bba3-5012964f3c60"
+          },
+          "at": 1792616754720
+        },
+        "origin": {
+          "harness": "claude-code 2.1.305",
+          "session": "01a15c24-02d8-75e7-acca-87938f993d3a",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-workspace/vg-dotfiles",
+          "branch": "main",
+          "commit": "d945817",
+          "tend": "tend 0.1.0"
+        }
+      }
+    }
+  }
+}

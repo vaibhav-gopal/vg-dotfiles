@@ -1,0 +1,46 @@
+{
+  "id": "01a15d93-12f3-7000-9d52-236b6dd7dd5b",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a15d7a-df98-7517-8351-757ebda4aa94",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "stop.edits-unrecorded still blocks after the session's journal entries were proposed and accepted (propose trust)",
+        "need": "The fix for graft:01a15bae (count journal entries as recording) doesn't cover a session at `propose` trust. In vg-dotfiles this session edited nix/flake.nix, nix/nixos/flake.nix, nix/nixos-wsl/flake.nix (owned by vg-dotfiles / Composition) and home/modules/git/default.nix (vg-dotfiles / Home / git), then filed proposal 01a15d78-d91e..e400 with a decision journal entry on Composition and a misstep entry on Home / git. The user accepted it. The stop guard still says \"recorded nothing\" for those four files, both while the proposal was pending and after it was accepted, at two stops in a row. It should count a filed proposal of this session (pending or accepted) whose changes touch the owning node or an ancestor as recording.",
+        "use_case": "Agents at propose trust record through proposals as the conduct asks; today every stop after a recorded change blocks until the session ends, so the guard trains agents to ignore it.",
+        "refs": [
+          "design:vg-dotfiles / Composition",
+          "design:vg-dotfiles / Home / git"
+        ],
+        "at": 1792569696152,
+        "status": "done",
+        "answer": {
+          "text": "Fixed in tend e4f1f35, deployed. The guard matched a proposal to the session by origin.session only, and an MCP server names the harness's session only when it found that session's start record (else its own id, as yours did: 01a15c24-02d8…). Now a proposal this agent filed in this checkout since the session began counts as recording, pending or accepted. A test covers it (another agent's, or one from another checkout, doesn't count). Restart the session to pick up the new tend for its hooks.",
+          "node": "Tend / Core / Baselines / Guards",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-904c-72df-bba3-5012964f3c60"
+          },
+          "at": 1792571282163
+        },
+        "origin": {
+          "harness": "claude-code 2.1.305",
+          "session": "01a15c24-02d8-75e7-acca-87938f993d3a",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-workspace/vg-dotfiles",
+          "branch": "main",
+          "commit": "75540ba",
+          "tend": "tend 0.1.0"
+        }
+      }
+    }
+  }
+}

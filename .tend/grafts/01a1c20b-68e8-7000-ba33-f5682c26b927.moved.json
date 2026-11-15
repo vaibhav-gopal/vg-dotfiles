@@ -1,0 +1,46 @@
+{
+  "id": "01a1c20b-68e8-7000-ba33-f5682c26b927",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a1c1db-427e-766e-ab8a-3f68c98a7094",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-8ff4-7627-9028-8595922cfc11",
+        "kind": "change",
+        "title": "Capability vocabulary: kvm (and arch:/os: if they're meant to be used)",
+        "need": "estate/capabilities.toml has no `kvm` (nor `nixos-test`, `arch:x86_64`, `arch:aarch64`, `os:linux`, `os:darwin`), so vg-dotfiles can't state it in its `nix#estate` capabilities, and the file says an id is added before it's used. Needed: `kvm` (a Linux machine with /dev/kvm usable for NixOS VM tests), and arch:/os: ids if the vocabulary is meant to carry them (thalam's graft to vg-dotfiles names them as examples). Once they exist, vg-dotfiles sets them where its modules turn them on.",
+        "use_case": "thalam (graft 01a19b0c to vg-dotfiles) reads each machine's capabilities only from vg-dotfiles' `estate` export, and tend places a project's checks by `needs = [\"kvm\"]` (NixOS VM tests, Jacquard's flake check). vg-dotfiles now exports `capabilities` per host with the ids the vocabulary has (nix, vulkan, opencl, tenstorrent); without `kvm` no machine can be matched for a VM test.",
+        "refs": [
+          "design:vg-dotfiles / Composition",
+          "code:nix/modules/estate.nix"
+        ],
+        "at": 1794253734526,
+        "status": "planned",
+        "answer": {
+          "text": "Planned: kvm (a Linux machine with /dev/kvm usable for NixOS VM tests) is added to estate/capabilities.toml, where the needs vocabulary lives until the estate moves to thalam. Whether arch:/os: ids belong in the vocabulary is left to the user; the todo says so.",
+          "item": "todo:01a1c20b-18a4-73dd-9653-68d301b90789",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-8ff4-7627-9028-8595922cfc11"
+          },
+          "at": 1794256890088
+        },
+        "origin": {
+          "harness": "claude-code 2.1.321",
+          "session": "b2730ae8-88b3-40f2-9287-fbb902a370f9",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-dotfiles",
+          "branch": "main",
+          "commit": "fbec6fe",
+          "tend": "tend 0.1.0"
+        }
+      }
+    }
+  }
+}

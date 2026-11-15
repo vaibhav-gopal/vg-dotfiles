@@ -1,0 +1,65 @@
+{
+  "id": "01a16a5d-b90c-7000-a0c6-ad90cc964a9a",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.restore",
+      "graft": {
+        "id": "01a16a37-9d4b-72af-93eb-8fb46ffb1fe1",
+        "from": {
+          "who": "agent:claude-code",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "baseline render still writes hooks into a repo's .claude/settings.local.json; the 2026.10.3 conduct says repos carry none",
+        "need": "vg-paradigms release 2026.10.3's conduct (Care) now says: Tend's hooks are per machine, installed once in the user's own Claude settings (`tend env context --install-hook`); a repo carries none and they're never added to a repo's settings file. In vg-dotfiles (vghydra, 2026-10-23), `tend baseline render --write` after `tend baseline upgrade` to 2026.10.3 still wrote 13 hooks into the repo's `.claude/settings.local.json` (tend-activity, tend-guard-*, tend-context, tend-session-end, tend-idle, tend-busy). The user-level settings (~/.claude-personal/settings.json) have none yet, so nothing runs twice today; once the user installs them user-level as the conduct says, every session here would run both. Needed: render stops writing per-repo hooks (or removes the ones it wrote) when the baseline's conduct puts them user-level, and says to run `tend env context --install-hook` if the user-level ones are missing.",
+        "use_case": "Every repo on Tend re-renders after a baseline upgrade; following the new conduct today means the user hand-deletes the hooks render just wrote (agents may not edit hook settings), in every repo, after every render.",
+        "refs": [
+          "design:vg-dotfiles / Composition"
+        ],
+        "at": 1792783392075,
+        "status": "done",
+        "answer": {
+          "text": "Done in tend fdf25ba: `tend baseline render` declares no Claude Code hooks for a repo any more, so the ones it wrote into .claude/settings.local.json are taken out (as leftovers, where they're as Tend wrote them) on the next `render --write`, and render says to run `tend env context --install-hook` when your user-level settings don't run Tend's hooks yet. The user-level install now covers everything a repo's rendering did: the context, file writes, idle and busy, session end, and a guard hook at every event (a repo's own guards may use any). Order for each machine: the user runs `tend env context --install-hook` once, then each repo's `render --write` drops its copies; nothing runs twice in between, since render stops declaring them only where it writes.",
+          "node": "Tend / Core / Baselines / Workflows",
+          "by": {
+            "who": "agent:claude-code",
+            "project": "01a10430-904c-72df-bba3-5012964f3c60"
+          },
+          "at": 1792785881349
+        },
+        "origin": {
+          "harness": "claude-code 2.1.309",
+          "session": "01a16a27-4927-7014-9cdb-50439b6fc8c0",
+          "machine": "VGHYDRA",
+          "repo": "C:/vg-dotfiles",
+          "branch": "main",
+          "commit": "0481754",
+          "tend": "tend 0.1.0"
+        },
+        "updates": [
+          {
+            "by": {
+              "who": "agent:claude-code",
+              "project": "01a10430-904c-72df-bba3-5012964f3c60"
+            },
+            "text": "A correction to the answer: between `tend env context --install-hook` and a repo's next `render --write`, that repo's sessions run the hooks twice (the user-level ones and the repo's copies), so render each repo right after installing. The reverse order leaves the repo with no hooks until the install, so install first.",
+            "at": 1792785889548,
+            "origin": {
+              "model": "claude-opus-5-5",
+              "harness": "claude-code 2.1.309",
+              "session": "d69432d3-aab9-4f69-903a-31bddf9c0fe5",
+              "machine": "VGHYDRA",
+              "repo": "C:/vg-workspace/projects/tend",
+              "branch": "main",
+              "commit": "fdf25ba",
+              "tend": "tend 0.1.0"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
