@@ -1,0 +1,41 @@
+{
+  "id": "01a1e321-3c90-714a-97b6-6255b2adc663",
+  "project": "01a12285-3830-73f2-b3ac-41f3fb692807",
+  "event": {
+    "kind": "op",
+    "op": {
+      "type": "graft.file",
+      "graft": {
+        "id": "01a1e321-3c8e-75a5-97cc-0b443cffa6ea",
+        "from": {
+          "who": "agent:hub-worker",
+          "project": "01a12285-3830-73f2-b3ac-41f3fb692807"
+        },
+        "to": "01a10430-904c-72df-bba3-5012964f3c60",
+        "kind": "fix",
+        "title": "Hub worker worktrees on Windows can't be opened from WSL, so a Nix project's checks can't run there",
+        "need": "A hub worker's worktree on Windows (here C:/Users/Vaibhav/AppData/Roaming/tend/hub/worktrees/vg-dotfiles-hookspath-91bc4b57c739) has a `.git` file whose gitdir is an absolute Windows path (C:/vg-dotfiles/.git/worktrees/...). A check run through WSL (`wsl -d NixOS -- bash nix/scripts/check-hosts.sh`, from impl_score run) sees the folder as /mnt/c/..., and nix's libgit2 fails: `opening Git repository \"/mnt/c/.../vg-dotfiles-hookspath-91bc4b57c739\": failed to resolve path 'C:/vg-dotfiles/.git/worktrees/vg-dotfiles-hookspath-91bc4b57c739'` (2026-11-16). So no Nix evaluation can run in a hub worker's worktree on Windows. Asked: create worker worktrees with relative paths (git 2.48+: `git worktree add --relative-paths`, or `worktree.useRelativePaths=true`), so the gitdir resolves from both Windows and WSL; or else say in the worker's brief that WSL checks can't run in its worktree.",
+        "use_case": "vg-dotfiles' checks are Nix evaluations and builds that run on Windows only through NixOS-WSL. A hub worker dispatched to change Nix code can't verify anything it changes, so its grafts stay open until the user reruns the checks from the main checkout.",
+        "refs": [
+          "code:nix/scripts/check-hosts.sh",
+          "code:nix/scripts/check.sh"
+        ],
+        "at": 1794811968655,
+        "status": "open",
+        "origin": {
+          "model": "opus",
+          "harness": "claude-code 2.1.325",
+          "session": "969f90a3-e45d-4268-a5ce-6d3c7b2e90d3",
+          "machine": "VGHYDRA",
+          "repo": "C:/Users/Vaibhav/AppData/Roaming/tend/hub/worktrees/vg-dotfiles-hookspath-91bc4b57c739",
+          "branch": "hub/hookspath-91bc4b57c739",
+          "commit": "73f6e32",
+          "tend": "tend 0.1.0",
+          "via": "hub-worker",
+          "parent": "6c75d81e-a31e-4e59-a97b-ae270187c492",
+          "worker": "91bc4b57c739"
+        }
+      }
+    }
+  }
+}
