@@ -34,6 +34,8 @@ facts() {
       gh = x.common.git.gh.enable;
       rustup = x.common.rustup.enable;
       gitName = x.common.git.name;
+      gitConfig = x.xdg.configFile.\"git/config\".text;
+      tendHooksWarn = x.home.activation ? tendHooks;
       liveNvim = !(builtins.isPath x.xdg.configFile.nvim.source);
       home = x.home.homeDirectory;
       user = x.home.username;
@@ -74,6 +76,7 @@ check "standard user is yaxpatel, in their own home" "$base" '.standard.profile 
 check "standard user gets the toolchains, plain claude and gh" "$base" '.standard.claude and .standard.claudeProfiles == [] and .standard.gh and .standard.rustup'
 check "standard user gets none of the opinionated or personal features" "$base" '(.standard.folders or .standard.autostart or .standard.kitty or .standard.zed) | not'
 check "standard user has no managed git identity" "$base" '.standard.gitName == null'
+check "every user's git runs tend's hook dispatcher from their own ~/.config/git/hooks" "$base" '(.admin.gitConfig | test("\\bhooksPath = \"?/home/vaibhav/\\.config/git/hooks\"?\\n")) and (.standard.gitConfig | test("\\bhooksPath = \"?/home/yaxpatel/\\.config/git/hooks\"?\\n")) and .admin.tendHooksWarn and .standard.tendHooksWarn'
 check "standard user's configs are store copies" "$base" '.standard.liveNvim | not'
 check "standard users are isolated (group guests)" "$base" '.standardGroup == "guests"'
 check "sshd admits exactly the users with ssh logins" "$base" '.sshUsers == ["sameerjuin","siddhpatel","vaibhav","yaxpatel"]'
@@ -97,6 +100,8 @@ masked="$(facts '{ profiles.masks."term.zellij.auto_start" = [ "admin" "standard
 check "a host mask turns a feature on for standard users" "$masked" '.standard.autostart and .admin.autostart'
 own="$(facts '{ profiles.users.yaxpatel.home.common.folders.enable = true; }')"
 check "a user's own settings turn one on just for them" "$own" '.standard.folders'
+noHooks="$(facts '{ profiles.users.yaxpatel.home.common.git.tendHooks.enable = false; }')"
+check "with tendHooks off, git keeps each repo's own hooks (no hooksPath) and nothing warns" "$noHooks" '(.standard.gitConfig | test("hooksPath") | not) and (.standard.tendHooksWarn | not) and (.admin.gitConfig | test("hooksPath"))'
 noEveryone="$(facts '{ profiles.shared.everyone = [ ]; }')"
 check "a host can drop the everyone folder, and keeps its own" "$noEveryone" '(.sharedGroups | has("shared-everyone") | not) and (.sharedGroups | has("shared-capstone"))'
 

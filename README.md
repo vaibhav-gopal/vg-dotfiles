@@ -164,6 +164,13 @@ also runs the NixOS VM tests in `nix/nixos/tests`, the master flake's `checks` (
 LAN or the tailnet, from a shell, a build or a container, and sees only their own processes and /tmp);
 without KVM it says it skipped them. They boot VMs, so `dot test` leaves them out.
 
+The pre-commit hook runs it for you: the design declares `check.sh` as the repo's commit test (`check`
+on Linux, `check-wsl` on Windows), and tend's hook dispatcher runs it. On every Nix machine git's global
+`core.hooksPath` is `~/.config/git/hooks` (`common.git.tendHooks`, on by default); once per machine, with
+tend installed, write the dispatcher there: `tend code hook --dispatcher ~/.config/git/hooks`. Until then
+no hook runs in any repo (each switch warns), since git reads no repo's `.git/hooks` with `core.hooksPath`
+set; the dispatcher runs each repo's own hook, then tend's where the repo has a `.tend/`.
+
 ## Starting a project
 
 The root flake carries templates for new projects (`dev-utils/nix-templates`), each with a dev shell,
