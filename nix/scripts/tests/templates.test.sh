@@ -27,6 +27,8 @@ if (($#)); then names=("$@"); else
   read -r -a names <<<"$("${NIX[@]}" eval --raw "$root#templates" \
     --apply 'ts: builtins.concatStringsSep " " (builtins.filter (n: n != "default") (builtins.attrNames ts))')"
 fi
+# no template listed means the flake didn't evaluate: fail rather than pass over nothing
+((${#names[@]})) || { echo "  FAIL  the flake lists no templates (it didn't evaluate)"; exit 1; }
 
 for name in "${names[@]}"; do
   echo "template: $name"
